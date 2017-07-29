@@ -1,0 +1,8 @@
+#pragma once
+
+#include <string>
+
+namespace sim
+{
+const std::string SHADER_PATH   = "@CMAKE_CURRENT_SOURCE_DIR@/src/shaders/";
+}
