@@ -1,14 +1,17 @@
 #pragma once
 
+#include <sim-driver/cameras/Camera.hpp>
+#include <sim-driver/callbacks/Callbacks.hpp>
+
 #include <glad/glad.h>
 
 #define GLFW_INCLUDE_NONE
-
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
 #include <string>
 #include <iostream>
+#include <memory>
 
 namespace sim
 {
@@ -20,19 +23,8 @@ public:
 
     void runEventLoop();
 
-    int width() const
-    {
-        int w, h;
-        glfwGetWindowSize(pWindow_, &w, &h);
-        return w;
-    }
-
-    int height() const
-    {
-        int w, h;
-        glfwGetWindowSize(pWindow_, &w, &h);
-        return h;
-    }
+    template<typename T>
+    void setCallbackClass(T *pCallbacks);
 
     SimDriver(const SimDriver &) = delete;
     SimDriver &operator=(const SimDriver &) = delete;
@@ -53,6 +45,8 @@ private:
     bool paused_{false};
 
     GLFWwindow *pWindow_{nullptr};
+    Camera camera_;
+    Callbacks callbacks_{};
 
     void update();
     void render(double alpha, bool eventBased = false);
@@ -106,6 +100,8 @@ SimDriver<Child>::SimDriver(std::string title, int width, int height)
     }
 
     ImGui_ImplGlfwGL3_Init(pWindow_, false); // false for no callbacks
+
+    setCallbackClass(&callbacks_);
 }
 
 
@@ -140,6 +136,35 @@ void SimDriver<Child>::runEventLoop()
 
 
 template<typename Child>
+template<typename T>
+void SimDriver<Child>::setCallbackClass(T *pCallbacks)
+{
+    glfwSetWindowUserPointer(pWindow_, pCallbacks);
+
+    glfwSetWindowSizeCallback(pWindow_, [](GLFWwindow *pWindow, int width, int height)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowSizeCallback(pWindow, width, height); });
+
+    glfwSetWindowFocusCallback(pWindow_, [](GLFWwindow *pWindow, int focus)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus); });
+
+    glfwSetMouseButtonCallback(pWindow_, [](GLFWwindow *pWindow, int button, int action, int mods)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods); });
+
+    glfwSetKeyCallback(pWindow_, [](GLFWwindow *pWindow, int key, int scancode, int action, int mods)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods); });
+
+    glfwSetCursorPosCallback(pWindow_, [](GLFWwindow *pWindow, double xpos, double ypos)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos); });
+
+    glfwSetScrollCallback(pWindow_, [](GLFWwindow *pWindow, double xoffset, double yoffset)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset); });
+
+    glfwSetCharCallback(pWindow_, [](GLFWwindow *pWindow, unsigned codepoint)
+    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint); });
+}
+
+
+template<typename Child>
 void SimDriver<Child>::update()
 {
     static_cast<Child *>(this)->update(worldTime_, timeStep_);
@@ -148,7 +173,9 @@ void SimDriver<Child>::update()
 template<typename Child>
 void SimDriver<Child>::render(double alpha, bool eventBased)
 {
-    static_cast<Child *>(this)->render(width(), height(), alpha, eventBased);
+    int w, h;
+    glfwGetWindowSize(pWindow_, &w, &h);
+    static_cast<Child *>(this)->render(w, h, alpha, eventBased);
     glfwSwapBuffers(pWindow_);
 }
 

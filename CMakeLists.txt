@@ -40,6 +40,7 @@ download_project(PROJ glm
         )
 
 set(SOURCE_FILES
+        # imgui
         ${imgui_SOURCE_DIR}/imgui.cpp
         ${imgui_SOURCE_DIR}/imgui.h
         ${imgui_SOURCE_DIR}/imgui_demo.cpp
@@ -52,18 +53,25 @@ set(SOURCE_FILES
         src/imgui_impl_glfw_gl3.cpp
         src/imgui_impl_glfw_gl3.h
 
+        # glad
+        src/glad/glad.c
+        src/glad/glad.h
+        src/KHR/khrplatform.h
+        src/sim-driver/OpenGLSimulation.hpp
+
+        # sim-driver
         src/sim-driver/SimDriver.cpp
         src/sim-driver/SimDriver.hpp
         src/sim-driver/OpenGLSimulation.hpp
         src/sim-driver/OpenGLForwardDeclarations.hpp
         src/sim-driver/OpenGLHelper.cpp
         src/sim-driver/OpenGLHelper.hpp
+        src/sim-driver/callbacks/Callbacks.hpp
+        src/sim-driver/callbacks/Callbacks.cpp
+        src/sim-driver/cameras/Camera.cpp
+        src/sim-driver/cameras/Camera.hpp
         src/shaders/shader.vert
         src/shaders/shader.frag
-        src/glad/glad.c
-        src/glad/glad.h
-        src/KHR/khrplatform.h
-        src/sim-driver/OpenGLSimulation.hpp
         )
 
 add_library(SimDriver ${SOURCE_FILES})
