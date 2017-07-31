@@ -3,9 +3,10 @@
 #include <sim-driver/cameras/Camera.hpp>
 #include <sim-driver/callbacks/Callbacks.hpp>
 
-#include <glad/glad.h>
+#include <sim-driver/OpenGLForwardDeclarations.hpp>
 
 #define GLFW_INCLUDE_NONE
+
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui_impl_glfw_gl3.h>
@@ -29,33 +30,35 @@ public:
     SimDriver(const SimDriver &) = delete;
     SimDriver &operator=(const SimDriver &) = delete;
 
+    Camera camera_;
+
 protected:
+
     explicit SimDriver(std::string title = "Sim Window",
                        int width = 0,
                        int height = 0);
-
     virtual ~SimDriver();
+
     SimDriver(SimDriver &&) noexcept = default;
+
     SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
-
     double timeStep_{0.1};
     double worldTime_{0.0};
-    bool paused_{false};
 
+    bool paused_{false};
     GLFWwindow *pWindow_{nullptr};
-    Camera camera_;
-    Callbacks callbacks_{};
+    Callbacks<Child> callbacks_;
 
     void update();
     void render(double alpha, bool eventBased = false);
 
 };
 
-
 template<typename Child>
 SimDriver<Child>::SimDriver(std::string title, int width, int height)
+    : callbacks_{*this}
 {
     glfwSetErrorCallback([](int error, const char *description)
                          { std::cerr << "ERROR: (" << error << ") " << description << std::endl; });
@@ -102,6 +105,7 @@ SimDriver<Child>::SimDriver(std::string title, int width, int height)
     ImGui_ImplGlfwGL3_Init(pWindow_, false); // false for no callbacks
 
     setCallbackClass(&callbacks_);
+    camera_.setAspectRatio(width / float(height));
 }
 
 

@@ -1,4 +1,3 @@
-// OpenGLForwardDeclarations.hpp
 #pragma once
 
 #include <glad/glad.h>

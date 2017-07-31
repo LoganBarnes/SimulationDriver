@@ -67,7 +67,6 @@ set(SOURCE_FILES
         src/sim-driver/OpenGLHelper.cpp
         src/sim-driver/OpenGLHelper.hpp
         src/sim-driver/callbacks/Callbacks.hpp
-        src/sim-driver/callbacks/Callbacks.cpp
         src/sim-driver/cameras/Camera.cpp
         src/sim-driver/cameras/Camera.hpp
         src/shaders/shader.vert

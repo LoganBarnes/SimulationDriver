@@ -1,5 +1,6 @@
 #include <sim-driver/OpenGLHelper.hpp>
 
+#include "ShaderConfig.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -7,7 +8,10 @@
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
-#include "../../cmake-build-release/ShaderConfig.hpp"
+
+#ifdef _WIN32
+#undef max
+#endif
 
 
 namespace sim
@@ -20,12 +24,12 @@ namespace
 const std::unordered_map<std::string, GLenum> &shaderTypes()
 {
     static std::unordered_map<std::string, GLenum> extMap{
-            {".vert", GL_VERTEX_SHADER},
-            {".tesc", GL_TESS_CONTROL_SHADER},
-            {".tese", GL_TESS_EVALUATION_SHADER},
-            {".geom", GL_GEOMETRY_SHADER},
-            {".frag", GL_FRAGMENT_SHADER},
-            {".comp", GL_COMPUTE_SHADER}
+        {".vert", GL_VERTEX_SHADER},
+        {".tesc", GL_TESS_CONTROL_SHADER},
+        {".tese", GL_TESS_EVALUATION_SHADER},
+        {".geom", GL_GEOMETRY_SHADER},
+        {".frag", GL_FRAGMENT_SHADER},
+        {".comp", GL_COMPUTE_SHADER}
     };
     return extMap;
 }
@@ -33,12 +37,12 @@ const std::unordered_map<std::string, GLenum> &shaderTypes()
 const std::unordered_map<GLenum, std::string> &shaderTypeStrings()
 {
     static std::unordered_map<GLenum, std::string> typeMap{
-            {GL_VERTEX_SHADER,          "GL_VERTEX_SHADER"},
-            {GL_TESS_CONTROL_SHADER,    "GL_TESS_CONTROL_SHADER"},
-            {GL_TESS_EVALUATION_SHADER, "GL_TESS_EVALUATION_SHADER"},
-            {GL_GEOMETRY_SHADER,        "GL_GEOMETRY_SHADER"},
-            {GL_FRAGMENT_SHADER,        "GL_FRAGMENT_SHADER"},
-            {GL_COMPUTE_SHADER,         "GL_COMPUTE_SHADER"}
+        {GL_VERTEX_SHADER,          "GL_VERTEX_SHADER"},
+        {GL_TESS_CONTROL_SHADER,    "GL_TESS_CONTROL_SHADER"},
+        {GL_TESS_EVALUATION_SHADER, "GL_TESS_EVALUATION_SHADER"},
+        {GL_GEOMETRY_SHADER,        "GL_GEOMETRY_SHADER"},
+        {GL_FRAGMENT_SHADER,        "GL_FRAGMENT_SHADER"},
+        {GL_COMPUTE_SHADER,         "GL_COMPUTE_SHADER"}
     };
     return typeMap;
 }
@@ -46,9 +50,9 @@ const std::unordered_map<GLenum, std::string> &shaderTypeStrings()
 const std::vector<VAOElement> &posNormTexVaoElements()
 {
     static std::vector<VAOElement> elements{
-            {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
-            {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
-            {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
+        {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
+        {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
+        {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
     };
     return elements;
 }
@@ -56,7 +60,7 @@ const std::vector<VAOElement> &posNormTexVaoElements()
 const std::vector<VAOElement> &posVaoElements()
 {
     static std::vector<VAOElement> elements{
-            {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
+        {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
     };
     return elements;
 }
@@ -72,25 +76,23 @@ const std::vector<VAOElement> &posVaoElements()
 void
 OpenGLHelper::setDefaults()
 {
-    // Enable depth testing, so that objects are occluded based on depth instead of drawing order.
     glEnable(GL_DEPTH_TEST);
 
-    // Move the polygons back a bit so lines are still drawn even though they are coplanar with the
-    // polygons they came from, which will be drawn before them.
+    glEnable(GL_PRIMITIVE_RESTART);
+    glPrimitiveRestartIndex(std::numeric_limits<unsigned>::max());
+
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     glEnable(GL_POLYGON_OFFSET_LINE);
     glPolygonOffset(-1, -1);
 
-    // Enable back-face culling, meaning only the front side of every face is rendered.
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // Specify that the front face is represented by vertices in counterclockwise order (this is
-    // the default).
     glFrontFace(GL_CCW);
 
-    // Specify the color used when glClear is called
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-} // initContext
+} // setDefaults
 
 
 
@@ -102,22 +104,22 @@ OpenGLHelper::setDefaults()
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<GLuint>
 OpenGLHelper::createTextureArray(
-        GLsizei width,      ///<
-        GLsizei height,     ///<
-        float *pArray,     ///<
-        GLint filterType, ///<
-        GLint wrapType,   ///<
-        GLint internalFormat,
-        GLenum format
+    GLsizei width,      ///<
+    GLsizei height,     ///<
+    float *pArray,     ///<
+    GLint filterType, ///<
+    GLint wrapType,   ///<
+    GLint internalFormat,
+    GLenum format
 )
 {
     std::shared_ptr<GLuint> spTexture(
-            new GLuint,
-            [](auto pID)
-            {
-                glDeleteTextures(1, pID);
-                delete pID;
-            }
+        new GLuint,
+        [](auto pID)
+        {
+            glDeleteTextures(1, pID);
+            delete pID;
+        }
     );
 
     glGenTextures(1, spTexture.get());
@@ -144,10 +146,10 @@ OpenGLHelper::createTextureArray(
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<GLuint>
 OpenGLHelper::createVao(
-        const std::shared_ptr<GLuint> &spProgram,  ///<
-        const std::shared_ptr<GLuint> &spVbo,      ///<
-        const GLsizei totalStride, ///<
-        const std::vector<VAOElement> &elements    ///<
+    const std::shared_ptr<GLuint> &spProgram,  ///<
+    const std::shared_ptr<GLuint> &spVbo,      ///<
+    const GLsizei totalStride, ///<
+    const std::vector<VAOElement> &elements    ///<
 )
 {
     std::shared_ptr<GLuint> spVao(new GLuint,
@@ -190,12 +192,12 @@ OpenGLHelper::createVao(
 
         glEnableVertexAttribArray(position);
         glVertexAttribPointer(
-                position,
-                vaoElmt.size,     // Num coordinates per position
-                vaoElmt.type,     // Type
-                GL_FALSE,         // Normalized
-                totalStride,      // Stride, 0 = tightly packed
-                vaoElmt.pointer   // Array buffer offset
+            position,
+            vaoElmt.size,     // Num coordinates per position
+            vaoElmt.type,     // Type
+            GL_FALSE,         // Normalized
+            totalStride,      // Stride, 0 = tightly packed
+            vaoElmt.pointer   // Array buffer offset
         );
     }
 
@@ -216,10 +218,10 @@ OpenGLHelper::createVao(
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<GLuint>
 OpenGLHelper::createFramebuffer(
-        GLsizei width,      ///<
-        GLsizei height,     ///<
-        const std::shared_ptr<GLuint> spColorTex, ///<
-        const std::shared_ptr<GLuint> spDepthTex  ///<
+    GLsizei width,      ///<
+    GLsizei height,     ///<
+    const std::shared_ptr<GLuint> spColorTex, ///<
+    const std::shared_ptr<GLuint> spDepthTex  ///<
 )
 {
     std::shared_ptr<GLuint> spRbo = nullptr;
@@ -259,13 +261,14 @@ OpenGLHelper::createFramebuffer(
         glBindTexture(GL_TEXTURE_2D, *spColorTex);
 
         glFramebufferTexture2D(
-                GL_FRAMEBUFFER,
-                GL_COLOR_ATTACHMENT0,
-                GL_TEXTURE_2D,
-                *spColorTex,
-                0
+            GL_FRAMEBUFFER,
+            GL_COLOR_ATTACHMENT0,
+            GL_TEXTURE_2D,
+            *spColorTex,
+            0
         );
-    } else // no color attachment
+    }
+    else // no color attachment
     {
         glDrawBuffer(GL_NONE); // No color buffer is drawn to
         glReadBuffer(GL_NONE); // No color buffer is read to
@@ -276,13 +279,14 @@ OpenGLHelper::createFramebuffer(
         glBindTexture(GL_TEXTURE_2D, *spDepthTex);
 
         glFramebufferTexture2D(
-                GL_FRAMEBUFFER,
-                GL_DEPTH_ATTACHMENT,
-                GL_TEXTURE_2D,
-                *spDepthTex,
-                0
+            GL_FRAMEBUFFER,
+            GL_DEPTH_ATTACHMENT,
+            GL_TEXTURE_2D,
+            *spDepthTex,
+            0
         );
-    } else
+    }
+    else
     {
         glGenRenderbuffers(1, spRbo.get());
         glBindRenderbuffer(GL_RENDERBUFFER, *spRbo);
@@ -388,10 +392,10 @@ OpenGLHelper::clearFramebuffer()
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setTextureUniform(
-        const std::shared_ptr<GLuint> &spProgram, ///<
-        const std::string uniform,   ///<
-        const std::shared_ptr<GLuint> &spTexture, ///<
-        int activeTex  ///<
+    const std::shared_ptr<GLuint> &spProgram, ///<
+    const std::string uniform,   ///<
+    const std::shared_ptr<GLuint> &spTexture, ///<
+    int activeTex  ///<
 )
 {
     glActiveTexture(static_cast< GLenum >( GL_TEXTURE0 + activeTex ));
@@ -407,11 +411,11 @@ OpenGLHelper::setTextureUniform(
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setIntUniform(
-        const std::shared_ptr<GLuint> &spProgram, ///<
-        const std::string uniform,   ///<
-        const int *pValue,    ///<
-        const int size,      ///<
-        const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram, ///<
+    const std::string uniform,   ///<
+    const int *pValue,    ///<
+    const int size,      ///<
+    const int count      ///<
 )
 {
     switch (size)
@@ -446,11 +450,11 @@ OpenGLHelper::setIntUniform(
 
 void
 OpenGLHelper::setFloatUniform(
-        const std::shared_ptr<GLuint> &spProgram, ///<
-        const std::string uniform,   ///<
-        const float *pValue,    ///<
-        const int size,      ///<
-        const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram, ///<
+    const std::string uniform,   ///<
+    const float *pValue,    ///<
+    const int size,      ///<
+    const int count      ///<
 )
 {
     switch (size)
@@ -485,40 +489,40 @@ OpenGLHelper::setFloatUniform(
 
 void
 OpenGLHelper::setMatrixUniform(
-        const std::shared_ptr<GLuint> &spProgram, ///<
-        const std::string uniform,   ///<
-        const float *pValue,    ///<
-        const int size,      ///<
-        const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram, ///<
+    const std::string uniform,   ///<
+    const float *pValue,    ///<
+    const int size,      ///<
+    const int count      ///<
 )
 {
     switch (size)
     {
         case 2:
             glUniformMatrix2fv(
-                    glGetUniformLocation(*spProgram, uniform.c_str()),
-                    count,
-                    GL_FALSE,
-                    pValue
+                glGetUniformLocation(*spProgram, uniform.c_str()),
+                count,
+                GL_FALSE,
+                pValue
             );
             break;
 
         case 3:
             glUniformMatrix3fv(
-                    glGetUniformLocation(*spProgram, uniform.c_str()),
-                    count,
-                    GL_FALSE,
-                    pValue
+                glGetUniformLocation(*spProgram, uniform.c_str()),
+                count,
+                GL_FALSE,
+                pValue
             );
             break;
 
 
         case 4:
             glUniformMatrix4fv(
-                    glGetUniformLocation(*spProgram, uniform.c_str()),
-                    count,
-                    GL_FALSE,
-                    pValue
+                glGetUniformLocation(*spProgram, uniform.c_str()),
+                count,
+                GL_FALSE,
+                pValue
             );
             break;
 
@@ -534,13 +538,13 @@ OpenGLHelper::setMatrixUniform(
 
 void
 OpenGLHelper::renderBuffer(
-        const std::shared_ptr<GLuint> &spVao,
-        const int start,
-        const int verts,
-        const GLenum mode,
-        const std::shared_ptr<GLuint> &spIbo,
-        const void *pOffset,
-        const GLenum iboType
+    const std::shared_ptr<GLuint> &spVao,
+    const int start,
+    const int verts,
+    const GLenum mode,
+    const std::shared_ptr<GLuint> &spIbo,
+    const void *pOffset,
+    const GLenum iboType
 )
 {
     glBindVertexArray(*spVao);
@@ -550,7 +554,8 @@ OpenGLHelper::renderBuffer(
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *spIbo);
         glDrawElements(mode, verts, iboType, pOffset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    } else
+    }
+    else
     {
         glDrawArrays(mode, start, verts);
     }
@@ -590,8 +595,8 @@ OpenGLHelper::_readFile(const std::string filePath)
 
 std::shared_ptr<GLuint>
 OpenGLHelper::_createShader(
-        GLenum shaderType,
-        const std::string filePath
+    GLenum shaderType,
+    const std::string filePath
 )
 {
     std::shared_ptr<GLuint> upShader(new GLuint,

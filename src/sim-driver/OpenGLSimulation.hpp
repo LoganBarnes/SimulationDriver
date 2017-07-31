@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include "OpenGLHelper.hpp"
 
 namespace sim
 {
@@ -27,7 +28,7 @@ private:
 template<typename Child>
 OpenGLSimulation<Child>::OpenGLSimulation()
 {
-    glEnable(GL_PROGRAM_POINT_SIZE);
+    sim::OpenGLHelper::setDefaults();
 }
 
 template<typename Child>

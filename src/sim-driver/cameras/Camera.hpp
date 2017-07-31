@@ -57,7 +57,8 @@ public:
 
     void lookAt(const glm::tvec3<T> &eye,
                 const glm::tvec3<T> &point,
-                const glm::tvec3<T> &up = glm::tvec3<T>(0.0, 1.0, 0.0));
+                const glm::tvec3<T> &up = glm::tvec3<T>(0, 1, 0),
+                bool updateOrbitPoint = false);
 
     void perspective(T fovyDegrees,
                      T aspect,
@@ -69,6 +70,8 @@ public:
                T bottom,
                T top);
 
+    void yaw(T angleRadians);
+    void pitch(T angleRadians);
 
     void setEye(const glm::tvec3<T> &eye);
     void setLook(const glm::tvec3<T> &look);
@@ -84,11 +87,16 @@ public:
     void setOrthoBottom(T bottom);
     void setOrthoTop(T top);
 
+    void setUsingOrbitMode(bool usingOrbitMode);
+    void setOrbitPoint(glm::tvec3<T> orbitPoint);
+    void setOrbitOffsetDistance(T orbitOffsetDistance);
 
 private:
 
     // view matrix variables
     glm::tvec3<T> eye_, lookVector_, upVector_, rightVector_;
+    T orbitOffsetDistance_;
+    glm::tvec3<T> orbitPoint_;
     glm::tmat4x4<T> viewMatrix_;
 
     // projection matrix variables
@@ -101,6 +109,11 @@ private:
 
     glm::tmat4x4<T> perspectiveProjectionViewMatrix_;
     glm::tmat4x4<T> orthoProjectionViewMatrix_;
+
+    bool usingOrbitMode_;
+
+    void updateOrbitSettings();
+    void updateOrbit(glm::tvec3<T> newLook);
 
 };
 
