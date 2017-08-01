@@ -125,6 +125,7 @@ SimDriver<Child>::~SimDriver()
 template<typename Child>
 void SimDriver<Child>::runEventLoop()
 {
+    render(1.0, true);
     do
     {
         if (!paused_)

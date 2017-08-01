@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <memory>
+#include <iostream>
 
 //struct GLFWwindow;
 //typedef GLFWwindow GLFWwindow;
@@ -29,7 +30,7 @@ public:
     void mouseButtonCallback(GLFWwindow *pWindow, int button, int action, int mods);
     void keyCallback(GLFWwindow *pWindow, int key, int scancode, int action, int mods);
     void cursorPosCallback(GLFWwindow *pWindow, double xpos, double ypos);
-    void scrollCallback(GLFWwindow *pWindow, double yoffset, double xoffset);
+    void scrollCallback(GLFWwindow *pWindow, double xoffset, double yoffset);
     void charCallback(GLFWwindow *pWindow, unsigned codepoint);
 
     void windowRefreshCallback(GLFWwindow *pWindow);
@@ -111,7 +112,7 @@ void Callbacks<T>::cursorPosCallback(GLFWwindow *pWindow, double xpos, double yp
 }
 
 template<typename T>
-void Callbacks<T>::scrollCallback(GLFWwindow *pWindow, double yoffset, double xoffset)
+void Callbacks<T>::scrollCallback(GLFWwindow *pWindow, double xoffset, double yoffset)
 {
     ImGuiIO &io = ImGui::GetIO();
 

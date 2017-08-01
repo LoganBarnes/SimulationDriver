@@ -71,6 +71,9 @@ set(SOURCE_FILES
         src/sim-driver/cameras/Camera.hpp
         src/shaders/shader.vert
         src/shaders/shader.frag
+        src/sim-driver/renderers/RendererHelper.cpp
+        src/sim-driver/renderers/RendererHelper.hpp
+        src/sim-driver/renderers/Renderer.hpp
         )
 
 add_library(SimDriver ${SOURCE_FILES})

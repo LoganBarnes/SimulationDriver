@@ -94,36 +94,23 @@ OpenGLHelper::setDefaults()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 } // setDefaults
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::addTextureArray
-/// \return
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<GLuint>
-OpenGLHelper::createTextureArray(
-    GLsizei width,      ///<
-    GLsizei height,     ///<
-    float *pArray,     ///<
-    GLint filterType, ///<
-    GLint wrapType,   ///<
-    GLint internalFormat,
-    GLenum format
-)
+std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
+                                                         GLsizei height,
+                                                         float *pArray,
+                                                         GLint filterType,
+                                                         GLint wrapType,
+                                                         GLint internalFormat,
+                                                         GLenum format)
 {
-    std::shared_ptr<GLuint> spTexture(
-        new GLuint,
-        [](auto pID)
-        {
-            glDeleteTextures(1, pID);
-            delete pID;
-        }
-    );
+    GLuint tex;
+    glGenTextures(1, &tex);
+    std::shared_ptr<GLuint> spTexture(new GLuint(tex), [](auto pID)
+    {
+        glDeleteTextures(1, pID);
+        delete pID;
+    });
 
-    glGenTextures(1, spTexture.get());
-    glBindTexture(GL_TEXTURE_2D, *spTexture);
+    glBindTexture(GL_TEXTURE_2D, tex);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapType);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapType);
@@ -137,38 +124,37 @@ OpenGLHelper::createTextureArray(
 } // addTextureArray
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::createVao
-/// \return
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<GLuint>
-OpenGLHelper::createVao(
-    const std::shared_ptr<GLuint> &spProgram,  ///<
-    const std::shared_ptr<GLuint> &spVbo,      ///<
-    const GLsizei totalStride, ///<
-    const std::vector<VAOElement> &elements    ///<
-)
+void OpenGLHelper::resetTextureArray(std::shared_ptr<GLuint> &spTexture,
+                                     GLsizei width,
+                                     GLsizei height,
+                                     float *pArray,
+                                     GLint internalFormat,
+                                     GLenum format)
 {
-    std::shared_ptr<GLuint> spVao(new GLuint,
-                                  [](auto pID)
-                                  {
-                                      glDeleteVertexArrays(1, pID);
-                                      delete pID;
-                                  });
+    glBindTexture(GL_TEXTURE_2D, *spTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_FLOAT, pArray);
+} // resetTextureArray
 
-    //
-    // Initialize the vertex array object
-    //
-    glGenVertexArrays(1, spVao.get());
-    glBindVertexArray(*spVao);
+
+std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &spProgram,
+                                                const std::shared_ptr<GLuint> &spVbo,
+                                                const GLsizei totalStride,
+                                                const std::vector<VAOElement> &elements)
+{
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    std::shared_ptr<GLuint> spVao(new GLuint(vao), [](auto pID)
+    {
+        glDeleteVertexArrays(1, pID);
+        delete pID;
+    });
+
+    glBindVertexArray(vao);
 
     //
     // bind buffer and save program id for loop
     //
-    glBindBuffer(GL_ARRAY_BUFFER, *spVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vao);
 
     //
     // iteratoe through all elements
@@ -209,49 +195,38 @@ OpenGLHelper::createVao(
 } // createVao
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::createFramebuffer
-/// \return
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<GLuint>
-OpenGLHelper::createFramebuffer(
-    GLsizei width,      ///<
-    GLsizei height,     ///<
-    const std::shared_ptr<GLuint> spColorTex, ///<
-    const std::shared_ptr<GLuint> spDepthTex  ///<
-)
+std::shared_ptr<GLuint> OpenGLHelper::createFramebuffer(GLsizei width,
+                                                        GLsizei height,
+                                                        const std::shared_ptr<GLuint> &spColorTex,
+                                                        const std::shared_ptr<GLuint> &spDepthTex)
 {
-    std::shared_ptr<GLuint> spRbo = nullptr;
-    std::shared_ptr<GLuint> spFbo = nullptr;
+    std::shared_ptr<GLuint> spRbo{nullptr};
+    std::shared_ptr<GLuint> spFbo{nullptr};
 
     //
     // no depth texture; create a renderbuffer
     //
     if (!spDepthTex)
     {
-        spRbo = std::shared_ptr<GLuint>(new GLuint,
-                                        [](auto pID)
-                                        {
-                                            glDeleteRenderbuffers(1, pID);
-                                            delete pID;
-                                        }
-        );
+        GLuint rbo;
+        glGenRenderbuffers(1, &rbo);
+        spRbo = std::shared_ptr<GLuint>(new GLuint(rbo), [](auto pID)
+        {
+            glDeleteRenderbuffers(1, pID);
+            delete pID;
+        });
     }
 
-    spFbo = std::shared_ptr<GLuint>(new GLuint,
-                                    [spRbo](auto pID)
-                                    {
-                                        glDeleteFramebuffers(1, pID);
-                                        delete pID;
-                                    }
-    );
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    spFbo = std::shared_ptr<GLuint>(new GLuint(fbo), [spRbo](auto pID)
+    {
+        glDeleteFramebuffers(1, pID);
+        delete pID;
+    });
 
 
-    glGenFramebuffers(1, spFbo.get());
-    glBindFramebuffer(GL_FRAMEBUFFER, *spFbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     //
     // set color attachment if there is one
@@ -260,13 +235,11 @@ OpenGLHelper::createFramebuffer(
     {
         glBindTexture(GL_TEXTURE_2D, *spColorTex);
 
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_2D,
-            *spColorTex,
-            0
-        );
+        glFramebufferTexture2D(GL_FRAMEBUFFER,
+                               GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D,
+                               *spColorTex,
+                               0);
     }
     else // no color attachment
     {
@@ -278,17 +251,14 @@ OpenGLHelper::createFramebuffer(
     {
         glBindTexture(GL_TEXTURE_2D, *spDepthTex);
 
-        glFramebufferTexture2D(
-            GL_FRAMEBUFFER,
-            GL_DEPTH_ATTACHMENT,
-            GL_TEXTURE_2D,
-            *spDepthTex,
-            0
-        );
+        glFramebufferTexture2D(GL_FRAMEBUFFER,
+                               GL_DEPTH_ATTACHMENT,
+                               GL_TEXTURE_2D,
+                               *spDepthTex,
+                               0);
     }
     else
     {
-        glGenRenderbuffers(1, spRbo.get());
         glBindRenderbuffer(GL_RENDERBUFFER, *spRbo);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -323,7 +293,7 @@ StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *
                                                                numElements,
                                                                sizeof(PosNormTexVertex),
                                                                posNormTexVaoElements());
-    sp.numVerts = static_cast<int>(numElements);
+    sp.vboSize = static_cast<int>(numElements);
     return sp;
 }
 
@@ -342,7 +312,7 @@ StandardPipeline OpenGLHelper::createPosPipeline(const PosVertex *pData,
                                                                numElements,
                                                                sizeof(PosVertex),
                                                                posVaoElements());
-    sp.numVerts = static_cast<int>(numElements);
+    sp.vboSize = static_cast<int>(numElements);
     return sp;
 }
 
@@ -392,10 +362,10 @@ OpenGLHelper::clearFramebuffer()
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setTextureUniform(
-    const std::shared_ptr<GLuint> &spProgram, ///<
-    const std::string uniform,   ///<
-    const std::shared_ptr<GLuint> &spTexture, ///<
-    int activeTex  ///<
+    const std::shared_ptr<GLuint> &spProgram,
+    const std::string uniform,
+    const std::shared_ptr<GLuint> &spTexture,
+    int activeTex
 )
 {
     glActiveTexture(static_cast< GLenum >( GL_TEXTURE0 + activeTex ));
@@ -411,11 +381,11 @@ OpenGLHelper::setTextureUniform(
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setIntUniform(
-    const std::shared_ptr<GLuint> &spProgram, ///<
-    const std::string uniform,   ///<
-    const int *pValue,    ///<
-    const int size,      ///<
-    const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram,
+    const std::string uniform,
+    const int *pValue,
+    const int size,
+    const int count
 )
 {
     switch (size)
@@ -450,11 +420,11 @@ OpenGLHelper::setIntUniform(
 
 void
 OpenGLHelper::setFloatUniform(
-    const std::shared_ptr<GLuint> &spProgram, ///<
-    const std::string uniform,   ///<
-    const float *pValue,    ///<
-    const int size,      ///<
-    const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram,
+    const std::string uniform,
+    const float *pValue,
+    const int size,
+    const int count
 )
 {
     switch (size)
@@ -489,11 +459,11 @@ OpenGLHelper::setFloatUniform(
 
 void
 OpenGLHelper::setMatrixUniform(
-    const std::shared_ptr<GLuint> &spProgram, ///<
-    const std::string uniform,   ///<
-    const float *pValue,    ///<
-    const int size,      ///<
-    const int count      ///<
+    const std::shared_ptr<GLuint> &spProgram,
+    const std::string uniform,
+    const float *pValue,
+    const int size,
+    const int count
 )
 {
     switch (size)

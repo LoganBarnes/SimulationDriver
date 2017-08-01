@@ -12,6 +12,12 @@ struct VAOSettings;
 
 class OpenGLHelper;
 
+template<typename T>
+class TCamera;
+
+using Camera = TCamera<float>;
+using CameraD = TCamera<double>;
+
 struct StandardPipeline
 {
     std::shared_ptr<GLuint> program;
@@ -20,7 +26,8 @@ struct StandardPipeline
     std::shared_ptr<GLuint> vao;
     std::shared_ptr<GLuint> texture;
     std::shared_ptr<GLuint> framebuffer;
-    int numVerts;
+    int vboSize;
+    int iboSize;
 };
 
 } // namespace sim

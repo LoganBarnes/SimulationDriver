@@ -40,174 +40,124 @@ class OpenGLHelper
 
 public:
 
-    static
-    void setDefaults();
+    static void setDefaults();
 
     template<typename ... Shaders>
-    static
-    std::shared_ptr<GLuint> createProgram(const Shaders ... shaders);
+    static std::shared_ptr<GLuint> createProgram(const Shaders ... shaders);
 
-    static
-    std::shared_ptr<GLuint> createTextureArray(
-        GLsizei width,
-        GLsizei height,
-        float *pArray = nullptr,
-        GLint filterType = GL_NEAREST,
-        GLint wrapType = GL_REPEAT,
-        GLint internalFormat = GL_RGBA32F,
-        GLenum format = GL_RGBA
-    );
+    static std::shared_ptr<GLuint> createTextureArray(GLsizei width,
+                                                      GLsizei height,
+                                                      float *pArray = nullptr,
+                                                      GLint filterType = GL_NEAREST,
+                                                      GLint wrapType = GL_REPEAT,
+                                                      GLint internalFormat = GL_RGBA32F,
+                                                      GLenum format = GL_RGBA);
 
-
-    template<typename T>
-    static
-    std::shared_ptr<GLuint> createBuffer(
-        const T *pData,
-        const size_t numElements,
-        const GLenum type = GL_ARRAY_BUFFER,
-        const GLenum usage = GL_STATIC_DRAW
-    );
+    static void resetTextureArray(std::shared_ptr<GLuint> &spTexture,
+                                  GLsizei width,
+                                  GLsizei height,
+                                  float *pArray = nullptr,
+                                  GLint internalFormat = GL_RGBA32F,
+                                  GLenum format = GL_RGBA);
 
     template<typename T>
-    static
-    void updateBuffer(
-        const std::shared_ptr<GLuint> &spBuffer,
-        const size_t elementOffset,
-        const size_t numElements,
-        const T *pData,
-        const GLenum bufferType
-    );
-
-    static
-    std::shared_ptr<GLuint> createVao(
-        const std::shared_ptr<GLuint> &spProgram,
-        const std::shared_ptr<GLuint> &spVbo,
-        const GLsizei totalStride,
-        const std::vector<VAOElement> &elements
-    );
-
-
-    static
-    std::shared_ptr<GLuint> createFramebuffer(
-        GLsizei width,
-        GLsizei height,
-        const std::shared_ptr<GLuint> spColorTex = nullptr,
-        const std::shared_ptr<GLuint> spDepthTex = nullptr
-    );
+    static std::shared_ptr<GLuint> createBuffer(const T *pData,
+                                                const size_t numElements,
+                                                const GLenum type = GL_ARRAY_BUFFER,
+                                                const GLenum usage = GL_STATIC_DRAW);
 
     template<typename T>
-    static
-    StandardPipeline createStandardPipeline(
-        const std::vector<std::string> &shaderFiles,
-        const T *pData,
-        const size_t numElements,
-        const GLsizei totalStride,
-        const std::vector<VAOElement> &elements,
-        const GLenum type = GL_ARRAY_BUFFER,
-        const GLenum usage = GL_STATIC_DRAW
-    );
+    static void updateBuffer(const std::shared_ptr<GLuint> &spBuffer,
+                             const size_t elementOffset,
+                             const size_t numElements,
+                             const T *pData,
+                             const GLenum bufferType);
 
-    static
-    StandardPipeline createPosNormTexPipeline(
-        const PosNormTexVertex *pData,
-        const size_t numElements,
-        std::vector<std::string> shaderFiles = {}
-    );
-
-    static
-    StandardPipeline createPosPipeline(
-        const PosVertex *pData,
-        const size_t numElements,
-        std::vector<std::string> shaderFiles = {}
-    );
-
-    static
-    void bindFramebuffer();
-
-    static
-    void bindFramebuffer(const std::shared_ptr<GLuint> &spFbo);
-
-    static
-    void clearFramebuffer();
-
-    static
-    void setTextureUniform(
-        const std::shared_ptr<GLuint> &spProgram,
-        const std::string uniform,
-        const std::shared_ptr<GLuint> &spTexture,
-        int activeTex
-    );
-
-    static
-    void setIntUniform(
-        const std::shared_ptr<GLuint> &spProgram,
-        const std::string uniform,
-        const int *pValue,
-        const int size = 1,
-        const int count = 1
-    );
-
-    static
-    void setFloatUniform(
-        const std::shared_ptr<GLuint> &spProgram,
-        const std::string uniform,
-        const float *pValue,
-        const int size = 1,
-        const int count = 1
-    );
+    static std::shared_ptr<GLuint> createVao(const std::shared_ptr<GLuint> &spProgram,
+                                             const std::shared_ptr<GLuint> &spVbo,
+                                             const GLsizei totalStride,
+                                             const std::vector<VAOElement> &elements);
 
 
-    static
-    void setMatrixUniform(
-        const std::shared_ptr<GLuint> &spProgram,
-        const std::string uniform,
-        const float *pValue,
-        const int size = 4,
-        const int count = 1
-    );
+    static std::shared_ptr<GLuint> createFramebuffer(GLsizei width,
+                                                     GLsizei height,
+                                                     const std::shared_ptr<GLuint> &spColorTex = nullptr,
+                                                     const std::shared_ptr<GLuint> &spDepthTex = nullptr);
 
-    static
-    void renderBuffer(
-        const std::shared_ptr<GLuint> &spVao,
-        const int start,
-        const int verts,
-        const GLenum mode,
-        const std::shared_ptr<GLuint> &spIbo = nullptr,
-        const void *pOffset = 0,
-        const GLenum iboType = GL_UNSIGNED_INT
-    );
+    template<typename T>
+    static StandardPipeline createStandardPipeline(const std::vector<std::string> &shaderFiles,
+                                                   const T *pData,
+                                                   const size_t numElements,
+                                                   const GLsizei totalStride,
+                                                   const std::vector<VAOElement> &elements,
+                                                   const GLenum type = GL_ARRAY_BUFFER,
+                                                   const GLenum usage = GL_STATIC_DRAW);
+
+    static StandardPipeline createPosNormTexPipeline(const PosNormTexVertex *pData,
+                                                     const size_t numElements,
+                                                     std::vector<std::string> shaderFiles = {});
+
+    static StandardPipeline createPosPipeline(const PosVertex *pData,
+                                              const size_t numElements,
+                                              std::vector<std::string> shaderFiles = {});
+
+    static void bindFramebuffer();
+
+    static void bindFramebuffer(const std::shared_ptr<GLuint> &spFbo);
+
+    static void clearFramebuffer();
+
+    static void setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
+                                  const std::string uniform,
+                                  const std::shared_ptr<GLuint> &spTexture,
+                                  int activeTex);
+
+    static void setIntUniform(const std::shared_ptr<GLuint> &spProgram,
+                              const std::string uniform,
+                              const int *pValue,
+                              const int size = 1,
+                              const int count = 1);
+
+    static void setFloatUniform(const std::shared_ptr<GLuint> &spProgram,
+                                const std::string uniform,
+                                const float *pValue,
+                                const int size = 1,
+                                const int count = 1);
+
+
+    static void setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
+                                 const std::string uniform,
+                                 const float *pValue,
+                                 const int size = 4,
+                                 const int count = 1);
+
+    static void renderBuffer(const std::shared_ptr<GLuint> &spVao,
+                             const int start,
+                             const int verts,
+                             const GLenum mode,
+                             const std::shared_ptr<GLuint> &spIbo = nullptr,
+                             const void *pOffset = 0,
+                             const GLenum iboType = GL_UNSIGNED_INT);
 
 private:
 
-    static
-    std::string _readFile(const std::string filePath);
+    static std::string _readFile(const std::string filePath);
 
-    static
-    std::shared_ptr<GLuint> _createShader(
-        GLenum shaderType,
-        const std::string filePath
-    );
+    static std::shared_ptr<GLuint> _createShader(GLenum shaderType,
+                                                 const std::string filePath);
 
-    static
-    std::shared_ptr<GLuint> _createShader(const std::string filePath);
+    static std::shared_ptr<GLuint> _createShader(const std::string filePath);
 
     template<typename ... Shaders>
-    static
-    void _createShader(
-        IdVec *pIds,
-        const std::string filePath
-    );
+    static void _createShader(IdVec *pIds,
+                              const std::string filePath);
 
     template<typename ... Shaders>
-    static
-    void _createShader(
-        IdVec *pIds,
-        const std::string filePath,
-        const Shaders ... shaders
-    );
+    static void _createShader(IdVec *pIds,
+                              const std::string filePath,
+                              const Shaders ... shaders);
 
-    static
-    std::shared_ptr<GLuint> _createProgram(const IdVec shaderIds);
+    static std::shared_ptr<GLuint> _createProgram(const IdVec shaderIds);
 };
 
 
