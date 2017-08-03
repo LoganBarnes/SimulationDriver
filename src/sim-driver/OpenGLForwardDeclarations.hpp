@@ -30,4 +30,27 @@ struct StandardPipeline
     int iboSize;
 };
 
+
+struct SeparablePrograms
+{
+    std::shared_ptr<GLuint> vert;
+    std::shared_ptr<GLuint> tesc;
+    std::shared_ptr<GLuint> tese;
+    std::shared_ptr<GLuint> geom;
+    std::shared_ptr<GLuint> frag;
+    std::shared_ptr<GLuint> comp;
+};
+
+struct SeparablePipeline
+{
+    SeparablePrograms programs;
+    std::shared_ptr<GLuint> vbo;
+    std::shared_ptr<GLuint> ibo;
+    std::shared_ptr<GLuint> vao;
+    std::shared_ptr<GLuint> texture;
+    std::shared_ptr<GLuint> framebuffer;
+    int vboSize;
+    int iboSize;
+};
+
 } // namespace sim

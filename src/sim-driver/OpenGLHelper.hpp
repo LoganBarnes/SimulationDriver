@@ -43,7 +43,12 @@ public:
     static void setDefaults();
 
     template<typename ... Shaders>
-    static std::shared_ptr<GLuint> createProgram(const Shaders ... shaders);
+    static std::shared_ptr<GLuint> createProgram(std::string firstShader, Shaders ... shaders);
+
+    static std::shared_ptr<GLuint> createProgram(std::vector<std::string> shaderFiles);
+
+    template<typename ... Shaders>
+    static SeparablePrograms createSeparablePrograms(std::string firstShader, Shaders ... shaders);
 
     static std::shared_ptr<GLuint> createTextureArray(GLsizei width,
                                                       GLsizei height,
@@ -139,119 +144,33 @@ public:
                              const void *pOffset = 0,
                              const GLenum iboType = GL_UNSIGNED_INT);
 
-private:
-
-    static std::string _readFile(const std::string filePath);
-
-    static std::shared_ptr<GLuint> _createShader(GLenum shaderType,
-                                                 const std::string filePath);
-
-    static std::shared_ptr<GLuint> _createShader(const std::string filePath);
-
-    template<typename ... Shaders>
-    static void _createShader(IdVec *pIds,
-                              const std::string filePath);
-
-    template<typename ... Shaders>
-    static void _createShader(IdVec *pIds,
-                              const std::string filePath,
-                              const Shaders ... shaders);
-
-    static std::shared_ptr<GLuint> _createProgram(const IdVec shaderIds);
 };
 
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::createProgram
-/// \param shaders
-/// \return
-///
-/// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-template<typename ... Shaders>
-std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(const Shaders ... shaders)
-{
-    IdVec shaderIds;
-
-    // create and compile all the shaders
-    OpenGLHelper::_createShader(&shaderIds, shaders ...);
-
-    // link shaders and create OpenGL program
-    return OpenGLHelper::_createProgram(shaderIds);
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::_createShader
-///
-///        Base case for templated shader creation functions
-///
-/// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-template<typename ... Shaders>
-void
-OpenGLHelper::_createShader(
-    IdVec *pIds,
-    const std::string filePath
-)
-{
-    // create/compile shader and add it to list of shaders
-    pIds->emplace_back(OpenGLHelper::_createShader(filePath));
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::_createShader
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
-template<typename ... Shaders>
-void
-OpenGLHelper::_createShader(
-    IdVec *pIds,      ///<
-    const std::string filePath, ///<
-    const Shaders ... shaders   ///<
-)
-{
-    // create/compile shader and add it to list of shaders
-    pIds->emplace_back(OpenGLHelper::_createShader(filePath));
 
-    // repeat for the rest of the shaders
-    OpenGLHelper::_createShader(pIds, shaders ...);
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::createBuffer
-/// \return
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-std::shared_ptr<GLuint>
-OpenGLHelper::createBuffer(
-    const T *pData,       ///<
-    const size_t numElements, ///<
-    const GLenum type,        ///<
-    const GLenum usage        ///<
-)
+std::shared_ptr<GLuint> OpenGLHelper::createBuffer(const T *pData,
+                                                   const size_t numElements,
+                                                   const GLenum type,
+                                                   const GLenum usage)
 {
-    std::shared_ptr<GLuint> upBuffer(new GLuint,
-                                     [](auto pID)
-                                     {
-                                         glDeleteBuffers(1, pID);
-                                         delete pID;
-                                     });
+    std::shared_ptr<GLuint> upBuffer(new GLuint, [](auto pID)
+    {
+        glDeleteBuffers(1, pID);
+        delete pID;
+    });
 
     glGenBuffers(1, upBuffer.get());
     glBindBuffer(type, *upBuffer);
-    glBufferData(
-        type,
-        static_cast< GLsizeiptr >( numElements * sizeof(T)),
-        pData,
-        usage
-    );
+    glBufferData(type,
+                 static_cast< GLsizeiptr >( numElements * sizeof(T)),
+                 pData,
+                 usage);
 
     glBindBuffer(type, 0);
 
@@ -259,81 +178,50 @@ OpenGLHelper::createBuffer(
 } // OpenGLHelper::addBuffer
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief OpenGLHelper::updateBuffer
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-void
-OpenGLHelper::updateBuffer(
-    const std::shared_ptr<GLuint> &upBuffer,     ///<
-    const size_t elementOffset, ///<
-    const size_t numElements,  ///<
-    const T *pData,        ///<
-    const GLenum bufferType    ///<
-)
+void OpenGLHelper::updateBuffer(const std::shared_ptr<GLuint> &upBuffer,
+                                const size_t elementOffset,
+                                const size_t numElements,
+                                const T *pData,
+                                const GLenum bufferType)
 {
     constexpr auto typeSizeBytes = sizeof(T);
 
     glBindBuffer(bufferType, *upBuffer);
-    glBufferSubData(
-        bufferType,
-        static_cast< GLintptr >( elementOffset * typeSizeBytes ),
-        static_cast< GLsizeiptr >( numElements * typeSizeBytes ),
-        pData
-    );
+    glBufferSubData(bufferType,
+                    static_cast< GLintptr >( elementOffset * typeSizeBytes ),
+                    static_cast< GLsizeiptr >( numElements * typeSizeBytes ),
+                    pData);
 
     glBindBuffer(bufferType, 0);
 } // OpenGLHelper::updateBuffer
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief createStandardPipeline
-/// \return
-///
-/// \author Logan Barnes
-////////////////////////////////////////////////////////////////////////////////
 template<typename T>
-StandardPipeline
-OpenGLHelper::createStandardPipeline(
-    const std::vector<std::string> &shaderFiles, ///<
-    const T *pData,      ///<
-    const size_t numElements, ///<
-    const GLsizei totalStride, ///<
-    const std::vector<VAOElement> &elements,   ///<
-    const GLenum type,       ///<
-    const GLenum usage       ///<
-)
+StandardPipeline OpenGLHelper::createStandardPipeline(const std::vector<std::string> &shaderFiles,
+                                                      const T *pData,
+                                                      const size_t numElements,
+                                                      const GLsizei totalStride,
+                                                      const std::vector<VAOElement> &elements,
+                                                      const GLenum type,
+                                                      const GLenum usage)
 {
     StandardPipeline glIds;
+    glIds.program = OpenGLHelper::createProgram(shaderFiles);
 
-    IdVec shaders;
-    for (auto &shaderFile : shaderFiles)
-    {
-        shaders.emplace_back(OpenGLHelper::_createShader(shaderFile));
-    }
+    glIds.vbo = OpenGLHelper::createBuffer(pData,
+                                           numElements,
+                                           type,
+                                           usage);
 
-    glIds.program = OpenGLHelper::_createProgram(shaders);
-
-    glIds.vbo = OpenGLHelper::createBuffer(
-        pData,
-        numElements,
-        type,
-        usage
-    );
-
-    glIds.vao = OpenGLHelper::createVao(
-        glIds.program,
-        glIds.vbo,
-        totalStride,
-        elements
-    );
+    glIds.vao = OpenGLHelper::createVao(glIds.program,
+                                        glIds.vbo,
+                                        totalStride,
+                                        elements);
 
     return glIds;
 } // OpenGLHelper::createStandardPipeline
-
 
 
 } // namespace sim

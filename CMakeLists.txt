@@ -71,10 +71,9 @@ set(SOURCE_FILES
         src/sim-driver/cameras/Camera.hpp
         src/shaders/shader.vert
         src/shaders/shader.frag
-        src/sim-driver/renderers/RendererHelper.cpp
         src/sim-driver/renderers/RendererHelper.hpp
         src/sim-driver/renderers/Renderer.hpp
-        )
+        src/sim-driver/renderers/RendererHelper2.hpp)
 
 add_library(SimDriver ${SOURCE_FILES})
 
@@ -91,3 +90,9 @@ set(EXEC_SOURCE_FILES
         )
 add_executable(SimDriverExec ${EXEC_SOURCE_FILES})
 target_link_libraries(SimDriverExec SimDriver)
+
+set(EXEC_SOURCE_FILES2
+        src/exec/main2.cpp
+        )
+add_executable(SimDriverExec2 ${EXEC_SOURCE_FILES2})
+target_link_libraries(SimDriverExec2 SimDriver)

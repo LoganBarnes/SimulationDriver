@@ -65,6 +65,242 @@ const std::vector<VAOElement> &posVaoElements()
     return elements;
 }
 
+std::string read_file(const std::string filePath)
+{
+    std::ifstream file(filePath, std::ios::in);
+
+    if (!file.is_open() || !file.good())
+    {
+        throw std::runtime_error("Could not read file: " + filePath);
+    }
+
+    // get full file size
+    file.seekg(0, std::ios::end);
+    size_t size = static_cast< size_t >( file.tellg());
+
+    // allocate string of correct size
+    std::string buffer(size, ' ');
+
+    // fill string with file contents
+    // note: string memory is only guaranteed contiguous in C++11 and up
+    file.seekg(0);
+    file.read(&buffer[0], static_cast< std::streamsize >( size ));
+
+    file.close();
+
+    return buffer;
+} // read_file
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+std::shared_ptr<GLuint> create_shader(GLenum shaderType, const std::string filePath)
+{
+    std::shared_ptr<GLuint> spShader(new GLuint, [](auto pID)
+    {
+        glDeleteShader(*pID);
+        delete pID;
+    });
+
+    GLuint shader = glCreateShader(shaderType);
+    *spShader = shader;
+
+    // Load shader
+    std::string shaderStr = read_file(filePath);
+    const char *shaderSource = shaderStr.c_str();
+
+    // Compile shader
+    glShaderSource(shader, 1, &shaderSource, nullptr);
+    glCompileShader(shader);
+
+    // Check shader
+    GLint result = GL_FALSE;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
+
+    if (result == GL_FALSE)
+    {
+        int logLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<char> shaderError(static_cast< size_t >( logLength ));
+        glGetShaderInfoLog(shader, logLength, nullptr, shaderError.data());
+
+        // shader will get deleted when shared_ptr goes out of scope
+        throw std::runtime_error("(" + shaderTypeStrings().at(shaderType) + ") " + std::string(shaderError.data()));
+    }
+    return spShader;
+} // create_shader
+
+
+std::shared_ptr<GLuint> create_shader(const std::string filePath)
+{
+    size_t dot = filePath.find_last_of(".");
+
+    std::string ext = filePath.substr(dot);
+
+    if (shaderTypes().find(ext) == shaderTypes().end())
+    {
+        throw std::runtime_error("Unknown shader extension: " + ext);
+    }
+
+    return create_shader(shaderTypes().at(ext), filePath);
+} // create_shader
+
+
+template<typename ... Shaders>
+void create_shader(IdVec *pIds, const std::string filePath)
+{
+    // create/compile shader and add it to list of shaders
+    pIds->emplace_back(create_shader(filePath));
+}
+
+template<typename ... Shaders>
+void create_shader(IdVec *pIds, const std::string filePath, const Shaders ... shaders)
+{
+    // create/compile shader and add it to list of shaders
+    pIds->emplace_back(create_shader(filePath));
+
+    // repeat for the rest of the shaders
+    create_shader(pIds, shaders ...);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+
+std::shared_ptr<GLuint> create_program(const IdVec shaderIds)
+{
+    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateProgram()), [shaderIds](auto pID)
+    {
+        for (auto &spShader : shaderIds)
+        {
+            glDeleteShader(*spShader);
+        }
+
+        glDeleteProgram(*pID);
+        delete pID;
+    });
+
+    GLuint program = *spProgram;
+
+    for (auto &spShader : shaderIds)
+    {
+        glAttachShader(program, *spShader);
+    }
+
+    glLinkProgram(program);
+
+    // Check program
+    GLint result = GL_FALSE;
+    glGetProgramiv(program, GL_LINK_STATUS, &result);
+
+    if (result == GL_FALSE)
+    {
+        int logLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<char> programError(static_cast< size_t >( logLength ));
+        glGetProgramInfoLog(program, logLength, NULL, programError.data());
+
+        // shaders and programs get deleted with shared_ptr goes out of scope
+
+        throw std::runtime_error("(Program) " + std::string(programError.data()));
+    }
+
+    for (auto &spShader : shaderIds)
+    {
+        glDetachShader(program, *spShader);
+    }
+
+    return spProgram;
+} // create_program
+
+////////////////////////////////////////////////////////////////////////////////
+
+std::shared_ptr<GLuint> create_separable_program(GLenum shaderType, const std::string filePath)
+{
+    // Load shader
+    std::string shaderStr = read_file(filePath);
+    const char *shaderSource = shaderStr.c_str();
+
+    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateShaderProgramv(shaderType, 1, &shaderSource)), [](auto pId)
+    {
+        glDeleteProgram(*pId);
+        delete pId;
+    });
+
+    GLuint program = *spProgram;
+
+    // Check program
+    GLint result = GL_FALSE;
+    glGetProgramiv(program, GL_LINK_STATUS, &result);
+
+    if (result == GL_FALSE)
+    {
+        int logLength = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        std::vector<char> programError(static_cast< size_t >( logLength ));
+        glGetProgramInfoLog(program, logLength, NULL, programError.data());
+
+        // program deleted wh3en shared_ptr goes out of scope
+        throw std::runtime_error("(ShaderProgram) " + std::string(programError.data()));
+    }
+
+    return spProgram;
+} // create_separable_program
+
+
+void create_separable_program(const std::string filePath, SeparablePrograms *pSp)
+{
+    size_t dot = filePath.find_last_of(".");
+
+    std::string ext = filePath.substr(dot);
+
+    if (shaderTypes().find(ext) == shaderTypes().end())
+    {
+        throw std::runtime_error("Unknown shader extension: " + ext);
+    }
+
+    GLenum type = shaderTypes().at(ext);
+    std::shared_ptr<GLuint> program = create_separable_program(type, filePath);
+
+    switch (type)
+    {
+        case GL_VERTEX_SHADER:
+            pSp->vert = std::move(program);
+            break;
+        case GL_TESS_CONTROL_SHADER:
+            pSp->tesc = std::move(program);
+            break;
+        case GL_TESS_EVALUATION_SHADER:
+            pSp->tese = std::move(program);
+            break;
+        case GL_GEOMETRY_SHADER:
+            pSp->geom = std::move(program);
+            break;
+        case GL_FRAGMENT_SHADER:
+            pSp->frag = std::move(program);
+            break;
+        case GL_COMPUTE_SHADER:
+            pSp->comp = std::move(program);
+            break;
+        default:
+            break;
+    }
+} // create_separable_program
+
+template<typename ... Shaders>
+void create_separable_program(SeparablePrograms *pSp, const std::string filePath)
+{
+    create_separable_program(filePath, pSp);
+}
+
+template<typename ... Shaders>
+void create_separable_program(SeparablePrograms *pSp, const std::string filePath, const Shaders ... shaders)
+{
+    create_separable_program(filePath, pSp);
+    create_separable_program(pSp, shaders...);
+}
+
 } // namespace
 
 
@@ -93,6 +329,43 @@ OpenGLHelper::setDefaults()
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 } // setDefaults
+
+
+template<typename ... Shaders>
+std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string firstShader, Shaders ... shaders)
+{
+    IdVec shaderIds;
+
+    // create and compile all the shaders
+    create_shader(&shaderIds, firstShader, shaders ...);
+
+    // link shaders and create OpenGL program
+    return create_program(shaderIds);
+}
+
+
+std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::vector<std::string> shaderFiles)
+{
+    IdVec shaders;
+    for (auto &shaderFile : shaderFiles)
+    {
+        shaders.emplace_back(create_shader(shaderFile));
+    }
+
+    return create_program(shaders);
+}
+
+
+template<typename ... Shaders>
+sim::SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string firstShader, Shaders ... shaders)
+{
+    SeparablePrograms sp;
+
+    // create and compile all the shaders
+    create_separable_program(&sp, firstShader, shaders ...);
+
+    return sp;
+}
 
 std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
                                                          GLsizei height,
@@ -288,11 +561,13 @@ StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *
     {
         shaderFiles = {sim::SHADER_PATH + "shader.vert", sim::SHADER_PATH + "shader.frag"};
     }
-    StandardPipeline sp = OpenGLHelper::createStandardPipeline(shaderFiles,
-                                                               pData,
-                                                               numElements,
-                                                               sizeof(PosNormTexVertex),
-                                                               posNormTexVaoElements());
+    sim::StandardPipeline sp = sim::OpenGLHelper::createStandardPipeline(shaderFiles,
+                                                                         pData,
+                                                                         numElements,
+                                                                         sizeof(PosNormTexVertex),
+                                                                         posNormTexVaoElements());
+//    sp.program = sim::OpenGLHelper::createProgram(sim::SHADER_PATH + "shader.vert",
+//                                                  sim::SHADER_PATH + "shader.frag");
     sp.vboSize = static_cast<int>(numElements);
     return sp;
 }
@@ -533,146 +808,23 @@ OpenGLHelper::renderBuffer(
     glBindVertexArray(0);
 } // OpenGLHelper::renderBuffer
 
-
-std::string
-OpenGLHelper::_readFile(const std::string filePath)
-{
-    std::ifstream file(filePath, std::ios::in);
-
-    if (!file.is_open() || !file.good())
-    {
-        throw std::runtime_error("Could not read file: " + filePath);
-    }
-
-    // get full file size
-    file.seekg(0, std::ios::end);
-    size_t size = static_cast< size_t >( file.tellg());
-
-    // allocate string of correct size
-    std::string buffer(size, ' ');
-
-    // fill string with file contents
-    // note: string memory is only guaranteed contiguous in C++11 and up
-    file.seekg(0);
-    file.read(&buffer[0], static_cast< std::streamsize >( size ));
-
-    file.close();
-
-    return buffer;
-} // OpenGLHelper::_readFile
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string, std::string);
+template std::shared_ptr<GLuint>
+OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string);
+template std::shared_ptr<GLuint>
+OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string, std::string);
 
 
-
-std::shared_ptr<GLuint>
-OpenGLHelper::_createShader(
-    GLenum shaderType,
-    const std::string filePath
-)
-{
-    std::shared_ptr<GLuint> upShader(new GLuint,
-                                     [](auto pID)
-                                     {
-                                         glDeleteShader(*pID);
-                                         delete pID;
-                                     });
-
-    GLuint shader = glCreateShader(shaderType);
-    *upShader = shader;
-
-    // Load shader
-    std::string shaderStr = _readFile(filePath);
-    const char *shaderSource = shaderStr.c_str();
-
-    // Compile shader
-    glShaderSource(shader, 1, &shaderSource, nullptr);
-    glCompileShader(shader);
-
-    // Check shader
-    GLint result = GL_FALSE;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
-
-    if (result == GL_FALSE)
-    {
-        int logLength = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-        std::vector<char> shaderError(static_cast< size_t >( logLength ));
-        glGetShaderInfoLog(shader, logLength, nullptr, shaderError.data());
-
-        // shader will get deleted when shared_ptr goes out of scope
-
-        throw std::runtime_error("(" + shaderTypeStrings().at(shaderType) + ") " + std::string(shaderError.data()));
-    }
-
-    return upShader;
-} // OpenGLHelper::_createShader
-
-
-
-std::shared_ptr<GLuint>
-OpenGLHelper::_createShader(const std::string filePath)
-{
-    size_t dot = filePath.find_last_of(".");
-
-    std::string ext = filePath.substr(dot);
-
-    if (shaderTypes().find(ext) == shaderTypes().end())
-    {
-        throw std::runtime_error("Unknown shader extension: " + ext);
-    }
-
-    return OpenGLHelper::_createShader(shaderTypes().at(ext), filePath);
-} // OpenGLHelper::_createShader
-
-
-
-std::shared_ptr<GLuint>
-OpenGLHelper::_createProgram(const IdVec shaderIds)
-{
-    std::shared_ptr<GLuint> upProgram(new GLuint(glCreateProgram()),
-                                      [shaderIds](auto pID)
-                                      {
-                                          for (auto &upShader : shaderIds)
-                                          {
-                                              glDeleteShader(*upShader);
-                                          }
-
-                                          glDeleteProgram(*pID);
-                                          delete pID;
-                                      });
-
-    GLuint program = *upProgram;
-
-    for (auto &upShader : shaderIds)
-    {
-        glAttachShader(program, *upShader);
-    }
-
-    glLinkProgram(program);
-
-    // Check program
-    GLint result = GL_FALSE;
-    glGetProgramiv(program, GL_LINK_STATUS, &result);
-
-    if (result == GL_FALSE)
-    {
-        int logLength = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-        std::vector<char> programError(static_cast< size_t >( logLength ));
-        glGetProgramInfoLog(program, logLength, NULL, programError.data());
-
-        // shaders and programs get deleted with shared_ptr goes out of scope
-
-        throw std::runtime_error("(Program) " + std::string(programError.data()));
-    }
-
-    for (auto &upShader : shaderIds)
-    {
-        glDetachShader(program, *upShader);
-    }
-
-    return upProgram;
-} // OpenGLHelper::_createProgram
-
-
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string);
+template SeparablePrograms
+OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string);
+template SeparablePrograms
+OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string, std::string);
 
 } // namespace sim
