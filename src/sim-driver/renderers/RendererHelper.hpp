@@ -75,8 +75,20 @@ RendererHelper<T>::RendererHelper()
         {{s2,  s2,  0},  {s2,  s2,  0},  {1,    1}},
         {{0,   0,   -1}, {0,   0,   -1}, {0.5f, 0.5f}},
     };
-    glIds_ = sim::OpenGLHelper::createPosNormTexPipeline(vbo.data(),
-                                                         vbo.size());
+//    glIds_ = sim::OpenGLHelper::createPosNormTexPipeline(vbo.data(),
+//                                                         vbo.size());
+
+    glIds_.program = sim::OpenGLHelper::createProgram(sim::SHADER_PATH + "shader.vert",
+                                                      sim::SHADER_PATH + "shader.geom",
+                                                      sim::SHADER_PATH + "shader.frag");
+
+    glIds_.vbo = OpenGLHelper::createBuffer(vbo.data(), vbo.size());
+
+    glIds_.vao = OpenGLHelper::createVao(glIds_.program,
+                                         glIds_.vbo,
+                                         sizeof(sim::PosNormTexVertex),
+                                         sim::posNormTexVaoElements());
+    glIds_.vboSize = static_cast<int>(vbo.size());
 
     std::vector<unsigned> ibo{
         0, 1, 2, 3, 4, 1, 0xFFFFFFFF, 5, 4, 3, 2, 1, 4

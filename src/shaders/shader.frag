@@ -8,7 +8,7 @@ in Vertex
     vec2 texCoords;
 } vertex;
 
-uniform int displayMode = 1;
+uniform int displayMode = 5;
 uniform vec3 shapeColor = vec3(0.7);
 uniform sampler2D tex;
 uniform vec3 lightDir = normalize(vec3(0.7, 0.85, 1.0));

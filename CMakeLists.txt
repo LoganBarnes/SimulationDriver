@@ -70,6 +70,7 @@ set(SOURCE_FILES
         src/sim-driver/cameras/Camera.cpp
         src/sim-driver/cameras/Camera.hpp
         src/shaders/shader.vert
+        src/shaders/shader.geom
         src/shaders/shader.frag
         src/sim-driver/renderers/RendererHelper.hpp
         src/sim-driver/renderers/Renderer.hpp
