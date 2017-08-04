@@ -83,6 +83,13 @@ RendererHelper2<T>::RendererHelper2()
     glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::SHADER_PATH + "shader.vert",
                                                                  sim::SHADER_PATH + "shader.frag");
 
+    glIds_.vbo = OpenGLHelper::createBuffer(vbo.data(), vbo.size());
+
+    glIds_.vao = OpenGLHelper::createVao(glIds_.programs.vert,
+                                         glIds_.vbo,
+                                         sizeof(sim::PosNormTexVertex),
+                                         sim::posNormTexVaoElements());
+
     glIds_.ibo = sim::OpenGLHelper::createBuffer<unsigned>(ibo.data(),
                                                            ibo.size(),
                                                            GL_ELEMENT_ARRAY_BUFFER);
@@ -99,14 +106,18 @@ void RendererHelper2<T>::onRender(float alpha, const Camera &camera)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    glUseProgram(*glIds_.program);
+    glUseProgram(0);
+    glUseProgramStages(*glIds_.programs.pipeline, GL_VERTEX_SHADER_BIT, *glIds_.programs.vert);
+    glUseProgramStages(*glIds_.programs.pipeline, GL_FRAGMENT_SHADER_BIT, *glIds_.programs.frag);
+    glBindProgramPipeline(*glIds_.programs.pipeline);
+
     glm::vec3 lightDir{glm::normalize(lightDir_)};
-    sim::OpenGLHelper::setMatrixUniform(glIds_.program,
+    sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert,
                                         "projectionView",
                                         glm::value_ptr(camera.getPerspectiveProjectionViewMatrix()));
-    sim::OpenGLHelper::setIntUniform(glIds_.program, "displayMode", &displayMode_);
-    sim::OpenGLHelper::setFloatUniform(glIds_.program, "shapeColor", glm::value_ptr(shapeColor_), 3);
-    sim::OpenGLHelper::setFloatUniform(glIds_.program, "lightDir", glm::value_ptr(lightDir), 3);
+    sim::OpenGLHelper::setIntUniform(glIds_.programs.frag, "displayMode", &displayMode_);
+    sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "shapeColor", glm::value_ptr(shapeColor_), 3);
+    sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "lightDir", glm::value_ptr(lightDir), 3);
 
     bool culling = glIsEnabled(GL_CULL_FACE) != 0;
 

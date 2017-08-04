@@ -33,6 +33,11 @@ struct PosVertex
     float position[3];
 };
 
+
+const std::vector<VAOElement> &posNormTexVaoElements();
+
+const std::vector<VAOElement> &posVaoElements();
+
 typedef std::vector<std::shared_ptr<GLuint>> IdVec;
 
 class OpenGLHelper
@@ -219,7 +224,7 @@ StandardPipeline OpenGLHelper::createStandardPipeline(const std::vector<std::str
                                         glIds.vbo,
                                         totalStride,
                                         elements);
-
+    glIds.vboSize = static_cast<int>(numElements);
     return glIds;
 } // OpenGLHelper::createStandardPipeline
 

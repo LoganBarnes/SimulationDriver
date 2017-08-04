@@ -47,24 +47,6 @@ const std::unordered_map<GLenum, std::string> &shaderTypeStrings()
     return typeMap;
 }
 
-const std::vector<VAOElement> &posNormTexVaoElements()
-{
-    static std::vector<VAOElement> elements{
-        {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
-        {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
-        {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
-    };
-    return elements;
-}
-
-const std::vector<VAOElement> &posVaoElements()
-{
-    static std::vector<VAOElement> elements{
-        {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
-    };
-    return elements;
-}
-
 std::string read_file(const std::string filePath)
 {
     std::ifstream file(filePath, std::ios::in);
@@ -304,6 +286,25 @@ void create_separable_program(SeparablePrograms *pSp, const std::string filePath
 } // namespace
 
 
+const std::vector<VAOElement> &posNormTexVaoElements()
+{
+    static std::vector<VAOElement> elements{
+        {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
+        {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
+        {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
+    };
+    return elements;
+}
+
+const std::vector<VAOElement> &posVaoElements()
+{
+    static std::vector<VAOElement> elements{
+        {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
+    };
+    return elements;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief OpenGLHelper::setDefaults
 ///
@@ -363,6 +364,15 @@ sim::SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string firstSh
 
     // create and compile all the shaders
     create_separable_program(&sp, firstShader, shaders ...);
+
+    GLuint pipeline;
+    glGenProgramPipelines(1, &pipeline);
+
+    sp.pipeline = std::shared_ptr<GLuint>(new GLuint(pipeline), [](GLuint *pId)
+    {
+        glDeleteProgramPipelines(1, pId);
+        delete pId;
+    });
 
     return sp;
 }
@@ -566,9 +576,6 @@ StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *
                                                                          numElements,
                                                                          sizeof(PosNormTexVertex),
                                                                          posNormTexVaoElements());
-//    sp.program = sim::OpenGLHelper::createProgram(sim::SHADER_PATH + "shader.vert",
-//                                                  sim::SHADER_PATH + "shader.frag");
-    sp.vboSize = static_cast<int>(numElements);
     return sp;
 }
 
@@ -636,15 +643,13 @@ OpenGLHelper::clearFramebuffer()
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
 void
-OpenGLHelper::setTextureUniform(
-    const std::shared_ptr<GLuint> &spProgram,
-    const std::string uniform,
-    const std::shared_ptr<GLuint> &spTexture,
-    int activeTex
-)
+OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
+                                const std::string uniform,
+                                const std::shared_ptr<GLuint> &spTexture,
+                                int activeTex)
 {
     glActiveTexture(static_cast< GLenum >( GL_TEXTURE0 + activeTex ));
-    glUniform1i(glGetUniformLocation(*spProgram, uniform.c_str()), activeTex);
+    glProgramUniform1i(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), activeTex);
     glBindTexture(GL_TEXTURE_2D, *spTexture);
 }
 
@@ -655,31 +660,29 @@ OpenGLHelper::setTextureUniform(
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
 void
-OpenGLHelper::setIntUniform(
-    const std::shared_ptr<GLuint> &spProgram,
-    const std::string uniform,
-    const int *pValue,
-    const int size,
-    const int count
-)
+OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
+                            const std::string uniform,
+                            const int *pValue,
+                            const int size,
+                            const int count)
 {
     switch (size)
     {
 
         case 1:
-            glUniform1i(glGetUniformLocation(*spProgram, uniform.c_str()), *pValue);
+            glProgramUniform1iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         case 2:
-            glUniform2iv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform2iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         case 3:
-            glUniform3iv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform3iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         case 4:
-            glUniform4iv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform4iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         default:
@@ -706,19 +709,19 @@ OpenGLHelper::setFloatUniform(
     {
 
         case 1:
-            glUniform1f(glGetUniformLocation(*spProgram, uniform.c_str()), *pValue);
+            glProgramUniform1f(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), *pValue);
             break;
 
         case 2:
-            glUniform2fv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform2fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         case 3:
-            glUniform3fv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform3fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         case 4:
-            glUniform4fv(glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+            glProgramUniform4fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
         default:
@@ -733,42 +736,37 @@ OpenGLHelper::setFloatUniform(
 
 
 void
-OpenGLHelper::setMatrixUniform(
-    const std::shared_ptr<GLuint> &spProgram,
-    const std::string uniform,
-    const float *pValue,
-    const int size,
-    const int count
-)
+OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
+                               const std::string uniform,
+                               const float *pValue,
+                               const int size,
+                               const int count)
 {
     switch (size)
     {
         case 2:
-            glUniformMatrix2fv(
-                glGetUniformLocation(*spProgram, uniform.c_str()),
-                count,
-                GL_FALSE,
-                pValue
-            );
+            glProgramUniformMatrix2fv(*spProgram,
+                                      glGetUniformLocation(*spProgram, uniform.c_str()),
+                                      count,
+                                      GL_FALSE,
+                                      pValue);
             break;
 
         case 3:
-            glUniformMatrix3fv(
-                glGetUniformLocation(*spProgram, uniform.c_str()),
-                count,
-                GL_FALSE,
-                pValue
-            );
+            glProgramUniformMatrix3fv(*spProgram,
+                                      glGetUniformLocation(*spProgram, uniform.c_str()),
+                                      count,
+                                      GL_FALSE,
+                                      pValue);
             break;
 
 
         case 4:
-            glUniformMatrix4fv(
-                glGetUniformLocation(*spProgram, uniform.c_str()),
-                count,
-                GL_FALSE,
-                pValue
-            );
+            glProgramUniformMatrix4fv(*spProgram,
+                                      glGetUniformLocation(*spProgram, uniform.c_str()),
+                                      count,
+                                      GL_FALSE,
+                                      pValue);
             break;
 
         default:

@@ -1,7 +1,6 @@
 #include <sim-driver/OpenGLSimulation.hpp>
 #include <sim-driver/OpenGLHelper.hpp>
-#include <sim-driver/renderers/RendererHelper.hpp>
-#include <ShaderConfig.hpp>
+#include <sim-driver/renderers/RendererHelper2.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
@@ -41,7 +40,7 @@ public:
     }
 
 private:
-    sim::RendererHelper<sim::PosNormTexVertex> renderer_;
+    sim::RendererHelper2<sim::PosNormTexVertex> renderer_;
 };
 
 int main()

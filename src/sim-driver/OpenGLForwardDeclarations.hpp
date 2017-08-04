@@ -33,6 +33,7 @@ struct StandardPipeline
 
 struct SeparablePrograms
 {
+    std::shared_ptr<GLuint> pipeline;
     std::shared_ptr<GLuint> vert;
     std::shared_ptr<GLuint> tesc;
     std::shared_ptr<GLuint> tese;
