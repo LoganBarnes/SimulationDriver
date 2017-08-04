@@ -1,7 +1,6 @@
 #include <sim-driver/OpenGLSimulation.hpp>
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
-#include <ShaderConfig.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>

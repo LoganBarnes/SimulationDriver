@@ -59,22 +59,27 @@ set(SOURCE_FILES
         src/KHR/khrplatform.h
         src/sim-driver/OpenGLSimulation.hpp
 
-        # sim-driver
-        src/sim-driver/SimDriver.cpp
-        src/sim-driver/SimDriver.hpp
-        src/sim-driver/OpenGLSimulation.hpp
-        src/sim-driver/OpenGLForwardDeclarations.hpp
-        src/sim-driver/OpenGLHelper.cpp
-        src/sim-driver/OpenGLHelper.hpp
-        src/sim-driver/callbacks/Callbacks.hpp
-        src/sim-driver/cameras/Camera.cpp
-        src/sim-driver/cameras/Camera.hpp
+        #shaders
         src/shaders/shader.vert
         src/shaders/shader.geom
         src/shaders/shader.frag
+
+        # callbacks
+        src/sim-driver/callbacks/Callbacks.hpp
+        # cameras
+        src/sim-driver/cameras/Camera.cpp
+        src/sim-driver/cameras/Camera.hpp
+        # renderers
         src/sim-driver/renderers/RendererHelper.hpp
         src/sim-driver/renderers/Renderer.hpp
-        src/sim-driver/renderers/RendererHelper2.hpp)
+        # sim-driver
+        src/sim-driver/OpenGLForwardDeclarations.hpp
+        src/sim-driver/OpenGLHelper.cpp
+        src/sim-driver/OpenGLHelper.hpp
+        src/sim-driver/OpenGLSimulation.hpp
+        src/sim-driver/SimDriver.cpp
+        src/sim-driver/SimDriver.hpp
+        )
 
 add_library(SimDriver ${SOURCE_FILES})
 
@@ -91,9 +96,3 @@ set(EXEC_SOURCE_FILES
         )
 add_executable(SimDriverExec ${EXEC_SOURCE_FILES})
 target_link_libraries(SimDriverExec SimDriver)
-
-set(EXEC_SOURCE_FILES2
-        src/exec/main2.cpp
-        )
-add_executable(SimDriverExec2 ${EXEC_SOURCE_FILES2})
-target_link_libraries(SimDriverExec2 SimDriver)
