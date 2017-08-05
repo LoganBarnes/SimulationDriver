@@ -17,7 +17,7 @@ public:
 
 private:
     bool linkDivisions_{false};
-    int uDivisions_{50}, vDivisions_{50};
+    int uDivisions_{100}, vDivisions_{100};
 };
 
 } // namespace sim

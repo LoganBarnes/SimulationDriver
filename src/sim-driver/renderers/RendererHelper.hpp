@@ -41,7 +41,8 @@ public:
                       glm::vec3 shapeColor = glm::vec3{0.7},
                       glm::vec3 lightDir = glm::vec3{0.7f, 0.85f, 1.0f},
                       bool showNormals = false,
-                      float NormalScale = 0.5f) const;
+                      float NormalScale = 0.5f,
+                      std::function<void(void)> = std::function<void(void)>{}) const;
 
     void renderToFramebuffer(int width,
                              int height,
@@ -75,6 +76,7 @@ public:
 
 private:
     SeparablePipeline glIds_;
+    std::shared_ptr<GLuint> spCustomProgram_;
     std::shared_ptr<GLuint> spLightSsbo_{nullptr};
     std::vector<glm::vec4> lights_;
 
@@ -86,7 +88,9 @@ private:
     bool showNormals_{false};
 
     int displayMode_{5};
-    glm::vec3 shapeColor_{0.7f};
+    glm::vec3 shapeColor_{1.0f, 0.9f, 0.7f};
+    float shapeRoughness_{0.2f};
+    glm::vec3 shapeIor_{1.5145f, 1.5208f, 1.5232f}; // index of refraction
     glm::vec3 lightDir_{0.7, 0.85, 1.0};
 
     int pointSize_{1};
@@ -161,6 +165,9 @@ void RendererHelper<Vertex>::onGuiRender()
         }
         else if (displayMode_ == 6)
         {
+            ImGui::SliderFloat("Shape Roughness", &shapeRoughness_, 0.01f, 1.0f);
+            ImGui::SliderFloat3("Shape Index of Refraction", glm::value_ptr(shapeIor_), 1.0f, 10.0f);
+
             if (ImGui::Button("Add Light"))
             {
                 addLight(glm::vec3{1}, 1);
@@ -175,10 +182,11 @@ void RendererHelper<Vertex>::onGuiRender()
                     std::string light_str = "Light " + std::to_string(i);
                     glm::vec4 &light = lights_[i];
                     lights_need_update |= ImGui::SliderFloat3(std::string(light_str + " Direction").c_str(),
-                                        glm::value_ptr(light),
-                                        -1,
-                                        1);
-                    lights_need_update |= ImGui::SliderFloat(std::string(light_str + " Intensity").c_str(), &light.w, 0, 1);
+                                                              glm::value_ptr(light),
+                                                              -1,
+                                                              1);
+                    lights_need_update |= ImGui::SliderFloat(std::string(light_str + " Intensity").c_str(), &light.w, 0,
+                                                             1);
                     ImGui::Separator();
                 }
 
@@ -203,7 +211,8 @@ void RendererHelper<Vertex>::customRender(float alpha,
                                           glm::vec3 shapeColor,
                                           glm::vec3 lightDir,
                                           bool showNormals,
-                                          float NormalScale) const
+                                          float NormalScale,
+                                          std::function<void(void)> programReplacement) const
 {
     if (glIds_.framebuffer)
     {
@@ -212,31 +221,42 @@ void RendererHelper<Vertex>::customRender(float alpha,
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    glUseProgram(0);
-    glUseProgramStages(*glIds_.programs.pipeline, GL_VERTEX_SHADER_BIT, *glIds_.programs.vert);
-    glUseProgramStages(*glIds_.programs.pipeline, GL_GEOMETRY_SHADER_BIT, showNormals ? *glIds_.programs.geom : 0);
-    glUseProgramStages(*glIds_.programs.pipeline, GL_FRAGMENT_SHADER_BIT, *glIds_.programs.frag);
-    glBindProgramPipeline(*glIds_.programs.pipeline);
-
-    lightDir = glm::normalize(lightDir);
-    sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "projectionView",
-                                        glm::value_ptr(camera.getPerspectiveProjectionViewMatrix()));
-    if (showNormals)
+    if (programReplacement)
     {
-        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.geom, "projectionView",
-                                            glm::value_ptr(camera.getPerspectiveProjectionViewMatrix()));
-        sim::OpenGLHelper::setFloatUniform(glIds_.programs.geom, "normalScale", &NormalScale);
+        programReplacement();
     }
-    sim::OpenGLHelper::setIntUniform(glIds_.programs.frag, "displayMode", &displayMode);
-    sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "shapeColor", glm::value_ptr(shapeColor), 3);
-    sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "lightDir", glm::value_ptr(lightDir), 3);
-    if (spLightSsbo_)
+    else
     {
-        sim::OpenGLHelper::setSsboUniform(glIds_.programs.frag,
-                                          spLightSsbo_,
-                                          "lightData",
-                                          static_cast<int>(sizeof(lights_[0]) * lights_.size()),
-                                          0);
+        glUseProgram(0);
+        glUseProgramStages(*glIds_.programs.pipeline, GL_VERTEX_SHADER_BIT, *glIds_.programs.vert);
+        glUseProgramStages(*glIds_.programs.pipeline, GL_GEOMETRY_SHADER_BIT, showNormals ? *glIds_.programs.geom : 0);
+        glUseProgramStages(*glIds_.programs.pipeline, GL_FRAGMENT_SHADER_BIT, *glIds_.programs.frag);
+        glBindProgramPipeline(*glIds_.programs.pipeline);
+
+        lightDir = glm::normalize(lightDir);
+        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "projectionView",
+                                            glm::value_ptr(camera.getPerspectiveProjectionViewMatrix()));
+        if (showNormals)
+        {
+            sim::OpenGLHelper::setMatrixUniform(glIds_.programs.geom, "projectionView",
+                                                glm::value_ptr(camera.getPerspectiveProjectionViewMatrix()));
+            sim::OpenGLHelper::setFloatUniform(glIds_.programs.geom, "normalScale", &NormalScale);
+        }
+        sim::OpenGLHelper::setIntUniform(glIds_.programs.frag, "displayMode", &displayMode);
+        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "shapeColor", glm::value_ptr(shapeColor), 3);
+        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "lightDir", glm::value_ptr(lightDir), 3);
+        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "roughness", &shapeRoughness_);
+        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "IOR", glm::value_ptr(shapeIor_), 3);
+        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "eye", glm::value_ptr(camera.getEyeVector()), 3);
+
+        if (spLightSsbo_)
+        {
+            sim::OpenGLHelper::setSsboUniform(glIds_.programs.frag,
+                                              spLightSsbo_,
+                                              "lightData",
+                                              static_cast<int>(sizeof(lights_[0]) * lights_.size()),
+                                              0);
+        }
     }
 
     bool culling = glIsEnabled(GL_CULL_FACE) != 0;

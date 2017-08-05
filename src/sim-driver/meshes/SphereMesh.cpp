@@ -64,7 +64,7 @@ bool SphereMesh::onGuiRender()
 
     ImGui::Checkbox("Link U and V", &linkDivisions_);
 
-    mesh_needs_update |= ImGui::SliderInt("U Subdivisions", &uDivisions_, 0, 100);
+    mesh_needs_update |= ImGui::SliderInt("U Subdivisions", &uDivisions_, 0, 250);
 
     if (linkDivisions_)
     {
@@ -73,7 +73,7 @@ bool SphereMesh::onGuiRender()
     }
     else
     {
-        mesh_needs_update |= ImGui::SliderInt("V Subdivisions", &vDivisions_, 0, 100);
+        mesh_needs_update |= ImGui::SliderInt("V Subdivisions", &vDivisions_, 0, 250);
     }
 
     return mesh_needs_update;

@@ -49,41 +49,40 @@ download_project(PROJ variant
 set(SOURCE_FILES
         # imgui
         ${imgui_SOURCE_DIR}/imgui
-        ${imgui_SOURCE_DIR}/imgui_demo.cpp
-        ${imgui_SOURCE_DIR}/imgui_draw.cpp
-        ${imgui_SOURCE_DIR}/imgui_internal.h
-        ${imgui_SOURCE_DIR}/imconfig.h
-        ${imgui_SOURCE_DIR}/stb_rect_pack.h
-        ${imgui_SOURCE_DIR}/stb_textedit.h
-        ${imgui_SOURCE_DIR}/stb_truetype.h
+        ${imgui_SOURCE_DIR}/imgui_demo
+        ${imgui_SOURCE_DIR}/imgui_draw
+        ${imgui_SOURCE_DIR}/imgui_internal
+        ${imgui_SOURCE_DIR}/imconfig
+        ${imgui_SOURCE_DIR}/stb_rect_pack
+        ${imgui_SOURCE_DIR}/stb_textedit
+        ${imgui_SOURCE_DIR}/stb_truetype
         src/imgui_impl_glfw_gl3
-
         # glad
         src/glad/glad
-        src/KHR/khrplatform.h
-
+        src/KHR/khrplatform
         #shaders
         src/shaders/shader.vert
         src/shaders/shader.geom
         src/shaders/shader.frag
-
         # callbacks
         src/sim-driver/callbacks/Callbacks
         # cameras
         src/sim-driver/cameras/Camera
         # meshes
+        src/sim-driver/meshes/HeightMap
         src/sim-driver/meshes/MeshVariant
         src/sim-driver/meshes/SphereMesh
         # renderers
+        src/sim-driver/renderers/HeightMapRenderer
         src/sim-driver/renderers/MeshRenderer
         src/sim-driver/renderers/RendererHelper
-        src/sim-driver/renderers/Renderer
         # sim-driver
         src/sim-driver/OpenGLForwardDeclarations
         src/sim-driver/OpenGLHelper
         src/sim-driver/OpenGLSimulation
         src/sim-driver/SimDriver
-        src/sim-driver/meshes/MeshVariant.hpp src/sim-driver/meshes/SphereMesh.cpp src/sim-driver/meshes/SphereMesh.hpp)
+        src/sim-driver/meshes/MeshVariant.hpp
+        )
 
 add_library(SimDriver ${SOURCE_FILES})
 
@@ -96,6 +95,8 @@ target_include_directories(SimDriver SYSTEM PUBLIC
         )
 target_link_libraries(SimDriver ${OPENGL_gl_LIBRARY} glfw)
 
-set(EXEC_SOURCE_FILES src/exec/main)
-add_executable(SimDriverExec ${EXEC_SOURCE_FILES})
-target_link_libraries(SimDriverExec SimDriver)
+add_executable(MeshExec src/exec/MeshMain)
+target_link_libraries(MeshExec SimDriver)
+
+add_executable(HeightsExec src/exec/HeightsMain)
+target_link_libraries(HeightsExec SimDriver)
