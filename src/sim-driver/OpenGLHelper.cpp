@@ -316,7 +316,7 @@ OpenGLHelper::setDefaults()
     glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_PRIMITIVE_RESTART);
-    glPrimitiveRestartIndex(std::numeric_limits<unsigned>::max());
+    glPrimitiveRestartIndex(0xFFFFFFFF);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
@@ -644,7 +644,7 @@ OpenGLHelper::clearFramebuffer()
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
-                                const std::string uniform,
+                                const std::string &uniform,
                                 const std::shared_ptr<GLuint> &spTexture,
                                 int activeTex)
 {
@@ -661,7 +661,7 @@ OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
 ////////////////////////////////////////////////////////////////////////////////
 void
 OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
-                            const std::string uniform,
+                            const std::string &uniform,
                             const int *pValue,
                             const int size,
                             const int count)
@@ -699,7 +699,7 @@ OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
 void
 OpenGLHelper::setFloatUniform(
     const std::shared_ptr<GLuint> &spProgram,
-    const std::string uniform,
+    const std::string &uniform,
     const float *pValue,
     const int size,
     const int count
@@ -737,7 +737,7 @@ OpenGLHelper::setFloatUniform(
 
 void
 OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
-                               const std::string uniform,
+                               const std::string &uniform,
                                const float *pValue,
                                const int size,
                                const int count)
@@ -778,6 +778,20 @@ OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
 
 } // OpenGLHelper::setMatrixUniform
 
+
+void OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
+                                    const std::shared_ptr<GLuint> &spSsbo,
+                                    const std::string &uniform,
+                                    const int sizeBytes,
+                                    const GLuint binding)
+{
+    GLuint blockIdx = glGetProgramResourceIndex(*spProgram, GL_SHADER_STORAGE_BLOCK, uniform.c_str());
+    glShaderStorageBlockBinding(*spProgram, blockIdx, binding);
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, *spSsbo);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, *spSsbo);
+    glBindBufferRange(GL_SHADER_STORAGE_BUFFER, binding, *spSsbo, 0, sizeBytes);
+}
 
 void
 OpenGLHelper::renderBuffer(

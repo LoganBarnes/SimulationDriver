@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sim-driver/renderers/Renderer.hpp>
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/cameras/Camera.hpp>
 #include <ShaderConfig.hpp>
@@ -8,6 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <imgui.h>
+#include <functional>
 
 namespace sim
 {
@@ -15,14 +15,24 @@ namespace sim
 constexpr int max_point_size = 25;
 
 template<typename Vertex>
-class RendererHelper : public Renderer
+class RendererHelper
 {
 public:
+    struct DrawData
+    {
+        std::vector<Vertex> vbo;
+        std::vector<unsigned> ibo;
+        std::vector<sim::VAOElement> vaoElements;
+        std::vector<std::pair<int, int>> drawCalls;
+    };
+
+    typedef std::function<DrawData(void)> DataFun;
+
     explicit RendererHelper();
 
-    void onRender(float alpha, const Camera &camera) override;
-    void onGuiRender() override;
-    void onResize(int width, int height) override;
+    void onRender(float alpha, const Camera &camera) const;
+    void onGuiRender();
+    void onResize(int width, int height);
 
     void customRender(float alpha,
                       const Camera &camera,
@@ -31,12 +41,16 @@ public:
                       glm::vec3 shapeColor = glm::vec3{0.7},
                       glm::vec3 lightDir = glm::vec3{0.7f, 0.85f, 1.0f},
                       bool showNormals = false,
-                      float NormalScale = 0.5f);
+                      float NormalScale = 0.5f) const;
 
     void renderToFramebuffer(int width,
                              int height,
                              const std::shared_ptr<GLuint> &spColorTex = nullptr,
                              const std::shared_ptr<GLuint> &spDepthTex = nullptr);
+
+    void rebuild_mesh();
+
+    void addLight(glm::vec3 lightDir, float intensity);
 
     void setShowingVertsOnly(bool showingVertsOnly);
     void setUsingWireframe(bool usingWireframe);
@@ -47,6 +61,7 @@ public:
     void setShowNormals(bool showNormals);
     void setNormalScale(float normalScale);
 
+    void setDataFun(DataFun dataFun);
     void setDrawMode(GLenum drawMode);
 
     const bool &getShowingVertsOnly() const;
@@ -60,6 +75,8 @@ public:
 
 private:
     SeparablePipeline glIds_;
+    std::shared_ptr<GLuint> spLightSsbo_{nullptr};
+    std::vector<glm::vec4> lights_;
 
     int fboWidth_{0};
     int fboHeight_{0};
@@ -75,46 +92,22 @@ private:
     int pointSize_{1};
     float normalScale_{0.5f};
 
+    DataFun dataFun_{nullptr};
     GLenum drawMode_{GL_TRIANGLE_STRIP};
+
+    void updateLights();
 };
 
-template<typename T>
-RendererHelper<T>::RendererHelper()
+template<typename Vertex>
+RendererHelper<Vertex>::RendererHelper()
 {
-    float s2 = 1.f / std::sqrt(2.0f);
-    std::vector<sim::PosNormTexVertex> vbo{
-        {{0,   0,   1},  {0,   0,   1},  {0.5f, 0.5f}},
-        {{-s2, s2,  0},  {-s2, s2,  0},  {0,    1}},
-        {{-s2, -s2, 0},  {-s2, -s2, 0},  {0,    0}},
-        {{s2,  -s2, 0},  {s2,  -s2, 0},  {1,    0}},
-        {{s2,  s2,  0},  {s2,  s2,  0},  {1,    1}},
-        {{0,   0,   -1}, {0,   0,   -1}, {0.5f, 0.5f}},
-    };
-
-    std::vector<unsigned> ibo{
-        0, 1, 2, 3, 4, 1, 0xFFFFFFFF, 5, 4, 3, 2, 1, 4
-    };
-
     glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::SHADER_PATH + "shader.vert",
                                                                  sim::SHADER_PATH + "shader.geom",
                                                                  sim::SHADER_PATH + "shader.frag");
-
-    glIds_.vbo = OpenGLHelper::createBuffer(vbo.data(), vbo.size());
-
-    glIds_.vao = OpenGLHelper::createVao(glIds_.programs.vert,
-                                         glIds_.vbo,
-                                         sizeof(sim::PosNormTexVertex),
-                                         sim::posNormTexVaoElements());
-    glIds_.vboSize = static_cast<int>(vbo.size());
-
-    glIds_.ibo = sim::OpenGLHelper::createBuffer<unsigned>(ibo.data(),
-                                                           ibo.size(),
-                                                           GL_ELEMENT_ARRAY_BUFFER);
-    glIds_.iboSize = static_cast<int>(ibo.size());
 }
 
-template<typename T>
-void RendererHelper<T>::onRender(float alpha, const Camera &camera)
+template<typename Vertex>
+void RendererHelper<Vertex>::onRender(float alpha, const Camera &camera) const
 {
     if (showNormals_)
     {
@@ -124,9 +117,16 @@ void RendererHelper<T>::onRender(float alpha, const Camera &camera)
     customRender(alpha, camera, drawMode_, displayMode_, shapeColor_, lightDir_, false);
 }
 
-template<typename T>
-void RendererHelper<T>::onGuiRender()
+template<typename Vertex>
+void RendererHelper<Vertex>::onGuiRender()
 {
+    ImGui::Checkbox("Show Normals", &showNormals_);
+
+    if (showNormals_)
+    {
+        ImGui::SliderFloat("Normal Scale", &normalScale_, 0.1f, 1.5f);
+    }
+
     ImGui::Checkbox("Show Verts Only", &showingVertsOnly_);
 
     if (showingVertsOnly_)
@@ -137,6 +137,8 @@ void RendererHelper<T>::onGuiRender()
     {
         ImGui::Checkbox("Wireframe", &usingWireframe_);
     }
+
+    ImGui::Separator();
 
     ImGui::Combo("Display Mode", &displayMode_,
                  " Position \0"
@@ -157,30 +159,51 @@ void RendererHelper<T>::onGuiRender()
         {
             ImGui::SliderFloat3("Light Direction", glm::value_ptr(lightDir_), -1, 1);
         }
-    }
-    ImGui::Separator();
+        else if (displayMode_ == 6)
+        {
+            if (ImGui::Button("Add Light"))
+            {
+                addLight(glm::vec3{1}, 1);
+            }
 
-    ImGui::Checkbox("Show Normals", &showNormals_);
+            if (ImGui::CollapsingHeader("Lights", "lights", false, true))
+            {
+                bool lights_need_update = false;
 
-    if (showNormals_)
-    {
-        ImGui::SliderFloat("Normal Scale", &normalScale_, 0.1f, 1.5f);
+                for (int i = 0; i < lights_.size(); ++i)
+                {
+                    std::string light_str = "Light " + std::to_string(i);
+                    glm::vec4 &light = lights_[i];
+                    lights_need_update |= ImGui::SliderFloat3(std::string(light_str + " Direction").c_str(),
+                                        glm::value_ptr(light),
+                                        -1,
+                                        1);
+                    lights_need_update |= ImGui::SliderFloat(std::string(light_str + " Intensity").c_str(), &light.w, 0, 1);
+                    ImGui::Separator();
+                }
+
+                if (lights_need_update)
+                {
+                    updateLights();
+                }
+            }
+        }
     }
 }
 
-template<typename T>
-void RendererHelper<T>::onResize(int width, int height)
+template<typename Vertex>
+void RendererHelper<Vertex>::onResize(int width, int height)
 {}
 
-template<typename T>
-void RendererHelper<T>::customRender(float alpha,
-                                      const Camera &camera,
-                                      GLenum drawMode,
-                                      int displayMode,
-                                      glm::vec3 shapeColor,
-                                      glm::vec3 lightDir,
-                                      bool showNormals,
-                                      float NormalScale)
+template<typename Vertex>
+void RendererHelper<Vertex>::customRender(float alpha,
+                                          const Camera &camera,
+                                          GLenum drawMode,
+                                          int displayMode,
+                                          glm::vec3 shapeColor,
+                                          glm::vec3 lightDir,
+                                          bool showNormals,
+                                          float NormalScale) const
 {
     if (glIds_.framebuffer)
     {
@@ -207,6 +230,14 @@ void RendererHelper<T>::customRender(float alpha,
     sim::OpenGLHelper::setIntUniform(glIds_.programs.frag, "displayMode", &displayMode);
     sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "shapeColor", glm::value_ptr(shapeColor), 3);
     sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "lightDir", glm::value_ptr(lightDir), 3);
+    if (spLightSsbo_)
+    {
+        sim::OpenGLHelper::setSsboUniform(glIds_.programs.frag,
+                                          spLightSsbo_,
+                                          "lightData",
+                                          static_cast<int>(sizeof(lights_[0]) * lights_.size()),
+                                          0);
+    }
 
     bool culling = glIsEnabled(GL_CULL_FACE) != 0;
 
@@ -235,11 +266,11 @@ void RendererHelper<T>::customRender(float alpha,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-template<typename T>
-void RendererHelper<T>::renderToFramebuffer(int width,
-                                             int height,
-                                             const std::shared_ptr<GLuint> &spColorTex,
-                                             const std::shared_ptr<GLuint> &spDepthTex)
+template<typename Vertex>
+void RendererHelper<Vertex>::renderToFramebuffer(int width,
+                                                 int height,
+                                                 const std::shared_ptr<GLuint> &spColorTex,
+                                                 const std::shared_ptr<GLuint> &spDepthTex)
 {
     fboWidth_ = std::move(width);
     fboHeight_ = std::move(height);
@@ -247,16 +278,53 @@ void RendererHelper<T>::renderToFramebuffer(int width,
     glIds_.framebuffer = OpenGLHelper::createFramebuffer(fboWidth_, fboHeight_, spColorTex, spDepthTex);
 }
 
-template<typename T>
-void RendererHelper<T>::setShowingVertsOnly(bool showingVertsOnly)
+template<typename Vertex>
+void RendererHelper<Vertex>::rebuild_mesh()
+{
+    if (!dataFun_)
+    {
+        return;
+    }
+
+    glIds_.vbo = glIds_.vao = glIds_.ibo = nullptr;
+
+    auto data = dataFun_();
+    glIds_.vbo = OpenGLHelper::createBuffer(data.vbo.data(), data.vbo.size());
+
+    glIds_.vao = OpenGLHelper::createVao(glIds_.programs.vert,
+                                         glIds_.vbo,
+                                         sizeof(Vertex),
+                                         data.vaoElements);
+    glIds_.vboSize = static_cast<int>(data.vbo.size());
+
+    glIds_.ibo = sim::OpenGLHelper::createBuffer<unsigned>(data.ibo.data(),
+                                                           data.ibo.size(),
+                                                           GL_ELEMENT_ARRAY_BUFFER);
+    glIds_.iboSize = static_cast<int>(data.ibo.size());
+}
+
+template<typename Vertex>
+void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
+{
+    lights_.emplace_back(lightDir, intensity);
+
+    spLightSsbo_ = nullptr;
+    spLightSsbo_ = sim::OpenGLHelper::createBuffer(lights_.data(),
+                                                   lights_.size(),
+                                                   GL_SHADER_STORAGE_BUFFER,
+                                                   GL_DYNAMIC_DRAW);
+}
+
+template<typename Vertex>
+void RendererHelper<Vertex>::setShowingVertsOnly(bool showingVertsOnly)
 { showingVertsOnly_ = std::move(showingVertsOnly); }
 
-template<typename T>
-void RendererHelper<T>::setUsingWireframe(bool usingWireframe)
+template<typename Vertex>
+void RendererHelper<Vertex>::setUsingWireframe(bool usingWireframe)
 { usingWireframe_ = std::move(usingWireframe); }
 
-template<typename T>
-void RendererHelper<T>::setDisplayMode(int displayMode)
+template<typename Vertex>
+void RendererHelper<Vertex>::setDisplayMode(int displayMode)
 {
     if (0 > displayMode || displayMode > 8)
     {
@@ -266,16 +334,16 @@ void RendererHelper<T>::setDisplayMode(int displayMode)
     displayMode_ = std::move(displayMode);
 }
 
-template<typename T>
-void RendererHelper<T>::setShapeColor(glm::vec3 shapeColor)
+template<typename Vertex>
+void RendererHelper<Vertex>::setShapeColor(glm::vec3 shapeColor)
 { shapeColor_ = std::move(shapeColor); }
 
-template<typename T>
-void RendererHelper<T>::setLightDir(glm::vec3 lightDir)
+template<typename Vertex>
+void RendererHelper<Vertex>::setLightDir(glm::vec3 lightDir)
 { lightDir_ = std::move(lightDir); }
 
-template<typename T>
-void RendererHelper<T>::setPointSize(int pointSize)
+template<typename Vertex>
+void RendererHelper<Vertex>::setPointSize(int pointSize)
 {
     if (0 > pointSize || pointSize > max_point_size)
     {
@@ -285,49 +353,67 @@ void RendererHelper<T>::setPointSize(int pointSize)
     pointSize_ = std::move(pointSize);
 }
 
-template<typename T>
-void RendererHelper<T>::setShowNormals(bool showNormals)
+template<typename Vertex>
+void RendererHelper<Vertex>::setShowNormals(bool showNormals)
 { showNormals_ = showNormals; }
 
-template<typename T>
-void RendererHelper<T>::setNormalScale(float normalScale)
+template<typename Vertex>
+void RendererHelper<Vertex>::setNormalScale(float normalScale)
 { normalScale_ = normalScale; }
 
-template<typename T>
-void RendererHelper<T>::setDrawMode(GLenum drawMode)
-{ drawMode_ = std::move(drawMode); }
+template<typename Vertex>
+void RendererHelper<Vertex>::setDataFun(DataFun dataFun)
+{
+    dataFun_ = dataFun;
+    rebuild_mesh();
+}
 
+template<typename Vertex>
+void RendererHelper<Vertex>::setDrawMode(GLenum drawMode)
+{ drawMode_ = drawMode; }
 
-template<typename T>
-const bool &RendererHelper<T>::getShowingVertsOnly() const
+template<typename Vertex>
+const bool &RendererHelper<Vertex>::getShowingVertsOnly() const
 { return showingVertsOnly_; }
 
-template<typename T>
-const bool &RendererHelper<T>::getUsingWireframe() const
+template<typename Vertex>
+const bool &RendererHelper<Vertex>::getUsingWireframe() const
 { return usingWireframe_; }
 
-template<typename T>
-const int &RendererHelper<T>::getDisplayMode() const
+template<typename Vertex>
+const int &RendererHelper<Vertex>::getDisplayMode() const
 { return displayMode_; }
 
-template<typename T>
-const glm::vec3 &RendererHelper<T>::getShapeColor() const
+template<typename Vertex>
+const glm::vec3 &RendererHelper<Vertex>::getShapeColor() const
 { return shapeColor_; }
 
-template<typename T>
-const glm::vec3 &RendererHelper<T>::getLightDir() const
+template<typename Vertex>
+const glm::vec3 &RendererHelper<Vertex>::getLightDir() const
 { return lightDir_; }
 
-template<typename T>
-const int &RendererHelper<T>::getPointSize() const
+template<typename Vertex>
+const int &RendererHelper<Vertex>::getPointSize() const
 { return pointSize_; }
 
-template<typename T>
-const bool &RendererHelper<T>::getShowNormals() const
+template<typename Vertex>
+const bool &RendererHelper<Vertex>::getShowNormals() const
 { return showNormals_; }
 
-template<typename T>
-const float &RendererHelper<T>::getNormalScale() const
+template<typename Vertex>
+const float &RendererHelper<Vertex>::getNormalScale() const
 { return normalScale_; }
+
+template<typename Vertex>
+void RendererHelper<Vertex>::updateLights()
+{
+    sim::OpenGLHelper::updateBuffer(spLightSsbo_, 0, lights_.size(), lights_.data(), GL_SHADER_STORAGE_BUFFER);
+}
+
+using PosNormTexRenderer = sim::RendererHelper<sim::PosNormTexVertex>;
+using PosRenderer = sim::RendererHelper<sim::PosVertex>;
+
+using PosNormTexData = sim::RendererHelper<sim::PosNormTexVertex>::DrawData;
+using PosData = sim::RendererHelper<sim::PosVertex>::DrawData;
 
 } // namespace sim

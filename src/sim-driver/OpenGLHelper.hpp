@@ -118,28 +118,34 @@ public:
     static void clearFramebuffer();
 
     static void setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
-                                  const std::string uniform,
+                                  const std::string &uniform,
                                   const std::shared_ptr<GLuint> &spTexture,
                                   int activeTex);
 
     static void setIntUniform(const std::shared_ptr<GLuint> &spProgram,
-                              const std::string uniform,
+                              const std::string &uniform,
                               const int *pValue,
-                              const int size = 1,
-                              const int count = 1);
+                              int size = 1,
+                              int count = 1);
 
     static void setFloatUniform(const std::shared_ptr<GLuint> &spProgram,
-                                const std::string uniform,
+                                const std::string &uniform,
                                 const float *pValue,
-                                const int size = 1,
-                                const int count = 1);
+                                int size = 1,
+                                int count = 1);
 
 
     static void setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
-                                 const std::string uniform,
+                                 const std::string &uniform,
                                  const float *pValue,
-                                 const int size = 4,
-                                 const int count = 1);
+                                 int size = 4,
+                                 int count = 1);
+
+    static void setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
+                                 const std::shared_ptr<GLuint> &spSsbo,
+                                 const std::string &uniform,
+                                 int sizeBytes,
+                                 GLuint binding);
 
     static void renderBuffer(const std::shared_ptr<GLuint> &spVao,
                              const int start,
@@ -227,6 +233,5 @@ StandardPipeline OpenGLHelper::createStandardPipeline(const std::vector<std::str
     glIds.vboSize = static_cast<int>(numElements);
     return glIds;
 } // OpenGLHelper::createStandardPipeline
-
 
 } // namespace sim

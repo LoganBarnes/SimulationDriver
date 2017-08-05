@@ -1,5 +1,6 @@
 #version 410
 #extension GL_ARB_separate_shader_objects : enable
+#extension GL_ARB_shader_storage_buffer_object : require
 
 in Vertex
 {
@@ -7,6 +8,11 @@ in Vertex
     vec3 normal;
     vec2 texCoords;
 } vertex;
+
+layout(std430, binding = 0) buffer lightData
+{
+    vec4 lights[];
+};
 
 uniform int displayMode = 5;
 uniform vec3 shapeColor = vec3(0.7);
@@ -47,8 +53,11 @@ void main(void)
         break;
     case 6:
     {
-        float ambient = 0.1;
-        float intensity = max(ambient, dot(normal, lightDir));
+        float intensity = 0.1; // ambient
+        for (int i = 0; i < lights.length(); ++i)
+        {
+            intensity += max(0.0, dot(normal, normalize(lights[i].xyz))) * lights[i].w;
+        }
         color = shapeColor * intensity;
     }
         break;

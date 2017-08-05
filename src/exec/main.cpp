@@ -6,14 +6,15 @@
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <sim-driver/renderers/MeshRenderer.hpp>
+
 
 class Simulator : public sim::OpenGLSimulation<Simulator>
 {
 public:
     Simulator()
+        : renderer_{sim::MeshVariant{sim::SphereMesh()}}
     {
-        renderer_.setDrawMode(GL_TRIANGLE_FAN);
-
         camera_.setUsingOrbitMode(true);
         camera_.setOrbitPoint({0, 0, 0});
         camera_.setOrbitOffsetDistance(5);
@@ -39,8 +40,13 @@ public:
         ImGui::End();
     }
 
+    void onResize()
+    {
+
+    }
+
 private:
-    sim::RendererHelper<sim::PosNormTexVertex> renderer_;
+    sim::MeshRenderer renderer_;
 };
 
 int main()
