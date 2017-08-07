@@ -23,6 +23,7 @@ class SimDriver
 public:
 
     void runEventLoop();
+    void runAsFastAsPossibleLoop();
 
     template<typename T>
     void setCallbackClass(T *pCallbacks);
@@ -125,7 +126,6 @@ SimDriver<Child>::~SimDriver()
 template<typename Child>
 void SimDriver<Child>::runEventLoop()
 {
-    render(1.0, true);
     do
     {
         if (!paused_)
@@ -136,6 +136,23 @@ void SimDriver<Child>::runEventLoop()
         render(1.0, true);
 
         glfwWaitEvents();
+    } while (!glfwWindowShouldClose(pWindow_));
+}
+
+
+template<typename Child>
+void SimDriver<Child>::runAsFastAsPossibleLoop()
+{
+    do
+    {
+        if (!paused_)
+        {
+            update();
+            worldTime_ += timeStep_;
+        }
+        render(1.0, false);
+
+        glfwPollEvents();
     } while (!glfwWindowShouldClose(pWindow_));
 }
 

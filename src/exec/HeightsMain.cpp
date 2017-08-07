@@ -22,7 +22,7 @@ public:
 
     void onUpdate(double worldTime, double timeStep)
     {
-        camera_.yaw(static_cast<float>(timeStep * 0.1));
+        camera_.yaw(static_cast<float>(timeStep * 0.5));
     }
 
     void onRender(int width, int height, double alpha)
@@ -35,6 +35,7 @@ public:
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
+            ImGui::Text("Framerate: %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
             renderer_.onGuiRender();
         }
         ImGui::End();
@@ -54,7 +55,8 @@ int main()
     try
     {
         Simulator sim;
-        sim.runEventLoop();
+//        sim.runEventLoop();
+        sim.runAsFastAsPossibleLoop();
     }
     catch (const std::exception &e)
     {

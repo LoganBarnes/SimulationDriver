@@ -21,7 +21,6 @@ protected:
     ~OpenGLSimulation() override = default;
     OpenGLSimulation(OpenGLSimulation &&) noexcept = default;
     OpenGLSimulation &operator=(OpenGLSimulation &&) noexcept = default;
-private:
 };
 
 
