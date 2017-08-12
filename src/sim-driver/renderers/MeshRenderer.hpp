@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sim-driver/OpenGLForwardDeclarations.hpp>
-#include <sim-driver/meshes/MeshVariant.hpp>
+#include <sim-driver/meshes/MeshHelper.hpp>
 
 namespace sim
 {
@@ -9,18 +9,15 @@ namespace sim
 class MeshRenderer
 {
 public:
-    explicit MeshRenderer(sim::MeshVariant mesh);
+    explicit MeshRenderer(sim::PosNormTexMesh mesh);
 
-    explicit MeshRenderer(std::vector<sim::MeshVariant> meshes);
-
-    void onRender(float alpha, const Camera &camera) const;
-    void onGuiRender();
-    void onResize(int width, int height);
+    void render(float alpha, const Camera &camera) const;
+    void configureGui();
+    void resize(int width, int height);
 
 private:
-    sim::RendererHelper<sim::PosNormTexVertex> renderer_;
-
-    std::vector<sim::MeshVariant> meshes_;
+    sim::PosNormTexRenderer renderer_;
+    sim::PosNormTexMesh mesh_;
 };
 
 } // namespace sim

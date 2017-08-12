@@ -1,13 +1,29 @@
-#include <sim-driver/meshes/SphereMesh.hpp>
+#include <sim-driver/meshes/MeshHelper.hpp>
 
 namespace sim
 {
 
-namespace
+template<typename V>
+V create_sphere_vertex(glm::vec3 p, glm::vec2 t);
+
+template<>
+sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 {
-sim::PosNormTexData build_mesh_data(int u_divisions, int v_divisions)
+    return {{p.x, p.y, p.z},
+            {p.x, p.y, p.z},
+            {t.x, t.y}};
+}
+
+template<>
+sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 {
-    sim::PosNormTexData data{};
+    return {{p.x, p.y, p.z}};
+}
+
+template<typename V>
+sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
+{
+    sim::DrawData<V> data{};
 
     data.vbo.reserve(static_cast<unsigned>((u_divisions + 2) * (v_divisions + 2)));
 
@@ -23,9 +39,7 @@ sim::PosNormTexData build_mesh_data(int u_divisions, int v_divisions)
             glm::vec3 p{glm::cos(theta) * glm::sin(phi),
                         glm::cos(phi),
                         glm::sin(theta) * glm::sin(phi)};
-            data.vbo.push_back({{p.x,      p.y, p.z},
-                                {p.x,      p.y, p.z},
-                                {1.0f - u, v}});
+            data.vbo.emplace_back(create_sphere_vertex<V>(p, glm::vec2{1.0f - u, v}));
         }
     }
 
@@ -51,32 +65,8 @@ sim::PosNormTexData build_mesh_data(int u_divisions, int v_divisions)
     data.vaoElements = sim::posNormTexVaoElements();
     return data;
 }
-}
 
-sim::PosNormTexData SphereMesh::buildMeshData() const
-{
-    return build_mesh_data(uDivisions_, vDivisions_);
-}
-
-bool SphereMesh::onGuiRender()
-{
-    bool mesh_needs_update = false;
-
-    ImGui::Checkbox("Link U and V", &linkDivisions_);
-
-    mesh_needs_update |= ImGui::SliderInt("U Subdivisions", &uDivisions_, 0, 250);
-
-    if (linkDivisions_)
-    {
-        mesh_needs_update |= (uDivisions_ != vDivisions_);
-        vDivisions_ = uDivisions_;
-    }
-    else
-    {
-        mesh_needs_update |= ImGui::SliderInt("V Subdivisions", &vDivisions_, 0, 250);
-    }
-
-    return mesh_needs_update;
-}
+template sim::PosNormTexData create_sphere_mesh_data(int u_divisions, int v_divisions);
+template sim::PosData create_sphere_mesh_data(int u_divisions, int v_divisions);
 
 } // namespace sim

@@ -38,13 +38,6 @@ download_project(PROJ glm
         UPDATE_DISCONNECTED 1
         QUIET
         )
-# Download and unpack variant at configure time
-download_project(PROJ variant
-        GIT_REPOSITORY https://github.com/mapbox/variant.git
-        GIT_TAG v1.1.5
-        UPDATE_DISCONNECTED 1
-        QUIET
-        )
 
 set(SOURCE_FILES
         # imgui
@@ -72,8 +65,7 @@ set(SOURCE_FILES
         src/sim-driver/cameras/Camera
         # meshes
         src/sim-driver/meshes/HeightMap
-        src/sim-driver/meshes/MeshVariant
-        src/sim-driver/meshes/SphereMesh
+        src/sim-driver/meshes/MeshHelper
         # renderers
         src/sim-driver/renderers/HeightMapRenderer
         src/sim-driver/renderers/MeshRenderer
@@ -83,7 +75,7 @@ set(SOURCE_FILES
         src/sim-driver/OpenGLHelper
         src/sim-driver/OpenGLSimulation
         src/sim-driver/SimDriver
-        src/sim-driver/meshes/MeshVariant.hpp
+        src/sim-driver/meshes/MeshFunctions
         )
 
 add_library(SimDriver ${SOURCE_FILES})
@@ -93,7 +85,6 @@ target_include_directories(SimDriver SYSTEM PUBLIC
         ${glfw_SOURCE_DIR}/include
         ${imgui_SOURCE_DIR}
         ${glm_SOURCE_DIR}
-        ${variant_SOURCE_DIR}/include
         )
 target_link_libraries(SimDriver ${OPENGL_gl_LIBRARY} glfw)
 

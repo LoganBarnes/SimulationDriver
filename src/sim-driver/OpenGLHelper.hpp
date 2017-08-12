@@ -88,7 +88,6 @@ public:
                                              const GLsizei totalStride,
                                              const std::vector<VAOElement> &elements);
 
-
     static std::shared_ptr<GLuint> createFramebuffer(GLsizei width,
                                                      GLsizei height,
                                                      const std::shared_ptr<GLuint> &spColorTex = nullptr,
@@ -134,7 +133,6 @@ public:
                                 int size = 1,
                                 int count = 1);
 
-
     static void setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
                                  const std::string &uniform,
                                  const float *pValue,
@@ -156,7 +154,6 @@ public:
                              const GLenum iboType = GL_UNSIGNED_INT);
 
 };
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +185,6 @@ std::shared_ptr<GLuint> OpenGLHelper::createBuffer(const T *pData,
     return upBuffer;
 } // OpenGLHelper::addBuffer
 
-
 template<typename T>
 void OpenGLHelper::updateBuffer(const std::shared_ptr<GLuint> &upBuffer,
                                 const size_t elementOffset,
@@ -206,8 +202,6 @@ void OpenGLHelper::updateBuffer(const std::shared_ptr<GLuint> &upBuffer,
 
     glBindBuffer(bufferType, 0);
 } // OpenGLHelper::updateBuffer
-
-
 
 template<typename T>
 StandardPipeline OpenGLHelper::createStandardPipeline(const std::vector<std::string> &shaderFiles,

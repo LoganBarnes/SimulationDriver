@@ -27,5 +27,5 @@ void main(void)
     vertex.scale = inScale;
     vertex.indices = inIndices;
 
-    gl_Position = projectionView * vec4(vertex.position, 1.0);
+    gl_Position = projectionView * vec4(inHeights[1][1] * inScale, 1.0);
 }

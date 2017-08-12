@@ -15,18 +15,19 @@ namespace sim
 constexpr int max_point_size = 25;
 
 template<typename Vertex>
+struct DrawData
+{
+    std::vector<Vertex> vbo;
+    std::vector<unsigned> ibo;
+    std::vector<sim::VAOElement> vaoElements;
+    std::vector<std::pair<int, int>> drawCalls;
+};
+
+template<typename Vertex>
 class RendererHelper
 {
 public:
-    struct DrawData
-    {
-        std::vector<Vertex> vbo;
-        std::vector<unsigned> ibo;
-        std::vector<sim::VAOElement> vaoElements;
-        std::vector<std::pair<int, int>> drawCalls;
-    };
-
-    typedef std::function<DrawData(void)> DataFun;
+    using DataFun = std::function<DrawData<Vertex>(void)>;
 
     explicit RendererHelper();
 
@@ -42,7 +43,7 @@ public:
                       glm::vec3 lightDir = glm::vec3{0.7f, 0.85f, 1.0f},
                       bool showNormals = false,
                       float NormalScale = 0.5f,
-                      std::function<void(void)> = std::function<void(void)>{}) const;
+                      std::function<void(void)> programReplacement = nullptr) const;
 
     void renderToFramebuffer(int width,
                              int height,
@@ -433,7 +434,7 @@ void RendererHelper<Vertex>::updateLights()
 using PosNormTexRenderer = sim::RendererHelper<sim::PosNormTexVertex>;
 using PosRenderer = sim::RendererHelper<sim::PosVertex>;
 
-using PosNormTexData = sim::RendererHelper<sim::PosNormTexVertex>::DrawData;
-using PosData = sim::RendererHelper<sim::PosVertex>::DrawData;
+using PosNormTexData = sim::DrawData<sim::PosNormTexVertex>;
+using PosData = sim::DrawData<sim::PosVertex>;
 
 } // namespace sim

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sim-driver/SimDriver.hpp>
 #include <iostream>
 #include <stdexcept>

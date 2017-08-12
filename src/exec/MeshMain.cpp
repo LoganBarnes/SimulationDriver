@@ -1,12 +1,13 @@
 #include <sim-driver/OpenGLSimulation.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
 #include <sim-driver/renderers/MeshRenderer.hpp>
+#include <sim-driver/meshes/MeshFunctions.hpp>
 
 class Simulator : public sim::OpenGLSimulation<Simulator>
 {
 public:
     Simulator()
-        : renderer_{sim::MeshVariant{sim::SphereMesh()}}
+        : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}
     {
         camera_.setUsingOrbitMode(true);
         camera_.setOrbitPoint({0, 0, 0});
@@ -35,7 +36,7 @@ public:
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);
 
-        renderer_.onRender(a, camera);
+        renderer_.render(a, camera);
     }
 
     void onGuiRender(int width, int height)
@@ -44,7 +45,7 @@ public:
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Framerate: %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
-            renderer_.onGuiRender();
+            renderer_.configureGui();
         }
         ImGui::End();
     }

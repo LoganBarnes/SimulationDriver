@@ -217,7 +217,7 @@ template<typename T>
 void TCamera<T>::updateOrbit(glm::tvec3<T> newLook)
 {
     glm::tvec3<T> eye = orbitPoint_ - newLook * orbitOffsetDistance_;
-    lookAt(eye, eye + newLook, upVector_);
+    lookAt(eye, eye + newLook, glm::vec3{0, 1, 0});
 }
 
 template
