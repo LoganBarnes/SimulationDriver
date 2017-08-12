@@ -61,6 +61,8 @@ set(SOURCE_FILES
         src/glad/glad
         src/KHR/khrplatform
         #shaders
+        src/shaders/heights.vert
+        src/shaders/heights.geom
         src/shaders/shader.vert
         src/shaders/shader.geom
         src/shaders/shader.frag

@@ -9,9 +9,6 @@
 #include <memory>
 #include <iostream>
 
-//struct GLFWwindow;
-//typedef GLFWwindow GLFWwindow;
-
 namespace sim
 {
 template<typename Child>
@@ -55,85 +52,23 @@ void Callbacks<T>::windowFocusCallback(GLFWwindow *pWindow, int focus)
 
 template<typename T>
 void Callbacks<T>::mouseButtonCallback(GLFWwindow *pWindow, int button, int action, int mods)
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (!io.WantCaptureMouse)
-    {}
-    else
-    {
-        if (action == GLFW_PRESS && button >= 0 && button < 3)
-        {
-            io.MouseDown[button] = true;
-        }
-    }
-}
+{}
 
 template<typename T>
 void Callbacks<T>::keyCallback(GLFWwindow *pWindow, int key, int scancode, int action, int mods)
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (!io.WantCaptureKeyboard)
-    {
-        switch (key)
-        {
-            case GLFW_KEY_ESCAPE:
-                glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
-                break;
-            default:
-                break;
-        }
-    }
-    else
-    {
-        if (action == GLFW_PRESS)
-        {
-            io.KeysDown[key] = true;
-        }
-        else if (action == GLFW_RELEASE)
-        {
-            io.KeysDown[key] = false;
-        }
-        io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-        io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-        io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-        io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-    }
-}
+{}
 
 template<typename T>
 void Callbacks<T>::cursorPosCallback(GLFWwindow *pWindow, double xpos, double ypos)
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (!io.WantCaptureMouse)
-    {}
-}
+{}
 
 template<typename T>
 void Callbacks<T>::scrollCallback(GLFWwindow *pWindow, double xoffset, double yoffset)
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (!io.WantCaptureMouse)
-    {}
-    else
-    {
-        io.MouseWheel += static_cast<float>(yoffset); // the fractional mouse wheel. 1.0 unit 5 lines
-    }
-}
+{}
 
 template<typename T>
 void Callbacks<T>::charCallback(GLFWwindow *pWindow, unsigned codepoint)
-{
-    ImGuiIO &io = ImGui::GetIO();
-
-    if (io.WantCaptureKeyboard && codepoint > 0 && codepoint < 0x10000)
-    {
-        io.AddInputCharacter(static_cast<unsigned short>(codepoint));
-    }
-}
+{}
 
 template<typename T>
 void Callbacks<T>::windowRefreshCallback(GLFWwindow *pWindow)

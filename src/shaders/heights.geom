@@ -6,9 +6,9 @@ layout(line_strip, max_vertices = 2) out;
 
 in Vertex
 {
-    vec3 position;
-    vec3 normal;
-    vec2 texCoords;
+    mat3 heights;
+    vec3 scale;
+    ivec2 indices;
 } vertex_in[];
 
 uniform mat4 projectionView = mat4(1.0);
