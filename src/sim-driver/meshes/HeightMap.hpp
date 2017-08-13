@@ -14,8 +14,8 @@ public:
 
     HeightMap(int width,
               int height,
-              glm::vec3 world_origin,
-              glm::vec3 world_dimensions,
+              glm::vec3 worldOrigin,
+              glm::vec3 worldDimensions,
               std::vector<float> column_major_data);
 
     float safeGet(int x, int y, float paddingVal = 0);
@@ -28,20 +28,20 @@ public:
 
     const std::vector<float> &data();
 
-    glm::vec3 HeightMap::to_world(glm::vec3 p) const;
+    glm::vec3 to_world(glm::vec3 p) const;
 
-    const int width() const
-    { return width_; }
+    int getWidth() const;
+    int getHeight() const;
 
-    const int height() const
-    { return width_; }
+    const glm::vec3 &getWorldOrigin() const;
+    const glm::vec3 &getWorldDimensions() const;
 
 private:
     std::vector<float> data_; // column major so it can be accessed with [x][y]
 
     int width_, height_;
-    glm::vec3 world_origin_{0};
-    glm::vec3 world_dimensions_;
+    glm::vec3 worldOrigin_{0};
+    glm::vec3 worldDimensions_;
 };
 
 HeightMap::HeightMap(int width, int height)
@@ -52,22 +52,22 @@ HeightMap::HeightMap(int width, int height, std::vector<float> column_major_data
     : data_{std::move(column_major_data)},
       width_{width},
       height_{height},
-      world_origin_{0.0f},
-      world_dimensions_{width, 1.0f, height}
+      worldOrigin_{0.0f},
+      worldDimensions_{width, 1.0f, height}
 {
     assert(width * height == data_.size());
 }
 
 HeightMap::HeightMap(int width,
                      int height,
-                     glm::vec3 world_origin,
-                     glm::vec3 world_dimensions,
+                     glm::vec3 worldOrigin,
+                     glm::vec3 worldDimensions,
                      std::vector<float> column_major_data)
     : data_{std::move(column_major_data)},
       width_{width},
       height_{height},
-      world_origin_{world_origin},
-      world_dimensions_{world_dimensions}
+      worldOrigin_{worldOrigin},
+      worldDimensions_{worldDimensions}
 {
     assert(width * height == data_.size());
 }
@@ -118,7 +118,27 @@ glm::vec3 HeightMap::to_world(glm::vec3 p) const
 {
     p.x /= glm::max(1.0f, width_ - 1.0f);
     p.z /= glm::max(1.0f, height_ - 1.0f);
-    return p * world_dimensions_ + world_origin_;
+    return p * worldDimensions_ + worldOrigin_;
+}
+
+int HeightMap::getWidth() const
+{
+    return width_;
+}
+
+int HeightMap::getHeight() const
+{
+    return height_;
+}
+
+const glm::vec3 &HeightMap::getWorldOrigin() const
+{
+    return worldOrigin_;
+}
+
+const glm::vec3 &HeightMap::getWorldDimensions() const
+{
+    return worldDimensions_;
 }
 
 } // namespace sim

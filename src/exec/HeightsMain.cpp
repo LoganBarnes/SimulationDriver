@@ -15,7 +15,7 @@ class Simulator : public sim::OpenGLSimulation<Simulator>
 public:
     Simulator() : renderer_{sim::HeightMap{3,
                                            2,
-                                           glm::vec3{-1.5f, -1.0f, -0.5f},
+                                           glm::vec3{-1.5f, 0.0f, -0.5f},
                                            glm::vec3{3, 2, 1},
                                            std::vector<float>{0.2f, 0.7f,
                                                               0.3f, 0.6f,

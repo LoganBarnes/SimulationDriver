@@ -1,20 +1,27 @@
 #version 410
 #extension GL_ARB_separate_shader_objects : enable
 
-layout(location = 0) in mat3 inHeights;
-layout(location = 1) in vec3 inScale;
-layout(location = 2) in ivec2 inIndices;
+layout(location = 0) in ivec2 indices;
 
-uniform mat4 projectionView = mat4(1.0);
-uniform mat4 model          = mat4(1.0);
-uniform mat3 normalMatrix   = mat3(1.0);
+uniform mat4 projection_from_world = mat4(1.0);
+
+uniform sampler2D heights;
+uniform ivec2 texSize;
+uniform vec3 worldOrigin;
+uniform vec3 worldDimensions;
 
 out Vertex
 {
-    mat3 heights;
-    vec3 scale;
-    ivec2 indices;
+    vec3 position;
+    vec3 normal;
+    vec2 texCoords;
 } vertex;
+
+//out Vertex
+//{
+//    ivec2 indices;
+//    vec3 worldPos;
+//} vertex;
 
 out gl_PerVertex
 {
@@ -23,9 +30,16 @@ out gl_PerVertex
 
 void main(void)
 {
-    vertex.heights = inHeights;
-    vertex.scale = inScale;
-    vertex.indices = inIndices;
+//    vertex.indices = indices;
+    vec2 texCoords = (vec2(indices) + 0.5) / vec2(texSize);
 
-    gl_Position = projectionView * vec4(inHeights[1][1] * inScale, 1.0);
+    float height = texture(heights, texCoords).r;
+
+    vertex.position = vec3(indices.x / max(1.0, texSize.x - 1.0), height, indices.y / max(1.0, texSize.y - 1.0));
+    vertex.position = vertex.position * worldDimensions + worldOrigin;
+
+    vertex.normal = vec3(0, 1, 0);
+    vertex.texCoords = texCoords;
+
+    gl_Position = projection_from_world * vec4(vertex.position, 1.0);
 }

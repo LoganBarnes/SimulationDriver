@@ -445,7 +445,6 @@ std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &s
     for (const auto &vaoElmt : elements)
     {
         int pos = glGetAttribLocation(*spProgram, vaoElmt.name.c_str());
-
         if (pos < 0)
         {
             std::stringstream msg;
@@ -460,14 +459,42 @@ std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &s
         GLuint position = static_cast< GLuint >( pos );
 
         glEnableVertexAttribArray(position);
-        glVertexAttribPointer(
-            position,
-            vaoElmt.size,     // Num coordinates per position
-            vaoElmt.type,     // Type
-            GL_FALSE,         // Normalized
-            totalStride,      // Stride, 0 = tightly packed
-            vaoElmt.pointer   // Array buffer offset
-        );
+        switch (vaoElmt.type)
+        {
+            case GL_BYTE:
+            case GL_UNSIGNED_BYTE:
+            case GL_SHORT:
+            case GL_UNSIGNED_SHORT:
+            case GL_INT:
+            case GL_UNSIGNED_INT:
+                glVertexAttribIPointer(
+                    position,
+                    vaoElmt.size,     // Num coordinates per position
+                    vaoElmt.type,     // Type
+                    totalStride,      // Stride, 0 = tightly packed
+                    vaoElmt.pointer   // Array buffer offset
+                );
+                break;
+            case GL_DOUBLE:
+                glVertexAttribLPointer(
+                    position,
+                    vaoElmt.size,     // Num coordinates per position
+                    vaoElmt.type,     // Type
+                    totalStride,      // Stride, 0 = tightly packed
+                    vaoElmt.pointer   // Array buffer offset
+                );
+                break;
+            default:
+                glVertexAttribPointer(
+                    position,
+                    vaoElmt.size,     // Num coordinates per position
+                    vaoElmt.type,     // Type
+                    GL_FALSE,         // Normalized
+                    totalStride,      // Stride, 0 = tightly packed
+                    vaoElmt.pointer   // Array buffer offset
+                );
+                break;
+        }
     }
 
     // Unbind buffers.
@@ -780,10 +807,10 @@ OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
 
 
 void OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
-                                    const std::shared_ptr<GLuint> &spSsbo,
-                                    const std::string &uniform,
-                                    const int sizeBytes,
-                                    const GLuint binding)
+                                  const std::shared_ptr<GLuint> &spSsbo,
+                                  const std::string &uniform,
+                                  const int sizeBytes,
+                                  const GLuint binding)
 {
     GLuint blockIdx = glGetProgramResourceIndex(*spProgram, GL_SHADER_STORAGE_BLOCK, uniform.c_str());
     glShaderStorageBlockBinding(*spProgram, blockIdx, binding);
