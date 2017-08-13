@@ -39,40 +39,24 @@ private:
 
 template<typename T>
 Callbacks<T>::Callbacks(SimDriver<T> &simDriver)
-    : simDriver_(simDriver)
-{}
+        : simDriver_(simDriver) {}
 
 template<typename T>
-void Callbacks<T>::windowSizeCallback(GLFWwindow *pWindow, int width, int height)
-{}
-
+void Callbacks<T>::windowSizeCallback(GLFWwindow *pWindow, int width, int height) {}
 template<typename T>
-void Callbacks<T>::windowFocusCallback(GLFWwindow *pWindow, int focus)
-{}
-
+void Callbacks<T>::windowFocusCallback(GLFWwindow *pWindow, int focus) {}
 template<typename T>
-void Callbacks<T>::mouseButtonCallback(GLFWwindow *pWindow, int button, int action, int mods)
-{}
-
+void Callbacks<T>::mouseButtonCallback(GLFWwindow *pWindow, int button, int action, int mods) {}
 template<typename T>
-void Callbacks<T>::keyCallback(GLFWwindow *pWindow, int key, int scancode, int action, int mods)
-{}
-
+void Callbacks<T>::keyCallback(GLFWwindow *pWindow, int key, int scancode, int action, int mods) {}
 template<typename T>
-void Callbacks<T>::cursorPosCallback(GLFWwindow *pWindow, double xpos, double ypos)
-{}
-
+void Callbacks<T>::cursorPosCallback(GLFWwindow *pWindow, double xpos, double ypos) {}
 template<typename T>
-void Callbacks<T>::scrollCallback(GLFWwindow *pWindow, double xoffset, double yoffset)
-{}
-
+void Callbacks<T>::scrollCallback(GLFWwindow *pWindow, double xoffset, double yoffset) {}
 template<typename T>
-void Callbacks<T>::charCallback(GLFWwindow *pWindow, unsigned codepoint)
-{}
-
+void Callbacks<T>::charCallback(GLFWwindow *pWindow, unsigned codepoint) {}
 template<typename T>
-void Callbacks<T>::windowRefreshCallback(GLFWwindow *pWindow)
-{}
+void Callbacks<T>::windowRefreshCallback(GLFWwindow *pWindow) {}
 
 
 } // namespace sim

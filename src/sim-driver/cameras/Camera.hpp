@@ -12,49 +12,6 @@ public:
 
     TCamera();
 
-    const glm::tmat4x4<T> &getViewMatrix() const
-    { return viewMatrix_; }
-
-    const glm::tmat4x4<T> &getPerspectiveProjectionMatrix() const
-    { return perspectiveMatrix_; }
-
-    const glm::tmat4x4<T> &getOrthographicProjectionMatrix() const
-    { return orthographicMatrix_; }
-
-    const glm::tmat4x4<T> &getPerspectiveProjectionViewMatrix() const
-    { return perspectiveProjectionViewMatrix_; }
-
-    const glm::tmat4x4<T> &getOrthographicProjectionViewMatrix() const
-    { return orthoProjectionViewMatrix_; }
-
-    const glm::tvec3<T> &getEyeVector() const
-    { return eye_; }
-
-    const glm::tvec3<T> &getLookVector() const
-    { return lookVector_; }
-
-    const glm::tvec3<T> &getUpVector() const
-    { return upVector_; }
-
-    const glm::tvec3<T> &getRightVector() const
-    { return rightVector_; }
-
-    const T &getFovYDegrees() const
-    { return fovYDegrees_; }
-
-    const T &getFovTRadians() const
-    { return fovYRadians_; }
-
-    const T &getAspectRatio() const
-    { return aspectRatio_; }
-
-    const T &getNearPlaneDistance() const
-    { return nearPlane_; }
-
-    const T &getFarPlaneDistance() const
-    { return farPlane_; }
-
-
     void lookAt(const glm::tvec3<T> &eye,
                 const glm::tvec3<T> &point,
                 const glm::tvec3<T> &up = glm::tvec3<T>(0, 1, 0),
@@ -71,48 +28,70 @@ public:
                T top);
 
     void yaw(T angleRadians);
+
     void pitch(T angleRadians);
 
-    void setEye(const glm::tvec3<T> &eye);
-    void setLook(const glm::tvec3<T> &look);
-    void setUp(const glm::tvec3<T> &up);
+    const glm::tvec3<T> &getEyeVector() const;
+    const glm::tvec3<T> &getLookVector() const;
+    const glm::tvec3<T> &getUpVector() const;
+    const glm::tvec3<T> &getRightVector() const;
+    const glm::tmat4x4<T> &getViewFromWorldMatrix() const;
+    T getFovYDegrees() const;
+    T getFovYRadians() const;
+    T getAspectRatio() const;
+    T getNearPlane() const;
+    T getFarPlane() const;
+    const glm::tmat4x4<T> &getPerspectiveScreenFromViewMatrix() const;
+    T getOrthoLeft() const;
+    T getOrthoRight() const;
+    T getOrthoBottom() const;
+    T getOrthoTop() const;
+    const glm::tmat4x4<T> &getOrthographicScreenFromViewMatrix() const;
+    const glm::tmat4x4<T> &getPerspectiveScreenFromWorldMatrix() const;
+    const glm::tmat4x4<T> &getOrthoScreenFromWorldMatrix() const;
+    bool isUsingOrbitMode() const;
+    T getOrbitOffsetDistance() const;
+    const glm::tvec3<T> &getOrbitOrigin() const;
 
+    void setEyeVector(const glm::tvec3<T> &eyeVector);
+    void setLookVector(const glm::tvec3<T> &lookVector);
+    void setUpVector(const glm::tvec3<T> &upVector);
     void setFovYDegrees(T fovYDegrees);
     void setAspectRatio(T aspectRatio);
-    void setNearPlaneDistance(T near);
-    void setFarPlaneDistance(T far);
-
-    void setOrthoLeft(T left);
-    void setOrthoRight(T right);
-    void setOrthoBottom(T bottom);
-    void setOrthoTop(T top);
-
+    void setNearPlane(T nearPlane);
+    void setFarPlane(T farPlane);
+    void setOrthoLeft(T orthoLeft);
+    void setOrthoRight(T orthoRight);
+    void setOrthoBottom(T orthoBottom);
+    void setOrthoTop(T orthoTop);
     void setUsingOrbitMode(bool usingOrbitMode);
-    void setOrbitPoint(glm::tvec3<T> orbitPoint);
     void setOrbitOffsetDistance(T orbitOffsetDistance);
+    void setOrbitOrigin(const glm::tvec3<T> &orbitOrigin);
 
 private:
 
     // view matrix variables
-    glm::tvec3<T> eye_, lookVector_, upVector_, rightVector_;
-    T orbitOffsetDistance_;
-    glm::tvec3<T> orbitPoint_;
-    glm::tmat4x4<T> viewMatrix_;
+    glm::tvec3<T> eyeVector_, lookVector_, upVector_, rightVector_;
+    glm::tmat4x4<T> viewFromWorldMatrix_;
 
     // projection matrix variables
     T fovYDegrees_, fovYRadians_, aspectRatio_, nearPlane_, farPlane_;
-    glm::tmat4x4<T> perspectiveMatrix_;
+    glm::tmat4x4<T> perspectiveScreenFromViewMatrix_;
 
     // orthographic matrix variables
     T orthoLeft_, orthoRight_, orthoBottom_, orthoTop_;
-    glm::tmat4x4<T> orthographicMatrix_;
+    glm::tmat4x4<T> orthographicScreenFromViewMatrix_;
 
-    glm::tmat4x4<T> perspectiveProjectionViewMatrix_;
-    glm::tmat4x4<T> orthoProjectionViewMatrix_;
+    glm::tmat4x4<T> perspectiveScreenFromWorldMatrix_;
+    glm::tmat4x4<T> orthoScreenFromWorldMatrix_;
 
+    // orbit variables
     bool usingOrbitMode_;
+    T orbitOffsetDistance_;
+    glm::tvec3<T> orbitOrigin_;
 
     void updateOrbitSettings();
+
     void updateOrbit(glm::tvec3<T> newLook);
 
 };

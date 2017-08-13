@@ -59,12 +59,14 @@ set(SOURCE_FILES
         src/shaders/shader.vert
         src/shaders/shader.geom
         src/shaders/shader.frag
+        src/shaders/shader_mac.frag
         # callbacks
         src/sim-driver/callbacks/Callbacks
         # cameras
         src/sim-driver/cameras/Camera
         # meshes
         src/sim-driver/meshes/HeightMap
+        src/sim-driver/meshes/MeshFunctions
         src/sim-driver/meshes/MeshHelper
         # renderers
         src/sim-driver/renderers/HeightMapRenderer
@@ -75,7 +77,6 @@ set(SOURCE_FILES
         src/sim-driver/OpenGLHelper
         src/sim-driver/OpenGLSimulation
         src/sim-driver/SimDriver
-        src/sim-driver/meshes/MeshFunctions
         )
 
 add_library(SimDriver ${SOURCE_FILES})

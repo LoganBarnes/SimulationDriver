@@ -18,6 +18,21 @@ class TCamera;
 using Camera = TCamera<float>;
 using CameraD = TCamera<double>;
 
+template<typename T>
+class RendererHelper;
+
+template<typename T>
+struct DrawData;
+
+struct PosNormTexVertex;
+struct PosVertex;
+
+using PosNormTexRenderer = sim::RendererHelper<sim::PosNormTexVertex>;
+using PosRenderer = sim::RendererHelper<sim::PosVertex>;
+
+using PosNormTexData = sim::DrawData<sim::PosNormTexVertex>;
+using PosData = sim::DrawData<sim::PosVertex>;
+
 struct StandardPipeline
 {
     std::shared_ptr<GLuint> program;

@@ -1,4 +1,5 @@
 #include <sim-driver/meshes/MeshHelper.hpp>
+#include <glm/gtc/constants.hpp>
 
 namespace sim
 {
@@ -67,6 +68,7 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
 }
 
 template sim::PosNormTexData create_sphere_mesh_data(int u_divisions, int v_divisions);
+
 template sim::PosData create_sphere_mesh_data(int u_divisions, int v_divisions);
 
 } // namespace sim

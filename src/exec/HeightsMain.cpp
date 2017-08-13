@@ -22,7 +22,7 @@ public:
                                                               0.4f, 0.5f}}}
     {
         camera_.setUsingOrbitMode(true);
-        camera_.setOrbitPoint({0, 0, 0});
+        camera_.setOrbitOrigin({0, 0, 0});
         camera_.setOrbitOffsetDistance(5);
         camera_.pitch(glm::half_pi<float>() * -0.15f);
 

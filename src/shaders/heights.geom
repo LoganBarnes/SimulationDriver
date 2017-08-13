@@ -24,7 +24,7 @@ in Vertex
     vec3 worldPos;
 } vertex_in[];
 
-uniform mat4 projection_from_world = mat4(1.0);
+uniform mat4 screen_from_world = mat4(1.0);
 
 uniform sampler2D heights;
 uniform ivec2 texSize;
@@ -38,25 +38,30 @@ out Vertex
     vec2 texCoords;
 } vertex;
 
+out gl_PerVertex
+{
+  vec4 gl_Position;
+};
+
 void main()
 {
 
     vertex.position = vertex_in[0].worldPos + vec3(-0.5, 0, -0.5);
     vertex.normal = vec3(0, 1, 0);
     vertex.texCoords = vertex_in[0].indices / (texSize - 1.0);
-    gl_Position = projection_from_world * vec4(vertex.position, 1.0);
+    gl_Position = screen_from_world * vec4(vertex.position, 1.0);
     EmitVertex();
 
     vertex.position = vertex_in[0].worldPos + vec3(0.5, 0, -0.5);
     vertex.normal = vec3(0, 1, 0);
     vertex.texCoords = vertex_in[0].indices / (texSize - 1.0);
-    gl_Position = projection_from_world * vec4(vertex.position, 1.0);
+    gl_Position = screen_from_world * vec4(vertex.position, 1.0);
     EmitVertex();
 
     vertex.position = vertex_in[0].worldPos + vec3(0.0, 0, 0.5);
     vertex.normal = vec3(0, 1, 0);
     vertex.texCoords = vertex_in[0].indices / (texSize - 1.0);
-    gl_Position = projection_from_world * vec4(vertex.position, 1.0);
+    gl_Position = screen_from_world * vec4(vertex.position, 1.0);
     EmitVertex();
 
     EndPrimitive();

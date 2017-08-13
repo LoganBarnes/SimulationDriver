@@ -24,13 +24,16 @@ public:
 
     OpenGLSimulation(const OpenGLSimulation &) = delete;
     OpenGLSimulation &operator=(const OpenGLSimulation &) = delete;
+
 protected:
     explicit OpenGLSimulation(const std::string &title = "OpenGL Simulation",
                               int width = 0,
                               int height = 0);
+
     ~OpenGLSimulation() override = default;
-    OpenGLSimulation(OpenGLSimulation &&) noexcept = default;
-    OpenGLSimulation &operator=(OpenGLSimulation &&) noexcept = default;
+
+    OpenGLSimulation(OpenGLSimulation &&) = default; // no-except doesn't compile with llvm
+    OpenGLSimulation &operator=(OpenGLSimulation &&) = default; // no-except doesn't compile with llvm
 
 private:
     template<class T = Child>
@@ -51,7 +54,7 @@ private:
 
 template<typename Child>
 OpenGLSimulation<Child>::OpenGLSimulation(const std::string &title, int width, int height)
-    : SimDriver<OpenGLSimulation>(title, width, height)
+        : SimDriver<OpenGLSimulation>(title, width, height)
 {
     sim::OpenGLHelper::setDefaults();
 }

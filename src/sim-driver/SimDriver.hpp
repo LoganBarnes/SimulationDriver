@@ -41,10 +41,10 @@ protected:
     explicit SimDriver(const std::string &title = "Sim Window",
                        int width = 0,
                        int height = 0);
+
     virtual ~SimDriver();
 
     SimDriver(SimDriver &&) noexcept = default;
-
     SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
@@ -56,16 +56,19 @@ private:
     Callbacks<Child> callbacks_;
 
     void update();
+
     void render(double alpha, bool eventBased = false);
 
 };
 
 template<typename Child>
 SimDriver<Child>::SimDriver(const std::string &title, int width, int height)
-    : callbacks_{*this}
+        : callbacks_{*this}
 {
     glfwSetErrorCallback([](int error, const char *description)
-                         { std::cerr << "ERROR: (" << error << ") " << description << std::endl; });
+                         {
+                             std::cerr << "ERROR: (" << error << ") " << description << std::endl;
+                         });
 
     if (!glfwInit())
     {
@@ -88,7 +91,7 @@ SimDriver<Child>::SimDriver(const std::string &title, int width, int height)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // highest on mac :(
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
-    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE );
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif // __APPLE__
 
     pWindow_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
@@ -201,10 +204,14 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
     glfwSetWindowUserPointer(pWindow_, &pCallbacks);
 
     glfwSetWindowSizeCallback(pWindow_, [](GLFWwindow *pWindow, int width, int height)
-    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowSizeCallback(pWindow, width, height); });
+    {
+        static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowSizeCallback(pWindow, width, height);
+    });
 
     glfwSetWindowFocusCallback(pWindow_, [](GLFWwindow *pWindow, int focus)
-    { static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus); });
+    {
+        static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus);
+    });
 
     glfwSetMouseButtonCallback(pWindow_, [](GLFWwindow *pWindow, int button, int action, int mods)
     {

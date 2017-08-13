@@ -35,7 +35,6 @@ struct PosVertex
 
 
 const std::vector<VAOElement> &posNormTexVaoElements();
-
 const std::vector<VAOElement> &posVaoElements();
 
 typedef std::vector<std::shared_ptr<GLuint>> IdVec;
@@ -140,10 +139,10 @@ public:
                                  int count = 1);
 
     static void setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
-                                 const std::shared_ptr<GLuint> &spSsbo,
-                                 const std::string &uniform,
-                                 int sizeBytes,
-                                 GLuint binding);
+                               const std::shared_ptr<GLuint> &spSsbo,
+                               const std::string &uniform,
+                               int sizeBytes,
+                               GLuint binding);
 
     static void renderBuffer(const std::shared_ptr<GLuint> &spVao,
                              const int start,

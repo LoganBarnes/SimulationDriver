@@ -24,12 +24,12 @@ namespace
 const std::unordered_map<std::string, GLenum> &shaderTypes()
 {
     static std::unordered_map<std::string, GLenum> extMap{
-        {".vert", GL_VERTEX_SHADER},
-        {".tesc", GL_TESS_CONTROL_SHADER},
-        {".tese", GL_TESS_EVALUATION_SHADER},
-        {".geom", GL_GEOMETRY_SHADER},
-        {".frag", GL_FRAGMENT_SHADER},
-        {".comp", GL_COMPUTE_SHADER}
+            {".vert", GL_VERTEX_SHADER},
+            {".tesc", GL_TESS_CONTROL_SHADER},
+            {".tese", GL_TESS_EVALUATION_SHADER},
+            {".geom", GL_GEOMETRY_SHADER},
+            {".frag", GL_FRAGMENT_SHADER},
+            {".comp", GL_COMPUTE_SHADER}
     };
     return extMap;
 }
@@ -37,12 +37,12 @@ const std::unordered_map<std::string, GLenum> &shaderTypes()
 const std::unordered_map<GLenum, std::string> &shaderTypeStrings()
 {
     static std::unordered_map<GLenum, std::string> typeMap{
-        {GL_VERTEX_SHADER,          "GL_VERTEX_SHADER"},
-        {GL_TESS_CONTROL_SHADER,    "GL_TESS_CONTROL_SHADER"},
-        {GL_TESS_EVALUATION_SHADER, "GL_TESS_EVALUATION_SHADER"},
-        {GL_GEOMETRY_SHADER,        "GL_GEOMETRY_SHADER"},
-        {GL_FRAGMENT_SHADER,        "GL_FRAGMENT_SHADER"},
-        {GL_COMPUTE_SHADER,         "GL_COMPUTE_SHADER"}
+            {GL_VERTEX_SHADER,          "GL_VERTEX_SHADER"},
+            {GL_TESS_CONTROL_SHADER,    "GL_TESS_CONTROL_SHADER"},
+            {GL_TESS_EVALUATION_SHADER, "GL_TESS_EVALUATION_SHADER"},
+            {GL_GEOMETRY_SHADER,        "GL_GEOMETRY_SHADER"},
+            {GL_FRAGMENT_SHADER,        "GL_FRAGMENT_SHADER"},
+            {GL_COMPUTE_SHADER,         "GL_COMPUTE_SHADER"}
     };
     return typeMap;
 }
@@ -289,9 +289,9 @@ void create_separable_program(SeparablePrograms *pSp, const std::string filePath
 const std::vector<VAOElement> &posNormTexVaoElements()
 {
     static std::vector<VAOElement> elements{
-        {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
-        {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
-        {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
+            {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
+            {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
+            {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
     };
     return elements;
 }
@@ -299,7 +299,7 @@ const std::vector<VAOElement> &posNormTexVaoElements()
 const std::vector<VAOElement> &posVaoElements()
 {
     static std::vector<VAOElement> elements{
-        {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
+            {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
     };
     return elements;
 }
@@ -468,30 +468,30 @@ std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &s
             case GL_INT:
             case GL_UNSIGNED_INT:
                 glVertexAttribIPointer(
-                    position,
-                    vaoElmt.size,     // Num coordinates per position
-                    vaoElmt.type,     // Type
-                    totalStride,      // Stride, 0 = tightly packed
-                    vaoElmt.pointer   // Array buffer offset
+                        position,
+                        vaoElmt.size,     // Num coordinates per position
+                        vaoElmt.type,     // Type
+                        totalStride,      // Stride, 0 = tightly packed
+                        vaoElmt.pointer   // Array buffer offset
                 );
                 break;
             case GL_DOUBLE:
                 glVertexAttribLPointer(
-                    position,
-                    vaoElmt.size,     // Num coordinates per position
-                    vaoElmt.type,     // Type
-                    totalStride,      // Stride, 0 = tightly packed
-                    vaoElmt.pointer   // Array buffer offset
+                        position,
+                        vaoElmt.size,     // Num coordinates per position
+                        vaoElmt.type,     // Type
+                        totalStride,      // Stride, 0 = tightly packed
+                        vaoElmt.pointer   // Array buffer offset
                 );
                 break;
             default:
                 glVertexAttribPointer(
-                    position,
-                    vaoElmt.size,     // Num coordinates per position
-                    vaoElmt.type,     // Type
-                    GL_FALSE,         // Normalized
-                    totalStride,      // Stride, 0 = tightly packed
-                    vaoElmt.pointer   // Array buffer offset
+                        position,
+                        vaoElmt.size,     // Num coordinates per position
+                        vaoElmt.type,     // Type
+                        GL_FALSE,         // Normalized
+                        totalStride,      // Stride, 0 = tightly packed
+                        vaoElmt.pointer   // Array buffer offset
                 );
                 break;
         }
@@ -725,11 +725,11 @@ OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
 
 void
 OpenGLHelper::setFloatUniform(
-    const std::shared_ptr<GLuint> &spProgram,
-    const std::string &uniform,
-    const float *pValue,
-    const int size,
-    const int count
+        const std::shared_ptr<GLuint> &spProgram,
+        const std::string &uniform,
+        const float *pValue,
+        const int size,
+        const int count
 )
 {
     switch (size)
@@ -822,13 +822,13 @@ void OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
 
 void
 OpenGLHelper::renderBuffer(
-    const std::shared_ptr<GLuint> &spVao,
-    const int start,
-    const int verts,
-    const GLenum mode,
-    const std::shared_ptr<GLuint> &spIbo,
-    const void *pOffset,
-    const GLenum iboType
+        const std::shared_ptr<GLuint> &spVao,
+        const int start,
+        const int verts,
+        const GLenum mode,
+        const std::shared_ptr<GLuint> &spIbo,
+        const void *pOffset,
+        const GLenum iboType
 )
 {
     glBindVertexArray(*spVao);
@@ -848,21 +848,31 @@ OpenGLHelper::renderBuffer(
 } // OpenGLHelper::renderBuffer
 
 template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string);
+
 template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string);
+
 template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string);
+
 template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string, std::string);
+
 template std::shared_ptr<GLuint>
 OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string);
+
 template std::shared_ptr<GLuint>
 OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string, std::string);
 
 
 template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string);
+
 template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string);
+
 template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string);
+
 template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string);
+
 template SeparablePrograms
 OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string);
+
 template SeparablePrograms
 OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string, std::string);
 

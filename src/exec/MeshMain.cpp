@@ -7,10 +7,10 @@ class Simulator : public sim::OpenGLSimulation<Simulator>
 {
 public:
     Simulator()
-        : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}
+            : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}
     {
         camera_.setUsingOrbitMode(true);
-        camera_.setOrbitPoint({0, 0, 0});
+        camera_.setOrbitOrigin({0, 0, 0});
         camera_.setOrbitOffsetDistance(5);
 
         prevCam_ = camera_;

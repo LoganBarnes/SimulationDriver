@@ -2,7 +2,8 @@
 
 #include <sim-driver/OpenGLForwardDeclarations.hpp>
 #include <sim-driver/meshes/HeightMap.hpp>
-#include "RendererHelper.hpp"
+#include <sim-driver/renderers/RendererHelper.hpp>
+#include <ShaderConfig.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 
@@ -19,7 +20,9 @@ public:
     explicit HeightMapRenderer(sim::HeightMap heightMap);
 
     void render(float alpha, const Camera &camera) const;
+
     void configureGui();
+
     void resize(int width, int height);
 
 private:
@@ -35,7 +38,7 @@ private:
 };
 
 HeightMapRenderer::HeightMapRenderer(sim::HeightMap heightMap)
-    : heightMap_{std::move(heightMap)}
+        : heightMap_{std::move(heightMap)}
 {
 #ifdef NORMAL_RENDER
     glIds_.program = sim::OpenGLHelper::createProgram(sim::SHADER_PATH + "shader.vert",
@@ -49,7 +52,12 @@ HeightMapRenderer::HeightMapRenderer(sim::HeightMap heightMap)
 #else
     glIds_.program = sim::OpenGLHelper::createProgram(sim::SHADER_PATH + "heights.vert",
 //                                                      sim::SHADER_PATH + "heights.geom",
-                                                      sim::SHADER_PATH + "shader.frag");
+#ifdef __APPLE__
+                                                      sim::SHADER_PATH + "shader_mac.frag");
+#else
+    sim::SHADER_PATH + "shader.frag");
+#endif
+
     std::vector<int> vbo;
 #endif
     std::vector<float> tex;
@@ -81,7 +89,7 @@ HeightMapRenderer::HeightMapRenderer(sim::HeightMap heightMap)
 #endif
 
     glIds_.texture = sim::OpenGLHelper::createTextureArray(
-        heightMap_.getWidth(), heightMap_.getHeight(), tex.data(), GL_LINEAR, GL_CLAMP_TO_EDGE, GL_R32F, GL_RED
+            heightMap_.getWidth(), heightMap_.getHeight(), tex.data(), GL_LINEAR, GL_CLAMP_TO_EDGE, GL_R32F, GL_RED
     );
 
 
@@ -89,8 +97,7 @@ HeightMapRenderer::HeightMapRenderer(sim::HeightMap heightMap)
     renderer_.setShowingVertsOnly(true);
     renderer_.setPointSize(5);
 
-    renderer_.setDataFun([&]() -> sim::PosData
-                         { return updateVboAndVao(); });
+    renderer_.setDataFun([&]() -> sim::PosData { return updateVboAndVao(); });
 }
 
 void HeightMapRenderer::render(float alpha, const Camera &camera) const
@@ -109,12 +116,12 @@ void HeightMapRenderer::render(float alpha, const Camera &camera) const
         glm::vec3 worldDimensions{heightMap_.getWorldDimensions()};
 
         sim::OpenGLHelper::setMatrixUniform(
-            glIds_.program, "projection_from_world", glm::value_ptr(camera.getPerspectiveProjectionViewMatrix())
+                glIds_.program, "screen_from_world", glm::value_ptr(camera.getPerspectiveScreenFromWorldMatrix())
         );
         sim::OpenGLHelper::setTextureUniform(glIds_.program, "heights", glIds_.texture, 0);
-        sim::OpenGLHelper::setIntUniform(glIds_.program, "texSize", glm::value_ptr(texSize), 2);
-        sim::OpenGLHelper::setFloatUniform(glIds_.program, "worldOrigin", glm::value_ptr(worldOrigin), 3);
-        sim::OpenGLHelper::setFloatUniform(glIds_.program, "worldDimensions", glm::value_ptr(worldDimensions), 3);
+        sim::OpenGLHelper::setIntUniform(glIds_.program, "tex_size", glm::value_ptr(texSize), 2);
+        sim::OpenGLHelper::setFloatUniform(glIds_.program, "world_origin", glm::value_ptr(worldOrigin), 3);
+        sim::OpenGLHelper::setFloatUniform(glIds_.program, "world_dimensions", glm::value_ptr(worldDimensions), 3);
 #endif
         sim::OpenGLHelper::setIntUniform(glIds_.program, "displayMode", &displayMode_);
 
@@ -136,14 +143,14 @@ void HeightMapRenderer::configureGui()
 
     ImGui::Combo("Display Mode", &displayMode_,
                  " Position \0"
-                     " Normal \0"
-                     " Tex Coords \0"
-                     " Color \0"
-                     " Texture \0"
-                     " Simple Shading \0"
-                     " Advanced Shading \0"
-                     " White \0"
-                     "\0\0");
+                         " Normal \0"
+                         " Tex Coords \0"
+                         " Color \0"
+                         " Texture \0"
+                         " Simple Shading \0"
+                         " Advanced Shading \0"
+                         " White \0"
+                         "\0\0");
 }
 
 void HeightMapRenderer::resize(int width, int height)

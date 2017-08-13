@@ -1,14 +1,16 @@
 #include <sim-driver/renderers/MeshRenderer.hpp>
+#include <imgui.h>
 
 namespace sim
 {
 
 MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
-    : mesh_{std::move(mesh)}
+        : mesh_{std::move(mesh)}
 {
-    renderer_.setDataFun([&]{
-        return mesh_.getMeshData();
-    });
+    renderer_.setDataFun([&]
+                         {
+                             return mesh_.getMeshData();
+                         });
 }
 
 void MeshRenderer::render(float alpha, const Camera &camera) const
