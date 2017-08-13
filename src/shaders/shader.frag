@@ -4,9 +4,9 @@
 
 in Vertex
 {
-    vec3 position;
-    vec3 normal;
-    vec2 texCoords;
+    vec3 world_position;
+    vec3 world_normal;
+    vec2 tex_coords;
 } vertex;
 
 const float PI = 3.141592653589793;
@@ -102,24 +102,24 @@ void main(void)
 {
     vec3 color = vec3(1);
 
-    vec3 normal = gl_FrontFacing ? vertex.normal : -vertex.normal;
+    vec3 normal = gl_FrontFacing ? vertex.world_normal : -vertex.world_normal;
 
     switch(displayMode)
     {
     case 0:
-        color = vertex.position;
+        color = vertex.world_position;
         break;
     case 1:
         color = normal * 0.5 + 0.5;
         break;
     case 2:
-        color = vec3(vertex.texCoords, 1.0);
+        color = vec3(vertex.tex_coords, 1.0);
         break;
     case 3:
         color = shapeColor;
         break;
     case 4:
-        color = texture(tex, vertex.texCoords).rgb;
+        color = texture(tex, vertex.tex_coords).rgb;
         break;
     case 5:
     {
@@ -130,7 +130,7 @@ void main(void)
         break;
     case 6:
     {
-        vec3 w_v = normalize(eye - vertex.position);
+        vec3 w_v = normalize(eye - vertex.world_position);
 
         vec3 intensity = vec3(0.1); // ambient
 
@@ -138,7 +138,7 @@ void main(void)
         {
             vec3 w_l = normalize(lights[i].xyz);
 
-            intensity += calcBRDF(w_v, vertex.normal, w_l)
+            intensity += calcBRDF(w_v, normal, w_l)
                          * lights[i].w
                          * max(0.0, dot(normal, w_l));
         }

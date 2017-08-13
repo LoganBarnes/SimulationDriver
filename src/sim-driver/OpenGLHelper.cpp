@@ -289,9 +289,9 @@ void create_separable_program(SeparablePrograms *pSp, const std::string filePath
 const std::vector<VAOElement> &posNormTexVaoElements()
 {
     static std::vector<VAOElement> elements{
-            {"inPosition",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
-            {"inNormal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
-            {"inTexCoords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
+            {"local_position",  3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
+            {"local_normal",    3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, normal))},
+            {"tex_coords", 2, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, texCoords))},
     };
     return elements;
 }
@@ -299,7 +299,7 @@ const std::vector<VAOElement> &posNormTexVaoElements()
 const std::vector<VAOElement> &posVaoElements()
 {
     static std::vector<VAOElement> elements{
-            {"inPosition", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
+            {"local_position", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
     };
     return elements;
 }
