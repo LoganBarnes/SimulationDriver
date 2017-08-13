@@ -23,7 +23,7 @@ RendererHelper<Vertex>::RendererHelper()
 #ifdef __APPLE__
                                                                  sim::SHADER_PATH + "shader_mac.frag");
 #else
-    sim::SHADER_PATH + "shader.frag");
+                                                                 sim::SHADER_PATH + "shader.frag");
 #endif
 }
 
@@ -345,9 +345,9 @@ template
 class sim::RendererHelper<sim::PosVertex>;
 
 template
-class sim::DrawData<sim::PosNormTexVertex>;
+struct sim::DrawData<sim::PosNormTexVertex>;
 
 template
-class sim::DrawData<sim::PosVertex>;
+struct sim::DrawData<sim::PosVertex>;
 
 } // namespace sim
