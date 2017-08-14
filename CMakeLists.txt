@@ -61,7 +61,8 @@ set(SOURCE_FILES
         src/shaders/shader.frag
         src/shaders/shader_mac.frag
         # callbacks
-        src/sim-driver/callbacks/Callbacks
+        src/sim-driver/callbacks/CallbackWrapper
+        src/sim-driver/callbacks/CameraCallbacks
         # cameras
         src/sim-driver/cameras/Camera
         # meshes

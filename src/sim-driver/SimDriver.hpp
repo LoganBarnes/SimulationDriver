@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sim-driver/cameras/Camera.hpp>
-#include <sim-driver/callbacks/Callbacks.hpp>
+#include <sim-driver/callbacks/CameraCallbacks.hpp>
 
 #include <sim-driver/OpenGLForwardDeclarations.hpp>
 
@@ -34,7 +34,7 @@ public:
     SimDriver(const SimDriver &) = delete;
     SimDriver &operator=(const SimDriver &) = delete;
 
-    Camera camera_;
+    std::shared_ptr<Camera> camera_;
 
 protected:
 
@@ -53,24 +53,24 @@ private:
 
     bool paused_{false};
     GLFWwindow *pWindow_{nullptr};
-    Callbacks<Child> callbacks_;
+    CameraCallbacks<> callbacks_;
 
     void update();
-
     void render(double alpha, bool eventBased = false);
 
 };
 
 template<typename Child>
 SimDriver<Child>::SimDriver(const std::string &title, int width, int height)
-        : callbacks_{*this}
+        : camera_{std::make_shared<Camera>()},
+          callbacks_{camera_}
 {
     glfwSetErrorCallback([](int error, const char *description)
                          {
                              std::cerr << "ERROR: (" << error << ") " << description << std::endl;
                          });
 
-    if (!glfwInit())
+    if (glfwInit() == 0)
     {
         throw std::runtime_error("GLFW init failed");
     }
@@ -96,7 +96,7 @@ SimDriver<Child>::SimDriver(const std::string &title, int width, int height)
 
     pWindow_ = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
-    if (!pWindow_)
+    if (pWindow_ == nullptr)
     {
         throw std::runtime_error("GLFW window creation failed");
     }
@@ -104,14 +104,14 @@ SimDriver<Child>::SimDriver(const std::string &title, int width, int height)
     glfwMakeContextCurrent(pWindow_);
     glfwSwapInterval(1);
 
-    if (!gladLoadGLLoader(reinterpret_cast< GLADloadproc >( glfwGetProcAddress )))
+    if (gladLoadGLLoader(reinterpret_cast< GLADloadproc >( glfwGetProcAddress )) == 0)
     {
         throw std::runtime_error("Failed to initialize OpenGL context");
     }
 
     ImGui_ImplGlfwGL3_Init(pWindow_, false); // false for no callbacks
 
-    camera_.setAspectRatio(width / float(height));
+    camera_->setAspectRatio(width / float(height));
 
     setCallbackClass(&callbacks_);
 }
@@ -201,7 +201,7 @@ template<typename Child>
 template<typename T>
 void SimDriver<Child>::setCallbackClass(T *pCallbacks)
 {
-    glfwSetWindowUserPointer(pWindow_, &pCallbacks);
+    glfwSetWindowUserPointer(pWindow_, pCallbacks);
 
     glfwSetWindowSizeCallback(pWindow_, [](GLFWwindow *pWindow, int width, int height)
     {
@@ -234,14 +234,6 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard)
         {
-            switch (key)
-            {
-                case GLFW_KEY_ESCAPE:
-                    glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
-                    break;
-                default:
-                    break;
-            }
             static_cast<T *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
         }
         else
@@ -264,7 +256,6 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
     glfwSetCursorPosCallback(pWindow_, [](GLFWwindow *pWindow, double xpos, double ypos)
     {
         ImGuiIO &io = ImGui::GetIO();
-
         if (!io.WantCaptureMouse)
         {
             static_cast<T *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);

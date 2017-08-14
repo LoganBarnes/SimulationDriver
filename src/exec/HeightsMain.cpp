@@ -15,24 +15,24 @@ class Simulator : public sim::OpenGLSimulation<Simulator>
 public:
     Simulator() : renderer_{sim::HeightMap{3,
                                            2,
-                                           glm::vec3{-1.5f, -2.0f, -0.5f},
+                                           glm::vec3{-1.5f, -1.0f, -0.5f},
                                            glm::vec3{3, 2, 1},
                                            std::vector<float>{0.2f, 0.7f,
                                                               0.3f, 0.6f,
                                                               0.4f, 0.5f}}}
     {
-        camera_.setUsingOrbitMode(true);
-        camera_.setOrbitOrigin({0, 0, 0});
-        camera_.setOrbitOffsetDistance(5);
-        camera_.pitch(glm::half_pi<float>() * -0.15f);
+        camera_->setUsingOrbitMode(true);
+        camera_->setOrbitOrigin({0, 0, 0});
+        camera_->setOrbitOffsetDistance(5);
+        camera_->pitch(glm::half_pi<float>() * -0.15f);
 
-        prevCam_ = camera_;
+        prevCam_ = *camera_;
     }
 
     void onUpdate(double worldTime, double timeStep)
     {
-        prevCam_ = camera_;
-        camera_.yaw(static_cast<float>(timeStep * 0.5));
+        prevCam_ = *camera_;
+        camera_->yaw(static_cast<float>(timeStep * 0.5));
     }
 
     void onRender(int width, int height, double alpha)
@@ -40,11 +40,11 @@ public:
         auto a = static_cast<float>(alpha);
 
         sim::Camera camera;
-        glm::vec3 eye{glm::mix(camera_.getEyeVector(), prevCam_.getEyeVector(), a)};
-        glm::vec3 look{glm::mix(camera_.getLookVector(), prevCam_.getLookVector(), a)};
-        glm::vec3 up{glm::mix(camera_.getUpVector(), prevCam_.getUpVector(), a)};
+        glm::vec3 eye{glm::mix(camera_->getEyeVector(), prevCam_.getEyeVector(), a)};
+        glm::vec3 look{glm::mix(camera_->getLookVector(), prevCam_.getLookVector(), a)};
+        glm::vec3 up{glm::mix(camera_->getUpVector(), prevCam_.getUpVector(), a)};
 
-        float aspect{glm::mix(camera_.getAspectRatio(), prevCam_.getAspectRatio(), a)};
+        float aspect{glm::mix(camera_->getAspectRatio(), prevCam_.getAspectRatio(), a)};
 
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);

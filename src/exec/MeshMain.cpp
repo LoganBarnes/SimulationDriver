@@ -9,17 +9,17 @@ public:
     Simulator()
             : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}
     {
-        camera_.setUsingOrbitMode(true);
-        camera_.setOrbitOrigin({0, 0, 0});
-        camera_.setOrbitOffsetDistance(5);
+        camera_->setUsingOrbitMode(true);
+        camera_->setOrbitOrigin({0, 0, 0});
+        camera_->setOrbitOffsetDistance(5);
 
-        prevCam_ = camera_;
+        prevCam_ = *camera_;
     }
 
     void onUpdate(double worldTime, double timeStep)
     {
-        prevCam_ = camera_;
-        camera_.yaw(static_cast<float>(timeStep));
+        prevCam_ = *camera_;
+        camera_->yaw(static_cast<float>(timeStep));
     }
 
     void onRender(int width, int height, double alpha)
@@ -27,11 +27,11 @@ public:
         auto a = static_cast<float>(alpha);
 
         sim::Camera camera;
-        glm::vec3 eye{glm::mix(camera_.getEyeVector(), prevCam_.getEyeVector(), a)};
-        glm::vec3 look{glm::mix(camera_.getLookVector(), prevCam_.getLookVector(), a)};
-        glm::vec3 up{glm::mix(camera_.getUpVector(), prevCam_.getUpVector(), a)};
+        glm::vec3 eye{glm::mix(camera_->getEyeVector(), prevCam_.getEyeVector(), a)};
+        glm::vec3 look{glm::mix(camera_->getLookVector(), prevCam_.getLookVector(), a)};
+        glm::vec3 up{glm::mix(camera_->getUpVector(), prevCam_.getUpVector(), a)};
 
-        float aspect{glm::mix(camera_.getAspectRatio(), prevCam_.getAspectRatio(), a)};
+        float aspect{glm::mix(camera_->getAspectRatio(), prevCam_.getAspectRatio(), a)};
 
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);
@@ -60,7 +60,8 @@ int main()
     try
     {
         Simulator sim;
-        sim.runNoFasterThanRealTimeLoop();
+//        sim.runNoFasterThanRealTimeLoop();
+        sim.runAsFastAsPossibleLoop();
     }
     catch (const std::exception &e)
     {

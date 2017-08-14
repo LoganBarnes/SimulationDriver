@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sim-driver/cameras/Camera.hpp>
-#include <sim-driver/callbacks/Callbacks.hpp>
+#include <sim-driver/callbacks/CallbackWrapper.hpp>
 
 #include <sim-driver/OpenGLForwardDeclarations.hpp>
 
