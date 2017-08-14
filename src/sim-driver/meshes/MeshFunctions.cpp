@@ -57,7 +57,7 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
             data.ibo.push_back(index + v_divisions + 2);
             ++index;
         }
-        data.ibo.push_back(0xFFFFFFFF);
+        data.ibo.push_back(sim::primitiveRestart());
     }
     data.ibo.pop_back();
 

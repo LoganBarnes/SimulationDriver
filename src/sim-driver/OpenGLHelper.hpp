@@ -36,6 +36,7 @@ struct PosVertex
 
 const std::vector<VAOElement> &posNormTexVaoElements();
 const std::vector<VAOElement> &posVaoElements();
+const unsigned &primitiveRestart();
 
 typedef std::vector<std::shared_ptr<GLuint>> IdVec;
 

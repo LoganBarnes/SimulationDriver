@@ -60,8 +60,7 @@ int main()
     try
     {
         Simulator sim;
-//        sim.runNoFasterThanRealTimeLoop();
-        sim.runAsFastAsPossibleLoop();
+        sim.runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {
