@@ -28,7 +28,6 @@ public:
                T top);
 
     void yaw(T angleRadians);
-
     void pitch(T angleRadians);
 
     const glm::tvec3<T> &getEyeVector() const;

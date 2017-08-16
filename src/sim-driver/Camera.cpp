@@ -1,4 +1,4 @@
-#include <sim-driver/cameras/Camera.hpp>
+#include <sim-driver/Camera.hpp>
 
 #define GLM_FORCE_RADIANS
 #define GLM_ENABLE_EXPERIMENTAL

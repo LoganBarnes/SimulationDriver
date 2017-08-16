@@ -3,7 +3,8 @@ project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include(cmake/DownloadProject.cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+include(DownloadProject)
 
 configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/ShaderConfig.hpp)
 
@@ -60,11 +61,6 @@ set(SOURCE_FILES
         src/shaders/shader.geom
         src/shaders/shader.frag
         src/shaders/shader_mac.frag
-        # callbacks
-        src/sim-driver/callbacks/CallbackWrapper
-        src/sim-driver/callbacks/CameraCallbacks
-        # cameras
-        src/sim-driver/cameras/Camera
         # meshes
         src/sim-driver/meshes/HeightMap
         src/sim-driver/meshes/MeshFunctions
@@ -74,9 +70,13 @@ set(SOURCE_FILES
         src/sim-driver/renderers/MeshRenderer
         src/sim-driver/renderers/RendererHelper
         # sim-driver
+        src/sim-driver/CallbackWrapper
+        src/sim-driver/Camera
+        src/sim-driver/CameraCallbacks
         src/sim-driver/OpenGLForwardDeclarations
         src/sim-driver/OpenGLHelper
         src/sim-driver/OpenGLSimulation
+        src/sim-driver/SimData
         src/sim-driver/SimDriver
         )
 
@@ -89,6 +89,18 @@ target_include_directories(SimDriver SYSTEM PUBLIC
         ${glm_SOURCE_DIR}
         )
 target_link_libraries(SimDriver ${OPENGL_gl_LIBRARY} glfw)
+
+find_package(CUDA)
+if (CUDA_FOUND)
+    set(OptiX_FIND_QUIETLY TRUE)
+    find_package(OptiX)
+    if (optix_LIBRARY AND OptiX_INCLUDE AND optix_prime_LIBRARY)
+        add_definitions(-Dsutil_sdk_EXPORTS -D_CRT_SECURE_NO_DEPRECATE) # windows BS
+
+        list(APPEND SOURCE_FILES src/extra/sim-driver/extra/OptiXSimulation.hpp)
+#        cuda_add_library(OptixSimulation src/extra/sim-driver/extra/OptiXSimulation.cu)
+    endif ()
+endif ()
 
 add_executable(MeshExec src/exec/MeshMain)
 target_link_libraries(MeshExec SimDriver)

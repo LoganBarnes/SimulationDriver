@@ -3,23 +3,25 @@
 #include <sim-driver/renderers/MeshRenderer.hpp>
 #include <sim-driver/meshes/MeshFunctions.hpp>
 
-class Simulator : public sim::OpenGLSimulation<Simulator>
+
+class Simulator
 {
 public:
-    Simulator()
-            : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}
+    explicit Simulator(std::shared_ptr<sim::SimData> spSimData)
+            : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
+              spSimData_{std::move(spSimData)}
     {
-        camera_->setUsingOrbitMode(true);
-        camera_->setOrbitOrigin({0, 0, 0});
-        camera_->setOrbitOffsetDistance(5);
+        spSimData_->camera.setUsingOrbitMode(true);
+        spSimData_->camera.setOrbitOrigin({0, 0, 0});
+        spSimData_->camera.setOrbitOffsetDistance(5);
 
-        prevCam_ = *camera_;
+        prevCam_ = spSimData_->camera;
     }
 
     void onUpdate(double worldTime, double timeStep)
     {
-        prevCam_ = *camera_;
-        camera_->yaw(static_cast<float>(timeStep));
+        prevCam_ = spSimData_->camera;
+        spSimData_->camera.yaw(static_cast<float>(timeStep));
     }
 
     void onRender(int width, int height, double alpha)
@@ -27,11 +29,11 @@ public:
         auto a = static_cast<float>(alpha);
 
         sim::Camera camera;
-        glm::vec3 eye{glm::mix(camera_->getEyeVector(), prevCam_.getEyeVector(), a)};
-        glm::vec3 look{glm::mix(camera_->getLookVector(), prevCam_.getLookVector(), a)};
-        glm::vec3 up{glm::mix(camera_->getUpVector(), prevCam_.getUpVector(), a)};
+        glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), spSimData_->camera.getEyeVector(), a)};
+        glm::vec3 look{glm::mix(prevCam_.getLookVector(), spSimData_->camera.getLookVector(), a)};
+        glm::vec3 up{glm::mix(prevCam_.getUpVector(), spSimData_->camera.getUpVector(), a)};
 
-        float aspect{glm::mix(camera_->getAspectRatio(), prevCam_.getAspectRatio(), a)};
+        float aspect{glm::mix(prevCam_.getAspectRatio(), spSimData_->camera.getAspectRatio(), a)};
 
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);
@@ -50,8 +52,19 @@ public:
         ImGui::End();
     }
 
+    void keyCallback(GLFWwindow *pWindow,
+                     int key,
+                     int scancode,
+                     int action,
+                     int mods,
+                     const sim::SimCallbacks<Simulator>& parent)
+    {
+        spSimData_->paused = parent.isShiftDown();
+    }
+
 private:
     sim::MeshRenderer renderer_;
+    std::shared_ptr<sim::SimData> spSimData_;
     sim::Camera prevCam_;
 };
 
@@ -59,8 +72,7 @@ int main()
 {
     try
     {
-        Simulator sim;
-        sim.runNoFasterThanRealTimeLoop();
+        sim::OpenGLSimulation<Simulator>{}.runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {

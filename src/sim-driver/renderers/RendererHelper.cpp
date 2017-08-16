@@ -1,6 +1,6 @@
 #include <sim-driver/renderers/RendererHelper.hpp>
 #include <sim-driver/OpenGLHelper.hpp>
-#include <sim-driver/cameras/Camera.hpp>
+#include <sim-driver/Camera.hpp>
 #include <ShaderConfig.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>

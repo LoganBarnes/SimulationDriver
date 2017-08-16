@@ -9,72 +9,74 @@
 namespace sim
 {
 
+template<typename T, typename ... Args>
+auto
+make_child(int i, const std::shared_ptr<SimData>& simData, Args ...args) -> decltype(T(simData, args...), std::shared_ptr<T>())
+{
+    return std::make_shared<T>(simData, args...);
+}
+
+template<typename T, typename ... Args>
+auto make_child(long i, const std::shared_ptr<SimData>& simData, Args ...args) -> decltype(T(args...), std::shared_ptr<T>())
+{
+    return std::make_shared<T>(args...);
+}
+
 template<typename Child>
 class OpenGLSimulation : public SimDriver<OpenGLSimulation<Child>>
 {
 public:
-    template<class T = Child>
-    auto update(double world_time, double time_step, int i)
-    -> decltype(static_cast<T *>(this)->onUpdate(world_time, time_step), void());
+    template<typename ... Args>
+    explicit OpenGLSimulation(const SimInitData& initData = {}, Args ...args);
 
-    template<class T = Child>
-    auto update(double world_time, double time_step, long l) -> decltype(void());
+    void update(double worldTime, double timeStep);
 
     void render(int width, int height, double alpha, bool eventDriven);
 
-    OpenGLSimulation(const OpenGLSimulation &) = delete;
-    OpenGLSimulation &operator=(const OpenGLSimulation &) = delete;
-
-protected:
-    explicit OpenGLSimulation(const std::string &title = "OpenGL Simulation",
-                              int width = 0,
-                              int height = 0);
-
-    ~OpenGLSimulation() override = default;
-
-    OpenGLSimulation(OpenGLSimulation &&) = default; // no-except doesn't compile with llvm
-    OpenGLSimulation &operator=(OpenGLSimulation &&) = default; // no-except doesn't compile with llvm
-
 private:
-    template<class T = Child>
-    auto render_child(int width, int height, double alpha, int i)
-    -> decltype(static_cast<T *>(this)->onRender(width, height, alpha), void());
+
+    std::shared_ptr<Child> spChild_;
+    SimCallbacks<Child> callbacks_;
 
     template<class T = Child>
-    auto render_child(int width, int height, double alpha, long l) -> decltype(void());
+    auto updateChild(T &child, double worldTime, double timeStep, int i)
+    -> decltype(child.onUpdate(worldTime, timeStep), void());
 
     template<class T = Child>
-    auto render_child_gui(int width, int height, int i)
-    -> decltype(static_cast<T *>(this)->onGuiRender(width, height), void());
+    auto updateChild(T &child, double worldTime, double timeStep, long l) -> decltype(void());
 
     template<class T = Child>
-    auto render_child_gui(int width, int height, long l) -> decltype(void());
+    auto renderChild(T &child, int width, int height, double alpha, int i)
+    -> decltype(child.onRender(width, height, alpha), void());
+
+    template<class T = Child>
+    auto renderChild(T &child, int width, int height, double alpha, long l) -> decltype(void());
+
+    template<class T = Child>
+    auto renderChildGui(T &child, int width, int height, int i)
+    -> decltype(child.onGuiRender(width, height), void());
+
+    template<class T = Child>
+    auto renderChildGui(T &child, int width, int height, long l) -> decltype(void());
 };
 
 
 template<typename Child>
-OpenGLSimulation<Child>::OpenGLSimulation(const std::string &title, int width, int height)
-        : SimDriver<OpenGLSimulation>(title, width, height)
+template<typename ... Args>
+OpenGLSimulation<Child>::OpenGLSimulation(const SimInitData& initData, Args ...args)
+        : SimDriver<OpenGLSimulation<Child>>(initData),
+          spChild_{make_child<Child>(0, this->getSimData(), args...)},
+          callbacks_{this->getSimData(), spChild_}
 {
     sim::OpenGLHelper::setDefaults();
+    this->setCallbackClass(&callbacks_);
 }
 
 template<typename Child>
-template<typename T>
-auto OpenGLSimulation<Child>::update(double world_time, double time_step, int i)
--> decltype(static_cast<T *>(this)->onUpdate(world_time, time_step), void())
+void OpenGLSimulation<Child>::update(const double worldTime, const double timeStep)
 {
-    static_assert(std::is_same<T, Child>::value, "");
-    static_cast<Child *>(this)->onUpdate(world_time, time_step);
+    updateChild(*spChild_, worldTime, timeStep, 0);
 }
-
-template<typename Child>
-template<typename T>
-auto OpenGLSimulation<Child>::update(double world_time, double time_step, long l) -> decltype(void())
-{
-    static_assert(std::is_same<T, Child>::value, "");
-}
-
 
 template<typename Child>
 void OpenGLSimulation<Child>::render(const int width,
@@ -87,47 +89,63 @@ void OpenGLSimulation<Child>::render(const int width,
     if (eventDriven)
     {
         ImGui_ImplGlfwGL3_NewFrame();
-        render_child_gui(width, height, 0);
+        renderChildGui(*spChild_, width, height, 0);
         ImGui::Render();
     }
 
     ImGui_ImplGlfwGL3_NewFrame();
-    render_child_gui(width, height, 0);
+    renderChildGui(*spChild_, width, height, 0);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    render_child(width, height, alpha, 0);
+    renderChild(*spChild_, width, height, alpha, 0);
     ImGui::Render();
 }
 
 template<typename Child>
 template<typename T>
-auto OpenGLSimulation<Child>::render_child(int width, int height, double alpha, int i)
--> decltype(static_cast<T *>(this)->onRender(width, height, alpha), void())
+auto OpenGLSimulation<Child>::updateChild(T &child, double worldTime, double timeStep, int i)
+-> decltype(child.onUpdate(worldTime, timeStep), void())
 {
     static_assert(std::is_same<T, Child>::value, "");
-    static_cast<Child *>(this)->onRender(width, height, alpha);
+    child.onUpdate(worldTime, timeStep);
 }
 
 template<typename Child>
 template<typename T>
-auto OpenGLSimulation<Child>::render_child(int width, int height, double alpha, long l) -> decltype(void())
+auto OpenGLSimulation<Child>::updateChild(T &child, double worldTime, double timeStep, long l) -> decltype(void())
 {
     static_assert(std::is_same<T, Child>::value, "");
 }
 
 template<typename Child>
 template<typename T>
-auto OpenGLSimulation<Child>::render_child_gui(int width, int height, int i)
--> decltype(static_cast<T *>(this)->onGuiRender(width, height), void())
+auto OpenGLSimulation<Child>::renderChild(T &child, int width, int height, double alpha, int i)
+-> decltype(child.onRender(width, height, alpha), void())
 {
     static_assert(std::is_same<T, Child>::value, "");
-    static_cast<Child *>(this)->onGuiRender(width, height);
+    child.onRender(width, height, alpha);
 }
 
 template<typename Child>
 template<typename T>
-auto OpenGLSimulation<Child>::render_child_gui(int width, int height, long l) -> decltype(void())
+auto OpenGLSimulation<Child>::renderChild(T &child, int width, int height, double alpha, long l) -> decltype(void())
+{
+    static_assert(std::is_same<T, Child>::value, "");
+}
+
+template<typename Child>
+template<typename T>
+auto OpenGLSimulation<Child>::renderChildGui(T &child, int width, int height, int i)
+-> decltype(child.onGuiRender(width, height), void())
+{
+    static_assert(std::is_same<T, Child>::value, "");
+    child.onGuiRender(width, height);
+}
+
+template<typename Child>
+template<typename T>
+auto OpenGLSimulation<Child>::renderChildGui(T &child, int width, int height, long l) -> decltype(void())
 {
     static_assert(std::is_same<T, Child>::value, "");
 }
