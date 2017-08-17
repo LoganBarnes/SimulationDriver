@@ -10,14 +10,15 @@ namespace sim
 {
 
 template<typename T, typename ... Args>
-auto
-make_child(int i, const std::shared_ptr<SimData>& simData, Args ...args) -> decltype(T(simData, args...), std::shared_ptr<T>())
+auto make_child(int i, const std::shared_ptr<SimData> &simData, Args ...args)
+-> decltype(T(simData, args...), std::shared_ptr<T>())
 {
     return std::make_shared<T>(simData, args...);
 }
 
 template<typename T, typename ... Args>
-auto make_child(long i, const std::shared_ptr<SimData>& simData, Args ...args) -> decltype(T(args...), std::shared_ptr<T>())
+auto make_child(long i, const std::shared_ptr<SimData> &simData, Args ...args)
+-> decltype(T(args...), std::shared_ptr<T>())
 {
     return std::make_shared<T>(args...);
 }
@@ -27,7 +28,7 @@ class OpenGLSimulation : public SimDriver<OpenGLSimulation<Child>>
 {
 public:
     template<typename ... Args>
-    explicit OpenGLSimulation(const SimInitData& initData = {}, Args ...args);
+    explicit OpenGLSimulation(const SimInitData &initData = {}, Args ...args);
 
     void update(double worldTime, double timeStep);
 
@@ -63,7 +64,7 @@ private:
 
 template<typename Child>
 template<typename ... Args>
-OpenGLSimulation<Child>::OpenGLSimulation(const SimInitData& initData, Args ...args)
+OpenGLSimulation<Child>::OpenGLSimulation(const SimInitData &initData, Args ...args)
         : SimDriver<OpenGLSimulation<Child>>(initData),
           spChild_{make_child<Child>(0, this->getSimData(), args...)},
           callbacks_{this->getSimData(), spChild_}

@@ -122,16 +122,18 @@ void CallbackWrapper<C>::charCallback(GLFWwindow *pWindow, unsigned codepoint)
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::windowSizeCallback(T& callbacks, GLFWwindow* window, int width, int height, int i)
--> decltype(callbacks.windowSizeCallback(window, width, height), void()) {
+auto CallbackWrapper<C>::windowSizeCallback(T &callbacks, GLFWwindow *window, int width, int height, int i)
+-> decltype(callbacks.windowSizeCallback(window, width, height), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.windowSizeCallback(window, width, height);
 }
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::windowFocusCallback(T& callbacks, GLFWwindow* window, int focus, int i)
--> decltype(callbacks.windowFocusCallback(window, focus), void()) {
+auto CallbackWrapper<C>::windowFocusCallback(T &callbacks, GLFWwindow *window, int focus, int i)
+-> decltype(callbacks.windowFocusCallback(window, focus), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.windowFocusCallback(window, focus);
 }
@@ -139,8 +141,9 @@ auto CallbackWrapper<C>::windowFocusCallback(T& callbacks, GLFWwindow* window, i
 template<typename C>
 template<typename T>
 auto
-CallbackWrapper<C>::mouseButtonCallback(T& callbacks, GLFWwindow* window, int button, int action, int mods, int i)
--> decltype(callbacks.mouseButtonCallback(window, button, action, mods), void()) {
+CallbackWrapper<C>::mouseButtonCallback(T &callbacks, GLFWwindow *window, int button, int action, int mods, int i)
+-> decltype(callbacks.mouseButtonCallback(window, button, action, mods), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.mouseButtonCallback(window, button, action, mods);
 }
@@ -148,32 +151,36 @@ CallbackWrapper<C>::mouseButtonCallback(T& callbacks, GLFWwindow* window, int bu
 template<typename C>
 template<typename T>
 auto
-CallbackWrapper<C>::keyCallback(T& callbacks, GLFWwindow* window, int key, int scancode, int action, int mods, int i)
--> decltype(callbacks.keyCallback(window, key, scancode, action, mods), void()) {
+CallbackWrapper<C>::keyCallback(T &callbacks, GLFWwindow *window, int key, int scancode, int action, int mods, int i)
+-> decltype(callbacks.keyCallback(window, key, scancode, action, mods), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.keyCallback(window, key, scancode, action, mods);
 }
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::cursorPosCallback(T& callbacks, GLFWwindow* window, double xpos, double ypos, int i)
--> decltype(callbacks.cursorPosCallback(window, xpos, ypos), void()) {
+auto CallbackWrapper<C>::cursorPosCallback(T &callbacks, GLFWwindow *window, double xpos, double ypos, int i)
+-> decltype(callbacks.cursorPosCallback(window, xpos, ypos), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.cursorPosCallback(window, xpos, ypos);
 }
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::scrollCallback(T& callbacks, GLFWwindow* window, double xoffset, double yoffset, int i)
--> decltype(callbacks.scrollCallback(window, xoffset, yoffset), void()) {
+auto CallbackWrapper<C>::scrollCallback(T &callbacks, GLFWwindow *window, double xoffset, double yoffset, int i)
+-> decltype(callbacks.scrollCallback(window, xoffset, yoffset), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.scrollCallback(window, xoffset, yoffset);
 }
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::charCallback(T& callbacks, GLFWwindow* window, unsigned codepoint, int i)
--> decltype(callbacks.charCallback(window, codepoint), void()) {
+auto CallbackWrapper<C>::charCallback(T &callbacks, GLFWwindow *window, unsigned codepoint, int i)
+-> decltype(callbacks.charCallback(window, codepoint), void())
+{
     static_assert(std::is_same<T, C>::value, "");
     callbacks_.charCallback(window, codepoint);
 }
@@ -183,46 +190,53 @@ auto CallbackWrapper<C>::charCallback(T& callbacks, GLFWwindow* window, unsigned
 
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::windowSizeCallback(T& callbacks, GLFWwindow* window, int width, int height, long l)
--> decltype(void()) {
+auto CallbackWrapper<C>::windowSizeCallback(T &callbacks, GLFWwindow *window, int width, int height, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::windowFocusCallback(T& callbacks, GLFWwindow* window, int focus, long l)
--> decltype(void()) {
-    static_assert(std::is_same<T, C>::value, "");
-}
-template<typename C>
-template<typename T>
-auto
-CallbackWrapper<C>::mouseButtonCallback(T& callbacks, GLFWwindow* window, int button, int action, int mods, long l)
--> decltype(void()) {
+auto CallbackWrapper<C>::windowFocusCallback(T &callbacks, GLFWwindow *window, int focus, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
 auto
-CallbackWrapper<C>::keyCallback(T& callbacks, GLFWwindow* window, int key, int scancode, int action, int mods, long l)
--> decltype(void()) {
+CallbackWrapper<C>::mouseButtonCallback(T &callbacks, GLFWwindow *window, int button, int action, int mods, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::cursorPosCallback(T& callbacks, GLFWwindow* window, double xpos, double ypos, long l)
--> decltype(void()) {
+auto
+CallbackWrapper<C>::keyCallback(T &callbacks, GLFWwindow *window, int key, int scancode, int action, int mods, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::scrollCallback(T& callbacks, GLFWwindow* window, double xoffset, double yoffset, long l)
--> decltype(void()) {
+auto CallbackWrapper<C>::cursorPosCallback(T &callbacks, GLFWwindow *window, double xpos, double ypos, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
-auto CallbackWrapper<C>::charCallback(T& callbacks, GLFWwindow* window, unsigned codepoint, long l)
--> decltype(void()) {
+auto CallbackWrapper<C>::scrollCallback(T &callbacks, GLFWwindow *window, double xoffset, double yoffset, long l)
+-> decltype(void())
+{
+    static_assert(std::is_same<T, C>::value, "");
+}
+template<typename C>
+template<typename T>
+auto CallbackWrapper<C>::charCallback(T &callbacks, GLFWwindow *window, unsigned codepoint, long l)
+-> decltype(void())
+{
     static_assert(std::is_same<T, C>::value, "");
 }
 

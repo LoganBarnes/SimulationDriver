@@ -23,7 +23,7 @@ RendererHelper<Vertex>::RendererHelper()
 #ifdef __APPLE__
                                                                  sim::SHADER_PATH + "shader_mac.frag");
 #else
-                                                                 sim::SHADER_PATH + "shader.frag");
+    sim::SHADER_PATH + "shader.frag");
 #endif
 }
 

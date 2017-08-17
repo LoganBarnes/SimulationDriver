@@ -72,7 +72,7 @@ int main()
 {
     try
     {
-        sim::OpenGLSimulation<Simulator>{}.runNoFasterThanRealTimeLoop();
+        sim::OpenGLSimulation<Simulator>{{"test", 30, 25}}.runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {

@@ -16,7 +16,7 @@ class SimCallbacks
 {
 public:
 
-    explicit SimCallbacks(const std::shared_ptr<SimData>& spSimData, const std::shared_ptr<C>& spCallbacks = nullptr);
+    explicit SimCallbacks(const std::shared_ptr<SimData> &spSimData, const std::shared_ptr<C> &spCallbacks = nullptr);
 
     void windowSizeCallback(GLFWwindow *pWindow, int width, int height);
     void windowFocusCallback(GLFWwindow *pWindow, int focus);
@@ -152,7 +152,7 @@ private:
 
 
 template<typename C>
-SimCallbacks<C>::SimCallbacks(const std::shared_ptr<SimData>& spSimData, const std::shared_ptr<C>& spCallbacks)
+SimCallbacks<C>::SimCallbacks(const std::shared_ptr<SimData> &spSimData, const std::shared_ptr<C> &spCallbacks)
         : wpSimData_{spSimData},
           wpCallbacks_(spCallbacks) {}
 
@@ -303,11 +303,11 @@ void SimCallbacks<C>::charCallback(GLFWwindow *pWindow, unsigned codepoint)
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::windowSizeCallback(T &callbacks,
-                                            const SimCallbacks<T> &parent,
-                                            GLFWwindow *window,
-                                            int width,
-                                            int height,
-                                            int i)
+                                         const SimCallbacks<T> &parent,
+                                         GLFWwindow *window,
+                                         int width,
+                                         int height,
+                                         int i)
 -> decltype(callbacks.windowSizeCallback(window, width, height, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -317,10 +317,10 @@ auto SimCallbacks<C>::windowSizeCallback(T &callbacks,
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::windowFocusCallback(T &callbacks,
-                                             const SimCallbacks<T> &parent,
-                                             GLFWwindow *window,
-                                             int focus,
-                                             int i)
+                                          const SimCallbacks<T> &parent,
+                                          GLFWwindow *window,
+                                          int focus,
+                                          int i)
 -> decltype(callbacks.windowFocusCallback(window, focus, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -331,12 +331,12 @@ template<typename C>
 template<typename T>
 auto
 SimCallbacks<C>::mouseButtonCallback(T &callbacks,
-                                        const SimCallbacks<T> &parent,
-                                        GLFWwindow *window,
-                                        int button,
-                                        int action,
-                                        int mods,
-                                        int i)
+                                     const SimCallbacks<T> &parent,
+                                     GLFWwindow *window,
+                                     int button,
+                                     int action,
+                                     int mods,
+                                     int i)
 -> decltype(callbacks.mouseButtonCallback(window, button, action, mods, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -347,13 +347,13 @@ template<typename C>
 template<typename T>
 auto
 SimCallbacks<C>::keyCallback(T &callbacks,
-                                const SimCallbacks<T> &parent,
-                                GLFWwindow *window,
-                                int key,
-                                int scancode,
-                                int action,
-                                int mods,
-                                int i)
+                             const SimCallbacks<T> &parent,
+                             GLFWwindow *window,
+                             int key,
+                             int scancode,
+                             int action,
+                             int mods,
+                             int i)
 -> decltype(callbacks.keyCallback(window, key, scancode, action, mods, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -363,11 +363,11 @@ SimCallbacks<C>::keyCallback(T &callbacks,
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::cursorPosCallback(T &callbacks,
-                                           const SimCallbacks<T> &parent,
-                                           GLFWwindow *window,
-                                           double xpos,
-                                           double ypos,
-                                           int i)
+                                        const SimCallbacks<T> &parent,
+                                        GLFWwindow *window,
+                                        double xpos,
+                                        double ypos,
+                                        int i)
 -> decltype(callbacks.cursorPosCallback(window, xpos, ypos, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -377,11 +377,11 @@ auto SimCallbacks<C>::cursorPosCallback(T &callbacks,
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::scrollCallback(T &callbacks,
-                                        const SimCallbacks<T> &parent,
-                                        GLFWwindow *window,
-                                        double xoffset,
-                                        double yoffset,
-                                        int i)
+                                     const SimCallbacks<T> &parent,
+                                     GLFWwindow *window,
+                                     double xoffset,
+                                     double yoffset,
+                                     int i)
 -> decltype(callbacks.scrollCallback(window, xoffset, yoffset, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -391,10 +391,10 @@ auto SimCallbacks<C>::scrollCallback(T &callbacks,
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::charCallback(T &callbacks,
-                                      const SimCallbacks<T> &parent,
-                                      GLFWwindow *window,
-                                      unsigned codepoint,
-                                      int i)
+                                   const SimCallbacks<T> &parent,
+                                   GLFWwindow *window,
+                                   unsigned codepoint,
+                                   int i)
 -> decltype(callbacks.charCallback(window, codepoint, parent), void())
 {
     static_assert(std::is_same<T, C>::value, "");
@@ -407,11 +407,11 @@ auto SimCallbacks<C>::charCallback(T &callbacks,
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::windowSizeCallback(T &callbacks,
-                                            const SimCallbacks<T> &parent,
-                                            GLFWwindow *window,
-                                            int width,
-                                            int height,
-                                            long l) -> decltype(void())
+                                         const SimCallbacks<T> &parent,
+                                         GLFWwindow *window,
+                                         int width,
+                                         int height,
+                                         long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
@@ -419,10 +419,10 @@ template<typename C>
 template<typename T>
 auto
 SimCallbacks<C>::windowFocusCallback(T &callbacks,
-                                        const SimCallbacks<T> &parent,
-                                        GLFWwindow *window,
-                                        int focus,
-                                        long l) -> decltype(void())
+                                     const SimCallbacks<T> &parent,
+                                     GLFWwindow *window,
+                                     int focus,
+                                     long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
@@ -430,12 +430,12 @@ template<typename C>
 template<typename T>
 auto
 SimCallbacks<C>::mouseButtonCallback(T &callbacks,
-                                        const SimCallbacks<T> &parent,
-                                        GLFWwindow *window,
-                                        int button,
-                                        int action,
-                                        int mods,
-                                        long l) -> decltype(void())
+                                     const SimCallbacks<T> &parent,
+                                     GLFWwindow *window,
+                                     int button,
+                                     int action,
+                                     int mods,
+                                     long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
@@ -443,44 +443,44 @@ template<typename C>
 template<typename T>
 auto
 SimCallbacks<C>::keyCallback(T &callbacks,
-                                const SimCallbacks<T> &parent,
-                                GLFWwindow *window,
-                                int key,
-                                int scancode,
-                                int action,
-                                int mods,
-                                long l) -> decltype(void())
+                             const SimCallbacks<T> &parent,
+                             GLFWwindow *window,
+                             int key,
+                             int scancode,
+                             int action,
+                             int mods,
+                             long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
 auto SimCallbacks<C>::cursorPosCallback(T &callbacks,
-                                           const SimCallbacks<T> &parent,
-                                           GLFWwindow *window,
-                                           double xpos,
-                                           double ypos,
-                                           long l) -> decltype(void())
-{
-    static_assert(std::is_same<T, C>::value, "");
-}
-template<typename C>
-template<typename T>
-auto SimCallbacks<C>::scrollCallback(T &callbacks,
-                                        const SimCallbacks<T> &parent, GLFWwindow *window,
-                                        double xoffset,
-                                        double yoffset,
+                                        const SimCallbacks<T> &parent,
+                                        GLFWwindow *window,
+                                        double xpos,
+                                        double ypos,
                                         long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
 template<typename C>
 template<typename T>
+auto SimCallbacks<C>::scrollCallback(T &callbacks,
+                                     const SimCallbacks<T> &parent, GLFWwindow *window,
+                                     double xoffset,
+                                     double yoffset,
+                                     long l) -> decltype(void())
+{
+    static_assert(std::is_same<T, C>::value, "");
+}
+template<typename C>
+template<typename T>
 auto SimCallbacks<C>::charCallback(T &callbacks,
-                                      const SimCallbacks<T> &parent,
-                                      GLFWwindow *window,
-                                      unsigned codepoint,
-                                      long l) -> decltype(void())
+                                   const SimCallbacks<T> &parent,
+                                   GLFWwindow *window,
+                                   unsigned codepoint,
+                                   long l) -> decltype(void())
 {
     static_assert(std::is_same<T, C>::value, "");
 }
