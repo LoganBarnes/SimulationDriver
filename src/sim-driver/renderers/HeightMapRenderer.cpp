@@ -81,7 +81,7 @@ void HeightMapRenderer::render(float alpha, const Camera &camera) const
 {
     if (renderPointsOnly_)
     {
-        renderer_.onRender(alpha, camera);
+        renderer_.onRender(alpha, &camera);
     }
     else
     {
@@ -139,7 +139,7 @@ sim::PosData HeightMapRenderer::updateVboAndVao()
 {
     sim::PosData data{};
 
-    heightMap_.forEach([&](int x, int y, float val)
+    heightMap_.forEach([&](int x, int y, float)
                        {
                            glm::vec3 p{heightMap_.safeGetWorld(x, y)};
                            data.vbo.push_back({{p.x, p.y, p.z}});

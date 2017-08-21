@@ -13,9 +13,9 @@ namespace sim
 
 template<typename T>
 TCamera<T>::TCamera()
-        : orbitOffsetDistance_{0},
-          orbitOrigin_{0},
-          usingOrbitMode_{false}
+        : usingOrbitMode_{false},
+          orbitOffsetDistance_{0},
+          orbitOrigin_{0}
 {
     lookAt(glm::tvec3<T>(0, 0, 0), glm::tvec3<T>(0, 0, -1));
     perspective(60, 1, 1, 1000);

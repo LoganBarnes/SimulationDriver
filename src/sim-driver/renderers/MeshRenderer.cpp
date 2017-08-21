@@ -15,7 +15,7 @@ MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
 
 void MeshRenderer::render(float alpha, const Camera &camera) const
 {
-    renderer_.onRender(alpha, camera);
+    renderer_.onRender(alpha, &camera);
 }
 
 void MeshRenderer::configureGui()

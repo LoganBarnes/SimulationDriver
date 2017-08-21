@@ -16,7 +16,7 @@ sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 }
 
 template<>
-sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
+sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2)
 {
     return {{p.x, p.y, p.z}};
 }

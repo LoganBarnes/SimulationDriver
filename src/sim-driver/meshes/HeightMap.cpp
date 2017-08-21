@@ -13,7 +13,7 @@ HeightMap::HeightMap(int width, int height, std::vector<float> column_major_data
           worldOrigin_{0.0f},
           worldDimensions_{width, 1.0f, height}
 {
-    assert(width * height == data_.size());
+    assert(static_cast<size_t>(width * height) == data_.size());
 }
 
 HeightMap::HeightMap(int width,
@@ -27,7 +27,7 @@ HeightMap::HeightMap(int width,
           worldOrigin_{worldOrigin},
           worldDimensions_{worldDimensions}
 {
-    assert(width * height == data_.size());
+    assert(static_cast<size_t>(width * height) == data_.size());
 }
 
 float HeightMap::safeGet(int x, int y, float paddingVal)

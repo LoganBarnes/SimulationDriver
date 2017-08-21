@@ -1,15 +1,12 @@
-#include <sim-driver/OpenGLSimulation.hpp>
-#include <sim-driver/renderers/RendererHelper.hpp>
-#include <sim-driver/renderers/MeshRenderer.hpp>
-#include <sim-driver/meshes/MeshFunctions.hpp>
-
+#include <sim-driver/extra/OptiXSimulation.hpp>
+#include <sim-driver/extra/OptiXScene.hpp>
 
 class Simulator
 {
 public:
-    explicit Simulator(int, int, sim::SimData *pSimData)
-            : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
-              simData_{*pSimData}
+    explicit Simulator(int, int, optix::Context &context, sim::SimData *pSimData)
+            : simData_{*pSimData},
+              scene_{context}
     {
         simData_.camera.setUsingOrbitMode(true);
         simData_.camera.setOrbitOrigin({0, 0, 0});
@@ -18,13 +15,13 @@ public:
         prevCam_ = simData_.camera;
     }
 
-    void onUpdate(double , double timeStep)
+    void onUpdate(double, double timeStep)
     {
         prevCam_ = simData_.camera;
         simData_.camera.yaw(static_cast<float>(timeStep));
     }
 
-    void onRender(int , int , double alpha)
+    void onRender(int width, int height, double alpha, optix::Context &context)
     {
         auto a = static_cast<float>(alpha);
 
@@ -38,36 +35,36 @@ public:
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);
 
-        renderer_.render(a, camera);
+        context->launch(0, static_cast<unsigned>(width), static_cast<unsigned>(height));
     }
 
-    void onGuiRender(int , int )
+    void onGuiRender(int, int)
     {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
             ImGui::Text("Framerate: %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
-            renderer_.configureGui();
         }
         ImGui::End();
     }
 
-    void keyCallback(GLFWwindow *, int , int , int , int mods, const sim::SimCallbacks<Simulator> &)
+    void keyCallback(GLFWwindow *, int, int, int, int mods)
     {
         simData_.paused = (mods == GLFW_MOD_SHIFT);
     }
 
 private:
-    sim::MeshRenderer renderer_;
     sim::SimData &simData_;
     sim::Camera prevCam_;
+
+    sim::OptiXScene scene_;
 };
 
 int main()
 {
     try
     {
-        sim::OpenGLSimulation<Simulator>{{"test"}}.runNoFasterThanRealTimeLoop();
+        sim::OptiXSimulation<Simulator>{{"OptiX Test"}}.runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {

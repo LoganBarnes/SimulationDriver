@@ -14,7 +14,6 @@ struct DrawData
     std::vector<Vertex> vbo;
     std::vector<unsigned> ibo;
     std::vector<sim::VAOElement> vaoElements;
-    std::vector<std::pair<int, int>> drawCalls;
 };
 
 template<typename Vertex>
@@ -25,14 +24,14 @@ public:
 
     explicit RendererHelper();
 
-    void onRender(float alpha, const Camera &camera) const;
+    void onRender(float alpha, const Camera *pCamera) const;
 
     void onGuiRender();
 
     void onResize(int width, int height);
 
     void customRender(float alpha,
-                      const Camera &camera,
+                      const Camera *pCamera,
                       GLenum drawMode = GL_TRIANGLE_STRIP,
                       int displayMode = 5,
                       glm::vec3 shapeColor = glm::vec3{0.7},
@@ -49,6 +48,8 @@ public:
     void rebuild_mesh();
 
     void addLight(glm::vec3 lightDir, float intensity);
+
+    void setTexture(std::shared_ptr<GLuint> texture);
 
     int getFboWidth() const;
     int getFboHeight() const;

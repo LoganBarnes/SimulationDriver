@@ -16,6 +16,7 @@
 #include <memory>
 #include <chrono>
 #include <algorithm>
+#include <CoreGraphics/CoreGraphics.h>
 
 #ifdef NDEBUG
 #define DEBUG_PRINT(msg)
@@ -35,46 +36,47 @@ public:
     void runAsFastAsPossibleLoop();
     void runNoFasterThanRealTimeLoop();
 
-    template<typename T>
-    void setCallbackClass(T *callbacks);
+    template<typename C>
+    void setCallbackClass(C *callbacks);
 
     SimDriver(const SimDriver &) = delete;
     SimDriver &operator=(const SimDriver &) = delete;
 
-    const std::shared_ptr<SimData> &getSimData() const;
+    int getWidth() const;
+    int getHeight() const;
+
+    GLFWwindow *getWindow();
+    const GLFWwindow *getWindow() const;
+
+    SimData simData;
 
 protected:
 
     explicit SimDriver(SimInitData initData);
 
-    virtual ~SimDriver() = default;
-
+    ~SimDriver() = default;
     SimDriver(SimDriver &&) noexcept = default;
+
     SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
 
-    std::shared_ptr<SimData> spSimData_;
-
     double timeStep_{1.0 / 60.0};
-
     double worldTime_{0.0};
+
     std::unique_ptr<int, std::function<void(int *)>> upGlfw_{nullptr};
     std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>> upWindow_{nullptr};
     std::unique_ptr<bool, std::function<void(bool *)>> upImgui_{nullptr};
+
     SimCallbacks<> callbacks_;
 
     void update();
     void render(double alpha, bool eventBased = false);
-
-    GLFWwindow *getWindow();
-    const GLFWwindow *getWindow() const;
 };
 
 template<typename Child>
 SimDriver<Child>::SimDriver(SimInitData initData)
-        : spSimData_{std::make_shared<SimData>()},
-          callbacks_{spSimData_}
+        : callbacks_{&simData}
 {
     glfwSetErrorCallback([](int error, const char *description)
                          {
@@ -151,7 +153,7 @@ SimDriver<Child>::SimDriver(SimInitData initData)
             });
     DEBUG_PRINT("Initializing ImGui");
 
-    spSimData_->camera.setAspectRatio(initData.width / float(initData.height));
+    simData.camera.setAspectRatio(initData.width / float(initData.height));
 
     setCallbackClass(&callbacks_);
 
@@ -164,7 +166,7 @@ void SimDriver<Child>::runEventLoop()
 {
     do
     {
-        if (!spSimData_->paused)
+        if (!simData.paused)
         {
             update();
             worldTime_ += timeStep_;
@@ -182,7 +184,7 @@ void SimDriver<Child>::runAsFastAsPossibleLoop()
     glfwSwapInterval(0);
     do
     {
-        if (!spSimData_->paused)
+        if (!simData.paused)
         {
             update();
             worldTime_ += timeStep_;
@@ -208,7 +210,7 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
 
         frameTime = std::min(0.1, frameTime);
 
-        if (!spSimData_->paused)
+        if (!simData.paused)
         {
             accumulator += frameTime;
 
@@ -230,19 +232,19 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
 
 
 template<typename Child>
-template<typename T>
-void SimDriver<Child>::setCallbackClass(T *pCallbacks)
+template<typename C>
+void SimDriver<Child>::setCallbackClass(C *pCallbacks)
 {
     glfwSetWindowUserPointer(getWindow(), pCallbacks);
 
-    glfwSetWindowSizeCallback(getWindow(), [](GLFWwindow *pWindow, int width, int height)
+    glfwSetFramebufferSizeCallback(getWindow(), [](GLFWwindow *pWindow, int width, int height)
     {
-        static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowSizeCallback(pWindow, width, height);
+        static_cast<C *>(glfwGetWindowUserPointer(pWindow))->framebufferSizeCallback(pWindow, width, height);
     });
 
     glfwSetWindowFocusCallback(getWindow(), [](GLFWwindow *pWindow, int focus)
     {
-        static_cast<T *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus);
+        static_cast<C *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus);
     });
 
     glfwSetMouseButtonCallback(getWindow(), [](GLFWwindow *pWindow, int button, int action, int mods)
@@ -250,7 +252,7 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse)
         {
-            static_cast<T *>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods);
         }
         else
         {
@@ -266,7 +268,7 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard)
         {
-            static_cast<T *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
         }
         else
         {
@@ -290,7 +292,7 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse)
         {
-            static_cast<T *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);
         }
     });
 
@@ -299,7 +301,7 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse)
         {
-            static_cast<T *>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset);
         }
         else
         {
@@ -312,7 +314,7 @@ void SimDriver<Child>::setCallbackClass(T *pCallbacks)
         ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard)
         {
-            static_cast<T *>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint);
         }
         else if (io.WantCaptureKeyboard && codepoint > 0 && codepoint < 0x10000)
         {
@@ -350,9 +352,19 @@ const GLFWwindow *SimDriver<Child>::getWindow() const
 }
 
 template<typename Child>
-const std::shared_ptr<SimData> &SimDriver<Child>::getSimData() const
+int SimDriver<Child>::getWidth() const
 {
-    return spSimData_;
+    int w;
+    glfwGetWindowSize(upWindow_.get(), &w, nullptr);
+    return w;
+}
+
+template<typename Child>
+int SimDriver<Child>::getHeight() const
+{
+    int h;
+    glfwGetWindowSize(upWindow_.get(), nullptr, &h);
+    return h;
 }
 
 } // namespace sim

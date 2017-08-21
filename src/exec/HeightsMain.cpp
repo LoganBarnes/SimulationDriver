@@ -10,41 +10,43 @@
 #include <sim-driver/renderers/HeightMapRenderer.hpp>
 
 
-class Simulator : public sim::OpenGLSimulation<Simulator>
+class Simulator
 {
 public:
-    Simulator() : renderer_{sim::HeightMap{3,
-                                           2,
-                                           glm::vec3{-1.5f, -1.0f, -0.5f},
-                                           glm::vec3{3, 2, 1},
-                                           std::vector<float>{0.2f, 0.7f,
-                                                              0.3f, 0.6f,
-                                                              0.4f, 0.5f}}}
+    Simulator(int, int, sim::SimData *pSimData)
+            : renderer_{sim::HeightMap{3,
+                                       2,
+                                       glm::vec3{-1.5f, -1.0f, -0.5f},
+                                       glm::vec3{3, 2, 1},
+                                       std::vector<float>{0.2f, 0.7f,
+                                                          0.3f, 0.6f,
+                                                          0.4f, 0.5f}}},
+              simData_{*pSimData}
     {
-        camera_->setUsingOrbitMode(true);
-        camera_->setOrbitOrigin({0, 0, 0});
-        camera_->setOrbitOffsetDistance(5);
-        camera_->pitch(glm::half_pi<float>() * -0.15f);
+        simData_.camera.setUsingOrbitMode(true);
+        simData_.camera.setOrbitOrigin({0, 0, 0});
+        simData_.camera.setOrbitOffsetDistance(5);
+        simData_.camera.pitch(glm::half_pi<float>() * -0.15f);
 
-        prevCam_ = *camera_;
+        prevCam_ = simData_.camera;
     }
 
-    void onUpdate(double worldTime, double timeStep)
+    void onUpdate(double, double timeStep)
     {
-        prevCam_ = *camera_;
-        camera_->yaw(static_cast<float>(timeStep * 0.5));
+        prevCam_ = simData_.camera;
+        simData_.camera.yaw(static_cast<float>(timeStep * 0.5));
     }
 
-    void onRender(int width, int height, double alpha)
+    void onRender(int, int, double alpha)
     {
         auto a = static_cast<float>(alpha);
 
         sim::Camera camera;
-        glm::vec3 eye{glm::mix(camera_->getEyeVector(), prevCam_.getEyeVector(), a)};
-        glm::vec3 look{glm::mix(camera_->getLookVector(), prevCam_.getLookVector(), a)};
-        glm::vec3 up{glm::mix(camera_->getUpVector(), prevCam_.getUpVector(), a)};
+        glm::vec3 eye{glm::mix(simData_.camera.getEyeVector(), prevCam_.getEyeVector(), a)};
+        glm::vec3 look{glm::mix(simData_.camera.getLookVector(), prevCam_.getLookVector(), a)};
+        glm::vec3 up{glm::mix(simData_.camera.getUpVector(), prevCam_.getUpVector(), a)};
 
-        float aspect{glm::mix(camera_->getAspectRatio(), prevCam_.getAspectRatio(), a)};
+        float aspect{glm::mix(simData_.camera.getAspectRatio(), prevCam_.getAspectRatio(), a)};
 
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);
@@ -52,7 +54,7 @@ public:
         renderer_.render(a, camera);
     }
 
-    void onGuiRender(int width, int height)
+    void onGuiRender(int, int)
     {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
@@ -66,14 +68,15 @@ public:
 private:
     sim::HeightMapRenderer renderer_;
     sim::Camera prevCam_;
+
+    sim::SimData &simData_;
 };
 
 int main()
 {
     try
     {
-        Simulator sim;
-        sim.runNoFasterThanRealTimeLoop();
+        sim::OpenGLSimulation<Simulator>{{"Heights Sim"}}.runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {

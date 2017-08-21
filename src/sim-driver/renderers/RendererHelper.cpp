@@ -28,14 +28,14 @@ RendererHelper<Vertex>::RendererHelper()
 }
 
 template<typename Vertex>
-void RendererHelper<Vertex>::onRender(float alpha, const Camera &camera) const
+void RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
 {
     if (showNormals_)
     {
-        customRender(alpha, camera, drawMode_, 1, shapeColor_, lightDir_, showNormals_, normalScale_);
+        customRender(alpha, pCamera, drawMode_, 1, shapeColor_, lightDir_, showNormals_, normalScale_);
     }
 
-    customRender(alpha, camera, drawMode_, displayMode_, shapeColor_, lightDir_, false);
+    customRender(alpha, pCamera, drawMode_, displayMode_, shapeColor_, lightDir_, false);
 }
 
 template<typename Vertex>
@@ -121,11 +121,17 @@ void RendererHelper<Vertex>::onGuiRender()
 }
 
 template<typename Vertex>
-void RendererHelper<Vertex>::onResize(int width, int height) {}
+void RendererHelper<Vertex>::onResize(int, int)
+{
+    if (glIds_.framebuffer)
+    {
+        ///\todo: resize framebuffer
+    }
+}
 
 template<typename Vertex>
-void RendererHelper<Vertex>::customRender(float alpha,
-                                          const Camera &camera,
+void RendererHelper<Vertex>::customRender(float ,
+                                          const Camera *pCamera,
                                           GLenum drawMode,
                                           int displayMode,
                                           glm::vec3 shapeColor,
@@ -154,20 +160,33 @@ void RendererHelper<Vertex>::customRender(float alpha,
         glBindProgramPipeline(*glIds_.programs.pipeline);
 
         lightDir = glm::normalize(lightDir);
-        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "screen_from_world",
-                                            glm::value_ptr(camera.getPerspectiveScreenFromWorldMatrix()));
+        if (pCamera != nullptr)
+        {
+            sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "screen_from_world",
+                                                glm::value_ptr(pCamera->getPerspectiveScreenFromWorldMatrix()));
+            sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "eye", glm::value_ptr(pCamera->getEyeVector()), 3);
+        }
+
         if (showNormals)
         {
-            sim::OpenGLHelper::setMatrixUniform(glIds_.programs.geom, "screen_from_world",
-                                                glm::value_ptr(camera.getPerspectiveScreenFromWorldMatrix()));
+            if (pCamera != nullptr)
+            {
+                sim::OpenGLHelper::setMatrixUniform(glIds_.programs.geom, "screen_from_world",
+                                                    glm::value_ptr(pCamera->getPerspectiveScreenFromWorldMatrix()));
+            }
             sim::OpenGLHelper::setFloatUniform(glIds_.programs.geom, "normal_scale", &NormalScale);
         }
+
+        if (glIds_.texture)
+        {
+            sim::OpenGLHelper::setTextureUniform(glIds_.programs.frag, "tex", glIds_.texture, 0);
+        }
+
         sim::OpenGLHelper::setIntUniform(glIds_.programs.frag, "displayMode", &displayMode);
         sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "shapeColor", glm::value_ptr(shapeColor), 3);
         sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "lightDir", glm::value_ptr(lightDir), 3);
         sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "roughness", &shapeRoughness_);
         sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "IOR", glm::value_ptr(shapeIor_), 3);
-        sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "eye", glm::value_ptr(camera.getEyeVector()), 3);
 
         if (spLightSsbo_)
         {
@@ -238,10 +257,13 @@ void RendererHelper<Vertex>::rebuild_mesh()
                                          data.vaoElements);
     glIds_.vboSize = static_cast<int>(data.vbo.size());
 
-    glIds_.ibo = sim::OpenGLHelper::createBuffer<unsigned>(data.ibo.data(),
-                                                           data.ibo.size(),
-                                                           GL_ELEMENT_ARRAY_BUFFER);
-    glIds_.iboSize = static_cast<int>(data.ibo.size());
+    if (!data.ibo.empty())
+    {
+        glIds_.ibo = sim::OpenGLHelper::createBuffer<unsigned>(data.ibo.data(),
+                                                               data.ibo.size(),
+                                                               GL_ELEMENT_ARRAY_BUFFER);
+        glIds_.iboSize = static_cast<int>(data.ibo.size());
+    }
 }
 
 template<typename Vertex>
@@ -254,6 +276,12 @@ void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
                                                    lights_.size(),
                                                    GL_SHADER_STORAGE_BUFFER,
                                                    GL_DYNAMIC_DRAW);
+}
+
+template<typename Vertex>
+void RendererHelper<Vertex>::setTexture(std::shared_ptr<GLuint> texture)
+{
+    glIds_.texture = texture;
 }
 
 template<typename Vertex>

@@ -441,10 +441,10 @@ std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &s
     //
     // bind buffer and save program id for loop
     //
-    glBindBuffer(GL_ARRAY_BUFFER, vao);
+    glBindBuffer(GL_ARRAY_BUFFER, *spVbo);
 
     //
-    // iteratoe through all elements
+    // iterate through all elements
     //
     for (const auto &vaoElmt : elements)
     {
@@ -600,7 +600,13 @@ StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *
 {
     if (shaderFiles.empty())
     {
-        shaderFiles = {sim::SHADER_PATH + "shader.vert", sim::SHADER_PATH + "shader.frag"};
+        shaderFiles = {sim::SHADER_PATH + "shader.vert",
+#ifdef __APPLE__
+                       sim::SHADER_PATH + "shader_mac.frag"
+#else
+                sim::SHADER_PATH + "shader.frag"
+#endif
+        };
     }
     sim::StandardPipeline sp = sim::OpenGLHelper::createStandardPipeline(shaderFiles,
                                                                          pData,
@@ -617,7 +623,13 @@ StandardPipeline OpenGLHelper::createPosPipeline(const PosVertex *pData,
 {
     if (shaderFiles.empty())
     {
-        shaderFiles = {sim::SHADER_PATH + "shader.vert", sim::SHADER_PATH + "shader.frag"};
+        shaderFiles = {sim::SHADER_PATH + "shader.vert",
+#ifdef __APPLE__
+                       sim::SHADER_PATH + "shader_mac.frag"
+#else
+                sim::SHADER_PATH + "shader.frag"
+#endif
+        };
     }
 
     StandardPipeline sp = OpenGLHelper::createStandardPipeline(shaderFiles,
@@ -627,6 +639,44 @@ StandardPipeline OpenGLHelper::createPosPipeline(const PosVertex *pData,
                                                                posVaoElements());
     sp.vboSize = static_cast<int>(numElements);
     return sp;
+}
+
+StandardPipeline OpenGLHelper::createScreenspacePipeline()
+{
+    std::vector<sim::PosNormTexVertex> data{
+            {{-1, -1, 0}, {0, 0, 1}, {0, 1}},
+            {{1,  -1, 0}, {0, 0, 1}, {1, 1}},
+            {{-1, 1,  0}, {0, 0, 1}, {0, 0}},
+            {{1,  1,  0}, {0, 0, 1}, {1, 0}}
+    };
+
+    return createPosNormTexPipeline(data.data(), data.size());
+}
+
+void
+OpenGLHelper::bindBufferToTexture(const std::shared_ptr<GLuint> &spTexture,
+                                  const std::shared_ptr<GLuint> &spBuffer,
+                                  int alignment,
+                                  int width,
+                                  int height)
+{
+    glBindTexture(GL_TEXTURE_2D, *spTexture);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, *spBuffer);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA32F,
+                 width,
+                 height,
+                 0,
+                 GL_RGBA,
+                 GL_FLOAT,
+                 0);
+
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

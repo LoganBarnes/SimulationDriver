@@ -110,6 +110,14 @@ public:
                                               const size_t numElements,
                                               std::vector<std::string> shaderFiles = {});
 
+    static StandardPipeline createScreenspacePipeline();
+
+    static void bindBufferToTexture(const std::shared_ptr<GLuint> &spTexture,
+                                    const std::shared_ptr<GLuint> &spBuffer,
+                                    int alignment,
+                                    int width,
+                                    int height);
+
     static void bindFramebuffer();
 
     static void bindFramebuffer(const std::shared_ptr<GLuint> &spFbo);
