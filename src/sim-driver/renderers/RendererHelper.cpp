@@ -97,7 +97,7 @@ void RendererHelper<Vertex>::onGuiRender()
         {
             bool lights_need_update = false;
 
-            for (int i = 0; i < lights_.size(); ++i)
+            for (decltype(lights_.size()) i = 0; i < lights_.size(); ++i)
             {
                 std::string light_str = "Light " + std::to_string(i);
                 glm::vec4 &light = lights_[i];

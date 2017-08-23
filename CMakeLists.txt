@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.7)
 project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
+
+set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic")
+    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
@@ -32,7 +34,7 @@ add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
 download_project(PROJ imgui
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
-        GIT_TAG master
+        GIT_TAG v1.50
         UPDATE_DISCONNECTED 1
         QUIET
         )
@@ -41,12 +43,12 @@ download_project(PROJ imgui
 download_project(PROJ glm
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/g-truc/glm.git
-        GIT_TAG master
+        GIT_TAG 0.9.8.5
         UPDATE_DISCONNECTED 1
         QUIET
         )
 
-set(SOURCE_FILES
+add_library(thirdparty
         # imgui
         ${imgui_SOURCE_DIR}/imgui
         ${imgui_SOURCE_DIR}/imgui_demo
@@ -60,6 +62,16 @@ set(SOURCE_FILES
         # glad
         src/glad/glad
         src/KHR/khrplatform
+        )
+target_include_directories(thirdparty SYSTEM PUBLIC
+        ${glfw_SOURCE_DIR}/include
+        ${imgui_SOURCE_DIR}
+        ${glm_SOURCE_DIR}
+        src
+        )
+target_link_libraries(thirdparty glfw)
+
+set(SOURCE_FILES
         #shaders
         src/shaders/heights.vert
         src/shaders/heights.geom
@@ -88,13 +100,9 @@ set(SOURCE_FILES
 
 add_library(SimDriver ${SOURCE_FILES})
 
-target_include_directories(SimDriver PUBLIC src ${CMAKE_BINARY_DIR})
-target_include_directories(SimDriver SYSTEM PUBLIC
-        ${glfw_SOURCE_DIR}/include
-        ${imgui_SOURCE_DIR}
-        ${glm_SOURCE_DIR}
-        )
-target_link_libraries(SimDriver ${OPENGL_gl_LIBRARY} glfw)
+target_include_directories(SimDriver PUBLIC ${CMAKE_BINARY_DIR})
+target_link_libraries(SimDriver thirdparty)
+set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
 
 find_package(CUDA)
 if (CUDA_FOUND)
@@ -120,28 +128,25 @@ if (CUDA_FOUND)
                 src/extra/sim-driver/extra/optix-programs/Brdf.cu
                 )
 
-        cuda_add_library(SimDriverOptiX ${CUDA_SOURCE}
-                OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS})
-
-        target_link_libraries(SimDriverOptiX
-                SimDriver
-                ${optix_LIBRARY}
-                ${optixu_LIBRARY}
-                )
-        target_include_directories(SimDriverOptiX PUBLIC src/extra ${PROJECT_BINARY_DIR})
-        target_include_directories(SimDriverOptiX SYSTEM PUBLIC ${OptiX_INCLUDE})
-
-        target_link_libraries(SimDriver SimDriverOptiX)
-
         include_directories(src/extra)
         include_directories(SYSTEM ${OptiX_INCLUDE})
+
+        cuda_add_library(SimDriverOptiX ${CUDA_SOURCE} OPTIONS ${CUDA_ARCH_FLAGS})
 
         set(CUDA_GENERATED_OUTPUT_DIR ${PROJECT_BINARY_DIR}/ptx)
         cuda_wrap_srcs(SimDriverOptiX PTX GENERATED_PTX
                 ${OPTIX_PTX_SOURCE}
                 OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS}
                 )
+
+        target_link_libraries(SimDriverOptiX
+                SimDriver
+                ${optix_LIBRARY}
+                ${optixu_LIBRARY}
+                )
+
         target_sources(SimDriver PUBLIC ${GENERATED_PTX})
+        target_link_libraries(SimDriver SimDriverOptiX)
 
         cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
         target_link_libraries(OptiXExec SimDriver)
