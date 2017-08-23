@@ -16,7 +16,6 @@
 #include <memory>
 #include <chrono>
 #include <algorithm>
-#include <CoreGraphics/CoreGraphics.h>
 
 #ifdef NDEBUG
 #define DEBUG_PRINT(msg)

@@ -98,14 +98,13 @@ target_link_libraries(SimDriver ${OPENGL_gl_LIBRARY} glfw)
 
 find_package(CUDA)
 if (CUDA_FOUND)
-    set(OptiX_FIND_QUIETLY TRUE)
     find_package(OptiX)
     if (optix_LIBRARY AND OptiX_INCLUDE AND optix_prime_LIBRARY)
         add_definitions(-Dsutil_sdk_EXPORTS -D_CRT_SECURE_NO_DEPRECATE) # windows BS
 
         # Auto detect compute architecture
-       if (NOT ${CMAKE_VERSION} VERSION_LESS 3.7 #[[AND NOT CUDA_ARCH_FLAGS]])
-            cuda_select_nvcc_arch_flags(CUDA_ARCH_FLAGS 3.0) # Auto)
+       if (NOT ${CMAKE_VERSION} VERSION_LESS 3.7 AND NOT CUDA_ARCH_FLAGS)
+            cuda_select_nvcc_arch_flags(CUDA_ARCH_FLAGS Auto)
             set(CUDA_ARCH_FLAGS ${CUDA_ARCH_FLAGS} CACHE STRING "gencode architecture flags for nvcc")
        endif ()
 
@@ -124,12 +123,6 @@ if (CUDA_FOUND)
         cuda_add_library(SimDriverOptiX ${CUDA_SOURCE}
                 OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS})
 
-        set(CUDA_GENERATED_OUTPUT_DIR ${PROJECT_BINARY_DIR}/ptx)
-        cuda_wrap_srcs(SimDriverOptiX PTX GENERATED_PTX
-                ${OPTIX_PTX_SOURCE}
-                OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS}
-                )
-
         target_link_libraries(SimDriverOptiX
                 SimDriver
                 ${optix_LIBRARY}
@@ -139,6 +132,15 @@ if (CUDA_FOUND)
         target_include_directories(SimDriverOptiX SYSTEM PUBLIC ${OptiX_INCLUDE})
 
         target_link_libraries(SimDriver SimDriverOptiX)
+
+        include_directories(src/extra)
+        include_directories(SYSTEM ${OptiX_INCLUDE})
+
+        set(CUDA_GENERATED_OUTPUT_DIR ${PROJECT_BINARY_DIR}/ptx)
+        cuda_wrap_srcs(SimDriverOptiX PTX GENERATED_PTX
+                ${OPTIX_PTX_SOURCE}
+                OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS}
+                )
         target_sources(SimDriver PUBLIC ${GENERATED_PTX})
 
         cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
