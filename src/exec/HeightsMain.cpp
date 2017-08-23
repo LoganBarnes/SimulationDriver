@@ -76,7 +76,9 @@ int main()
 {
     try
     {
-        sim::OpenGLSimulation<Simulator>{{"Heights Sim"}}.runNoFasterThanRealTimeLoop();
+        sim::SimInitData initData;
+        initData.title = "Heights Sim";
+        sim::OpenGLSimulation<Simulator>(initData).runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {

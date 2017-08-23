@@ -67,7 +67,9 @@ int main()
 {
     try
     {
-        sim::OpenGLSimulation<Simulator>{{"test"}}.runNoFasterThanRealTimeLoop();
+        sim::SimInitData initData;
+        initData.title = "Mesh Sim";
+        sim::OpenGLSimulation<Simulator>(initData).runNoFasterThanRealTimeLoop();
     }
     catch (const std::exception &e)
     {
