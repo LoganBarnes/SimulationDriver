@@ -58,16 +58,16 @@ add_library(thirdparty
         ${imgui_SOURCE_DIR}/stb_rect_pack
         ${imgui_SOURCE_DIR}/stb_textedit
         ${imgui_SOURCE_DIR}/stb_truetype
-        src/imgui_impl_glfw_gl3
+        src/thirdparty/imgui_impl_glfw_gl3
         # glad
-        src/glad/glad
-        src/KHR/khrplatform
+        src/thirdparty/glad/glad
+        src/thirdparty/KHR/khrplatform
         )
 target_include_directories(thirdparty SYSTEM PUBLIC
         ${glfw_SOURCE_DIR}/include
         ${imgui_SOURCE_DIR}
         ${glm_SOURCE_DIR}
-        src
+        src/thirdparty
         )
 target_link_libraries(thirdparty glfw)
 
@@ -100,7 +100,7 @@ set(SOURCE_FILES
 
 add_library(SimDriver ${SOURCE_FILES})
 
-target_include_directories(SimDriver PUBLIC ${CMAKE_BINARY_DIR})
+target_include_directories(SimDriver PUBLIC src ${CMAKE_BINARY_DIR})
 target_link_libraries(SimDriver thirdparty)
 set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
 
@@ -128,7 +128,7 @@ if (CUDA_FOUND)
                 src/extra/sim-driver/extra/optix-programs/Brdf.cu
                 )
 
-        include_directories(src/extra)
+        include_directories(src/extra src ${CMAKE_BINARY_DIR})
         include_directories(SYSTEM ${OptiX_INCLUDE})
 
         cuda_add_library(SimDriverOptiX ${CUDA_SOURCE} OPTIONS ${CUDA_ARCH_FLAGS})
@@ -138,14 +138,14 @@ if (CUDA_FOUND)
                 ${OPTIX_PTX_SOURCE}
                 OPTIONS -use_fast_math ${CUDA_ARCH_FLAGS}
                 )
+        target_sources(SimDriverOptiX PUBLIC ${GENERATED_PTX})
 
         target_link_libraries(SimDriverOptiX
-                SimDriver
+                thirdparty
                 ${optix_LIBRARY}
                 ${optixu_LIBRARY}
                 )
 
-        target_sources(SimDriver PUBLIC ${GENERATED_PTX})
         target_link_libraries(SimDriver SimDriverOptiX)
 
         cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
