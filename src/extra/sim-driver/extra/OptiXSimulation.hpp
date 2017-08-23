@@ -281,7 +281,6 @@ auto OptiXSimulation<Child>::renderChildGui(T &, int, int, long) -> decltype(voi
 template<typename Child>
 void OptiXSimulation<Child>::framebufferSizeCallback(GLFWwindow *, int width, int height)
 {
-    std::cout << "Resize" << std::endl;
     optix::Buffer buffer = context()["output_buffer"]->getBuffer();
 
     auto uw = static_cast<unsigned>(width);
