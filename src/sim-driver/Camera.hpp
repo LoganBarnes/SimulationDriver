@@ -14,8 +14,7 @@ public:
 
     void lookAt(const glm::tvec3<T> &eye,
                 const glm::tvec3<T> &point,
-                const glm::tvec3<T> &up = glm::tvec3<T>(0, 1, 0),
-                bool updateOrbitPoint = false);
+                const glm::tvec3<T> &up = glm::tvec3<T>(0, 1, 0));
 
     void perspective(T fovyDegrees,
                      T aspect,
@@ -27,45 +26,41 @@ public:
                T bottom,
                T top);
 
-    void yaw(T angleRadians);
-    void pitch(T angleRadians);
-
     const glm::tvec3<T> &getEyeVector() const;
     const glm::tvec3<T> &getLookVector() const;
     const glm::tvec3<T> &getUpVector() const;
     const glm::tvec3<T> &getRightVector() const;
     const glm::tmat4x4<T> &getViewFromWorldMatrix() const;
+
     T getFovYDegrees() const;
     T getFovYRadians() const;
     T getAspectRatio() const;
     T getNearPlane() const;
     T getFarPlane() const;
     const glm::tmat4x4<T> &getPerspectiveScreenFromViewMatrix() const;
+    const glm::tmat4x4<T> &getPerspectiveScreenFromWorldMatrix() const;
+
     T getOrthoLeft() const;
     T getOrthoRight() const;
     T getOrthoBottom() const;
     T getOrthoTop() const;
+
     const glm::tmat4x4<T> &getOrthographicScreenFromViewMatrix() const;
-    const glm::tmat4x4<T> &getPerspectiveScreenFromWorldMatrix() const;
     const glm::tmat4x4<T> &getOrthoScreenFromWorldMatrix() const;
-    bool isUsingOrbitMode() const;
-    T getOrbitOffsetDistance() const;
-    const glm::tvec3<T> &getOrbitOrigin() const;
 
     void setEyeVector(const glm::tvec3<T> &eyeVector);
     void setLookVector(const glm::tvec3<T> &lookVector);
     void setUpVector(const glm::tvec3<T> &upVector);
+
     void setFovYDegrees(T fovYDegrees);
     void setAspectRatio(T aspectRatio);
     void setNearPlane(T nearPlane);
     void setFarPlane(T farPlane);
+
     void setOrthoLeft(T orthoLeft);
     void setOrthoRight(T orthoRight);
     void setOrthoBottom(T orthoBottom);
     void setOrthoTop(T orthoTop);
-    void setUsingOrbitMode(bool usingOrbitMode);
-    void setOrbitOffsetDistance(T orbitOffsetDistance);
-    void setOrbitOrigin(const glm::tvec3<T> &orbitOrigin);
 
 private:
 
@@ -83,15 +78,6 @@ private:
 
     glm::tmat4x4<T> perspectiveScreenFromWorldMatrix_;
     glm::tmat4x4<T> orthoScreenFromWorldMatrix_;
-
-    // orbit variables
-    bool usingOrbitMode_;
-    T orbitOffsetDistance_;
-    glm::tvec3<T> orbitOrigin_;
-
-    void updateOrbitSettings();
-
-    void updateOrbit(glm::tvec3<T> newLook);
 
 };
 

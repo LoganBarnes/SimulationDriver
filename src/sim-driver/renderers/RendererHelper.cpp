@@ -3,6 +3,10 @@
 #include <sim-driver/Camera.hpp>
 #include <ShaderConfig.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <imgui.h>
 #include <functional>
@@ -130,7 +134,7 @@ void RendererHelper<Vertex>::onResize(int, int)
 }
 
 template<typename Vertex>
-void RendererHelper<Vertex>::customRender(float ,
+void RendererHelper<Vertex>::customRender(float,
                                           const Camera *pCamera,
                                           GLenum drawMode,
                                           int displayMode,
@@ -166,6 +170,10 @@ void RendererHelper<Vertex>::customRender(float ,
                                                 glm::value_ptr(pCamera->getPerspectiveScreenFromWorldMatrix()));
             sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "eye", glm::value_ptr(pCamera->getEyeVector()), 3);
         }
+//        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local",
+//                                            glm::value_ptr(modelMatrix_));
+//        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local_normals",
+//                                            glm::value_ptr(normalMatrix_), 3);
 
         if (showNormals)
         {
@@ -364,6 +372,19 @@ template<typename Vertex>
 void RendererHelper<Vertex>::updateLights()
 {
     sim::OpenGLHelper::updateBuffer(spLightSsbo_, 0, lights_.size(), lights_.data(), GL_SHADER_STORAGE_BUFFER);
+}
+
+template<typename Vertex>
+const glm::mat4 &RendererHelper<Vertex>::getModelMatrix() const
+{
+    return modelMatrix_;
+}
+
+template<typename Vertex>
+void RendererHelper<Vertex>::setModelMatrix(const glm::mat4 &modelMatrix)
+{
+    modelMatrix_ = modelMatrix;
+    normalMatrix_ = glm::transpose(glm::inverse(glm::mat3(modelMatrix_)));
 }
 
 template

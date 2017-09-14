@@ -80,6 +80,9 @@ public:
     void setDataFun(const DataFun &dataFun);
     void setDrawMode(GLenum drawMode);
 
+    const glm::mat4 &getModelMatrix() const;
+    void setModelMatrix(const glm::mat4 &modelMatrix);
+
 private:
     SeparablePipeline glIds_;
     std::shared_ptr<GLuint> spCustomProgram_;
@@ -101,6 +104,9 @@ private:
 
     int pointSize_{1};
     float normalScale_{0.5f};
+
+    glm::mat4 modelMatrix_{1};
+    glm::mat3 normalMatrix_{1};
 
     DataFun dataFun_{nullptr};
     GLenum drawMode_{GL_TRIANGLE_STRIP};

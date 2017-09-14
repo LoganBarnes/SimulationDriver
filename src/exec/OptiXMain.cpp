@@ -40,12 +40,15 @@ public:
 
     void onGuiRender(int, int)
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
         {
-            ImGui::Text("Framerate: %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
+            ImGuiIO &io = ImGui::GetIO();
+            ImGui::Text("Framerate: %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
         ImGui::End();
+        ImGui::PopStyleVar();
     }
 
     void keyCallback(GLFWwindow *, int, int, int, int mods)

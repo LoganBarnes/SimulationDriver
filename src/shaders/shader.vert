@@ -24,7 +24,7 @@ out gl_PerVertex
 void main(void)
 {
     vertex.world_position = vec3(world_from_local * vec4(local_position, 1.0));
-    vertex.world_normal = world_from_local_normals * local_normal;
+    vertex.world_normal = normalize(world_from_local_normals * local_normal);
     vertex.tex_coords = tex_coords;
 
     gl_Position = screen_from_world * vec4(vertex.world_position, 1.0);

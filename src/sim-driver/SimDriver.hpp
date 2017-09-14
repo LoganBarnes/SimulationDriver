@@ -32,15 +32,15 @@ class SimDriver
 {
 public:
 
+    SimDriver(const SimDriver &) = delete;
+    SimDriver &operator=(const SimDriver &) = delete;
+
     void runEventLoop();
     void runAsFastAsPossibleLoop();
     void runNoFasterThanRealTimeLoop();
 
     template<typename C>
     void setCallbackClass(C *callbacks);
-
-    SimDriver(const SimDriver &) = delete;
-    SimDriver &operator=(const SimDriver &) = delete;
 
     int getWidth() const;
     int getHeight() const;
@@ -56,7 +56,6 @@ protected:
 
     ~SimDriver() = default;
     SimDriver(SimDriver &&) noexcept = default;
-
     SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
@@ -72,6 +71,7 @@ private:
 
     void update();
     void render(double alpha, bool eventBased = false);
+    bool isPaused() const;
 };
 
 template<typename Child>
@@ -153,7 +153,7 @@ SimDriver<Child>::SimDriver(SimInitData initData)
             });
     DEBUG_PRINT("Initializing ImGui");
 
-    simData.camera.setAspectRatio(initData.width / float(initData.height));
+    simData.camera().setAspectRatio(initData.width / float(initData.height));
 
     setCallbackClass(&callbacks_);
 
@@ -166,7 +166,7 @@ void SimDriver<Child>::runEventLoop()
 {
     do
     {
-        if (!simData.paused)
+        if (!isPaused())
         {
             update();
             worldTime_ += timeStep_;
@@ -184,14 +184,21 @@ void SimDriver<Child>::runAsFastAsPossibleLoop()
     glfwSwapInterval(0);
     do
     {
-        if (!simData.paused)
+        if (!isPaused())
         {
             update();
             worldTime_ += timeStep_;
         }
-        render(1.0);
+        render(1.0, isPaused());
 
-        glfwPollEvents();
+        if (isPaused())
+        {
+            glfwWaitEvents();
+        }
+        else
+        {
+            glfwPollEvents();
+        }
     } while (!glfwWindowShouldClose(getWindow()));
 }
 
@@ -210,7 +217,7 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
 
         frameTime = std::min(0.1, frameTime);
 
-        if (!simData.paused)
+        if (!isPaused())
         {
             accumulator += frameTime;
 
@@ -224,9 +231,16 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
 
         const double alpha = accumulator / timeStep_;
 
-        render(alpha);
+        render(alpha, isPaused());
 
-        glfwPollEvents();
+        if (isPaused())
+        {
+            glfwWaitEvents();
+        }
+        else
+        {
+            glfwPollEvents();
+        }
     } while (!glfwWindowShouldClose(getWindow()));
 }
 
@@ -337,6 +351,13 @@ void SimDriver<Child>::render(double alpha, bool eventBased)
     glfwGetWindowSize(getWindow(), &w, &h);
     static_cast<Child *>(this)->render(w, h, alpha, eventBased);
     glfwSwapBuffers(getWindow());
+}
+
+
+template<typename Child>
+bool SimDriver<Child>::isPaused() const
+{
+    return static_cast<const Child *>(this)->paused();
 }
 
 template<typename Child>

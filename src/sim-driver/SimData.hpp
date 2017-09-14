@@ -1,14 +1,16 @@
 #pragma once
 
-#include <sim-driver/Camera.hpp>
+#include <sim-driver/CameraMover.hpp>
 
 namespace sim
 {
 
 struct SimData
 {
-    Camera camera{};
+    CameraMover cameraMover{Camera{}};
     bool paused{false};
+
+    Camera &camera() { return cameraMover.camera; }
 };
 
 struct SimInitData

@@ -36,13 +36,15 @@ template<typename Child>
 class OptiXSimulation : public SimDriver<OptiXSimulation<Child>>
 {
 public:
+
     OptiXSimulation();
+
     template<typename ... Args>
     explicit OptiXSimulation(const SimInitData &initData, Args ...args);
 
     void update(double worldTime, double timeStep);
-
     void render(int width, int height, double alpha, bool eventDriven);
+    bool paused() const;
 
     void framebufferSizeCallback(GLFWwindow *pWindow, int width, int height);
 
@@ -174,6 +176,12 @@ void OptiXSimulation<Child>::render(const int width,
 
     renderChild(child_, width, height, alpha, context(), 0);
     ImGui::Render();
+}
+
+template<typename Child>
+bool OptiXSimulation<Child>::paused() const
+{
+    return this->simData.paused;
 }
 
 template<typename Child>

@@ -90,6 +90,7 @@ set(SOURCE_FILES
         # sim-driver
         src/sim-driver/CallbackWrapper
         src/sim-driver/Camera
+        src/sim-driver/CameraMover
         src/sim-driver/OpenGLForwardDeclarations
         src/sim-driver/OpenGLHelper
         src/sim-driver/OpenGLSimulation
@@ -159,3 +160,6 @@ target_link_libraries(MeshExec SimDriver)
 
 add_executable(HeightsExec src/exec/HeightsMain)
 target_link_libraries(HeightsExec SimDriver)
+
+add_executable(BounceExec src/exec/BounceMain)
+target_link_libraries(BounceExec SimDriver)

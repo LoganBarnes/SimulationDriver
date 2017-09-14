@@ -184,7 +184,7 @@ void SimCallbacks<C>::framebufferSizeCallback(GLFWwindow *pWindow, int width, in
 {
     if (pSimData_)
     {
-        pSimData_->camera.setAspectRatio(static_cast<float>(width) / height);
+        pSimData_->camera().setAspectRatio(static_cast<float>(width) / height);
     }
     if (pCallbacks_)
     {
@@ -272,13 +272,13 @@ void SimCallbacks<C>::cursorPosCallback(GLFWwindow *pWindow, double xpos, double
     {
         if (leftMouseDown_)
         {
-            pSimData_->camera.yaw(static_cast<float>(prevX_ - xpos) * 0.01f);
-            pSimData_->camera.pitch(static_cast<float>(prevY_ - ypos) * 0.01f);
+            pSimData_->cameraMover.pitch(static_cast<float>(prevY_ - ypos));
+            pSimData_->cameraMover.yaw(static_cast<float>(prevX_ - xpos));
         }
         else if (rightMouseDown_)
         {
-            float dist = pSimData_->camera.getOrbitOffsetDistance();
-            pSimData_->camera.setOrbitOffsetDistance(dist + dist * 0.01f * static_cast<float>(prevY_ - ypos));
+//            float dist = pSimData_->cameraMover.getOrbitOffsetDistance();
+//            pSimData_->cameraMover.setOrbitOffsetDistance(dist + dist * 0.01f * static_cast<float>(prevY_ - ypos));
         }
     }
 
@@ -295,8 +295,8 @@ void SimCallbacks<C>::scrollCallback(GLFWwindow *pWindow, double xoffset, double
 {
     if (pSimData_)
     {
-        float dist = pSimData_->camera.getOrbitOffsetDistance();
-        pSimData_->camera.setOrbitOffsetDistance(dist + dist * 0.01f * static_cast<float>(-yoffset));
+//        float dist = pSimData_->cameraMover.getOrbitOffsetDistance();
+//        pSimData_->cameraMover.setOrbitOffsetDistance(dist + dist * 0.01f * static_cast<float>(-yoffset));
     }
     if (pCallbacks_)
     {

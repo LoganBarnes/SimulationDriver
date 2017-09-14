@@ -13,9 +13,6 @@ namespace sim
 
 template<typename T>
 TCamera<T>::TCamera()
-        : usingOrbitMode_{false},
-          orbitOffsetDistance_{0},
-          orbitOrigin_{0}
 {
     lookAt(glm::tvec3<T>(0, 0, 0), glm::tvec3<T>(0, 0, -1));
     perspective(60, 1, 1, 1000);
@@ -25,8 +22,7 @@ TCamera<T>::TCamera()
 template<typename T>
 void TCamera<T>::lookAt(const glm::tvec3<T> &eye,
                         const glm::tvec3<T> &point,
-                        const glm::tvec3<T> &up,
-                        bool updateOrbitPoint)
+                        const glm::tvec3<T> &up)
 {
     eyeVector_ = eye;
     lookVector_ = glm::normalize(point - eyeVector_);
@@ -35,12 +31,6 @@ void TCamera<T>::lookAt(const glm::tvec3<T> &eye,
     viewFromWorldMatrix_ = glm::lookAt(eyeVector_, point, upVector_);
 
     perspectiveScreenFromWorldMatrix_ = perspectiveScreenFromViewMatrix_ * viewFromWorldMatrix_;
-
-    if (updateOrbitPoint)
-    {
-        orbitOrigin_ = point;
-        orbitOffsetDistance_ = glm::length(orbitOrigin_ - eyeVector_);
-    }
 }
 
 template<typename T>
@@ -75,35 +65,6 @@ void TCamera<T>::ortho(T left,
 }
 
 template<typename T>
-void TCamera<T>::yaw(T angleRadians)
-{
-    glm::tvec3<T> newLook = glm::rotate(lookVector_, angleRadians, upVector_);
-    if (usingOrbitMode_)
-    {
-        updateOrbit(newLook);
-    }
-    else
-    {
-        lookAt(eyeVector_, eyeVector_ + newLook, upVector_);
-    }
-}
-
-template<typename T>
-void TCamera<T>::pitch(T angleRadians)
-{
-    glm::tvec3<T> newLook = glm::rotate(lookVector_, angleRadians, rightVector_);
-    upVector_ = glm::cross(rightVector_, newLook);
-    if (usingOrbitMode_)
-    {
-        updateOrbit(newLook);
-    }
-    else
-    {
-        lookAt(eyeVector_, eyeVector_ + newLook, upVector_);
-    }
-}
-
-template<typename T>
 const glm::tvec3<T> &TCamera<T>::getEyeVector() const { return eyeVector_; }
 template<typename T>
 const glm::tvec3<T> &TCamera<T>::getLookVector() const { return lookVector_; }
@@ -111,10 +72,6 @@ template<typename T>
 const glm::tvec3<T> &TCamera<T>::getUpVector() const { return upVector_; }
 template<typename T>
 const glm::tvec3<T> &TCamera<T>::getRightVector() const { return rightVector_; }
-template<typename T>
-T TCamera<T>::getOrbitOffsetDistance() const { return orbitOffsetDistance_; }
-template<typename T>
-const glm::tvec3<T> &TCamera<T>::getOrbitOrigin() const { return orbitOrigin_; }
 template<typename T>
 const glm::tmat4x4<T> &TCamera<T>::getViewFromWorldMatrix() const { return viewFromWorldMatrix_; }
 template<typename T>
@@ -146,8 +103,6 @@ const glm::tmat4x4<T> &
 TCamera<T>::getPerspectiveScreenFromWorldMatrix() const { return perspectiveScreenFromWorldMatrix_; }
 template<typename T>
 const glm::tmat4x4<T> &TCamera<T>::getOrthoScreenFromWorldMatrix() const { return orthoScreenFromWorldMatrix_; }
-template<typename T>
-bool TCamera<T>::isUsingOrbitMode() const { return usingOrbitMode_; }
 
 template<typename T>
 void TCamera<T>::setEyeVector(const glm::tvec3<T> &eyeVector)
@@ -203,50 +158,6 @@ template<typename T>
 void TCamera<T>::setOrthoTop(T orthoTop)
 {
     ortho(orthoLeft_, orthoRight_, orthoBottom_, orthoTop);
-}
-template<typename T>
-void TCamera<T>::setUsingOrbitMode(bool usingOrbitMode)
-{
-    usingOrbitMode_ = usingOrbitMode;
-    updateOrbitSettings();
-}
-template<typename T>
-void TCamera<T>::setOrbitOffsetDistance(T orbitOffsetDistance)
-{
-    orbitOffsetDistance_ = orbitOffsetDistance;
-    updateOrbitSettings();
-}
-template<typename T>
-void TCamera<T>::setOrbitOrigin(const glm::tvec3<T> &orbitOrigin)
-{
-    orbitOrigin_ = orbitOrigin;
-    updateOrbitSettings();
-}
-
-template<typename T>
-void TCamera<T>::updateOrbitSettings()
-{
-    if (usingOrbitMode_)
-    {
-        glm::tvec3<T> newLook = orbitOrigin_ - eyeVector_;
-        T lookLen = glm::length(newLook);
-        if (lookLen > 1.0e-3f)
-        {
-            newLook /= lookLen;
-        }
-        else
-        {
-            newLook = lookVector_;
-        }
-        updateOrbit(newLook);
-    }
-}
-
-template<typename T>
-void TCamera<T>::updateOrbit(glm::tvec3<T> newLook)
-{
-    glm::tvec3<T> eye = orbitOrigin_ - newLook * orbitOffsetDistance_;
-    lookAt(eye, eye + newLook, glm::vec3{0, 1, 0});
 }
 
 template

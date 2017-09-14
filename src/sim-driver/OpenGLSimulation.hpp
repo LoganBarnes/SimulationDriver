@@ -31,13 +31,15 @@ template<typename Child>
 class OpenGLSimulation : public SimDriver<OpenGLSimulation<Child>>
 {
 public:
+
     OpenGLSimulation();
+
     template<typename ... Args>
     explicit OpenGLSimulation(const SimInitData &initData, Args ...args);
 
     void update(double worldTime, double timeStep);
-
     void render(int width, int height, double alpha, bool eventDriven);
+    bool paused() const;
 
 private:
 
@@ -113,6 +115,12 @@ void OpenGLSimulation<Child>::render(const int width,
 
     renderChild(child_, width, height, alpha, 0);
     ImGui::Render();
+}
+
+template<typename Child>
+bool OpenGLSimulation<Child>::paused() const
+{
+    return this->simData.paused;
 }
 
 template<typename Child>

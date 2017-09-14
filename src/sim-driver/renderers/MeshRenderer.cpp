@@ -40,4 +40,9 @@ void MeshRenderer::resize(int width, int height)
     renderer_.onResize(width, height);
 }
 
+void MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
+{
+    renderer_.setModelMatrix(modelMatrix);
+}
+
 } // namespace sim

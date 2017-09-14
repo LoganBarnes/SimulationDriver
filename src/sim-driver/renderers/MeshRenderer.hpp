@@ -17,6 +17,8 @@ public:
 
     void resize(int width, int height);
 
+    void setModelMatrix(const glm::mat4 &modelMatrix);
+
 private:
     sim::PosNormTexRenderer renderer_;
     sim::PosNormTexMesh mesh_;
