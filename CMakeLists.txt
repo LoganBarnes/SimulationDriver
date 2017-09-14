@@ -43,7 +43,7 @@ download_project(PROJ imgui
 download_project(PROJ glm
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/g-truc/glm.git
-        GIT_TAG 0.9.8.5
+        GIT_TAG master
         UPDATE_DISCONNECTED 1
         QUIET
         )
