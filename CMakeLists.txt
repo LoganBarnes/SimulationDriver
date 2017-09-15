@@ -3,9 +3,9 @@ project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_EXECUTABLES ON "Build visual executables")
+option(SIM_BUILD_EXECS ON "Build visual executables")
 
-if (${BUILD_EXECUTABLES})
+if (${SIM_BUILD_EXECS})
     message("-- Building visual executables")
 endif ()
 
@@ -155,14 +155,14 @@ if (CUDA_FOUND)
 
         target_link_libraries(SimDriver SimDriverOptiX)
 
-        if (${BUILD_EXECUTABLES})
+        if (${SIM_BUILD_EXECS})
             cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
             target_link_libraries(OptiXExec SimDriver)
         endif ()
     endif ()
 endif ()
 
-if (${BUILD_EXECUTABLES})
+if (${SIM_BUILD_EXECS})
     add_executable(MeshExec src/exec/MeshMain)
     target_link_libraries(MeshExec SimDriver)
 
