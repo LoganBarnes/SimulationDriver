@@ -8,17 +8,17 @@ public:
             : simData_{*pSimData},
               scene_{context}
     {
-        simData_.camera.setUsingOrbitMode(true);
-        simData_.camera.setOrbitOrigin({0, 0, 0});
-        simData_.camera.setOrbitOffsetDistance(5);
+        simData_.cameraMover.setUsingOrbitMode(true);
+        simData_.cameraMover.setOrbitOrigin({0, 0, 0});
+        simData_.cameraMover.setOrbitOffsetDistance(5);
 
-        prevCam_ = simData_.camera;
+        prevCam_ = simData_.camera();
     }
 
     void onUpdate(double, double timeStep)
     {
-        prevCam_ = simData_.camera;
-        simData_.camera.yaw(static_cast<float>(timeStep));
+        prevCam_ = simData_.camera();
+        simData_.cameraMover.yaw(static_cast<float>(timeStep));
     }
 
     void onRender(int width, int height, double alpha, optix::Context &context)
@@ -26,11 +26,11 @@ public:
         auto a = static_cast<float>(alpha);
 
         sim::Camera camera;
-        glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), simData_.camera.getEyeVector(), a)};
-        glm::vec3 look{glm::mix(prevCam_.getLookVector(), simData_.camera.getLookVector(), a)};
-        glm::vec3 up{glm::mix(prevCam_.getUpVector(), simData_.camera.getUpVector(), a)};
+        glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), simData_.camera().getEyeVector(), a)};
+        glm::vec3 look{glm::mix(prevCam_.getLookVector(), simData_.camera().getLookVector(), a)};
+        glm::vec3 up{glm::mix(prevCam_.getUpVector(), simData_.camera().getUpVector(), a)};
 
-        float aspect{glm::mix(prevCam_.getAspectRatio(), simData_.camera.getAspectRatio(), a)};
+        float aspect{glm::mix(prevCam_.getAspectRatio(), simData_.camera().getAspectRatio(), a)};
 
         camera.lookAt(eye, eye + look, up);
         camera.setAspectRatio(aspect);

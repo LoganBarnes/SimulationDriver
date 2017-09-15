@@ -3,6 +3,12 @@ project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
 
+option(BUILD_EXECUTABLES ON "Build visual executables")
+
+if (${BUILD_EXECUTABLES})
+    message("-- Building visual executables")
+endif ()
+
 set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
     list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
@@ -112,10 +118,10 @@ if (CUDA_FOUND)
         add_definitions(-Dsutil_sdk_EXPORTS -D_CRT_SECURE_NO_DEPRECATE) # windows BS
 
         # Auto detect compute architecture
-       if (NOT ${CMAKE_VERSION} VERSION_LESS 3.7 AND NOT CUDA_ARCH_FLAGS)
+        if (NOT ${CMAKE_VERSION} VERSION_LESS 3.7 AND NOT CUDA_ARCH_FLAGS)
             cuda_select_nvcc_arch_flags(CUDA_ARCH_FLAGS Auto)
             set(CUDA_ARCH_FLAGS ${CUDA_ARCH_FLAGS} CACHE STRING "gencode architecture flags for nvcc")
-       endif ()
+        endif ()
 
         set(CUDA_SOURCE
                 src/extra/sim-driver/extra/OptiXCommon
@@ -149,17 +155,20 @@ if (CUDA_FOUND)
 
         target_link_libraries(SimDriver SimDriverOptiX)
 
-        cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
-        target_link_libraries(OptiXExec SimDriver)
+        if (${BUILD_EXECUTABLES})
+            cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
+            target_link_libraries(OptiXExec SimDriver)
+        endif ()
     endif ()
 endif ()
 
+if (${BUILD_EXECUTABLES})
+    add_executable(MeshExec src/exec/MeshMain)
+    target_link_libraries(MeshExec SimDriver)
 
-add_executable(MeshExec src/exec/MeshMain)
-target_link_libraries(MeshExec SimDriver)
+    add_executable(HeightsExec src/exec/HeightsMain)
+    target_link_libraries(HeightsExec SimDriver)
 
-add_executable(HeightsExec src/exec/HeightsMain)
-target_link_libraries(HeightsExec SimDriver)
-
-add_executable(BounceExec src/exec/BounceMain)
-target_link_libraries(BounceExec SimDriver)
+    add_executable(BounceExec src/exec/BounceMain)
+    target_link_libraries(BounceExec SimDriver)
+endif ()
