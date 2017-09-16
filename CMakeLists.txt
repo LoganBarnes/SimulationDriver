@@ -4,6 +4,7 @@ project(SimDriver)
 set(CMAKE_CXX_STANDARD 14)
 
 option(SIM_BUILD_EXECS ON "Build visual executables")
+option(SIM_BUILD_CUDA OFF "Build CUDA files if available")
 
 if (${SIM_BUILD_EXECS})
     message("-- Building visual executables")
@@ -112,7 +113,7 @@ target_link_libraries(SimDriver thirdparty)
 set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
 
 find_package(CUDA)
-if (CUDA_FOUND)
+if (${SIM_BUILD_CUDA} AND CUDA_FOUND)
     find_package(OptiX)
     if (optix_LIBRARY AND OptiX_INCLUDE AND optix_prime_LIBRARY)
         add_definitions(-Dsutil_sdk_EXPORTS -D_CRT_SECURE_NO_DEPRECATE) # windows BS
