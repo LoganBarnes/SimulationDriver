@@ -1,5 +1,2 @@
-build
-cmake-build-*
-.idea
+*build*
 imgui.ini
-*.DS_Store

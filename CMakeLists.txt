@@ -10,11 +10,6 @@ if (${SIM_BUILD_EXECS})
     message("-- Building visual executables")
 endif ()
 
-set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
-if (NOT MSVC)
-    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
-endif ()
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(DownloadProject)
 
@@ -35,7 +30,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # compile glfw with current project
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-
+target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
 
 # Download and unpack imgui at configure time
 download_project(PROJ imgui
@@ -77,6 +72,12 @@ target_include_directories(thirdparty SYSTEM PUBLIC
         src/thirdparty
         )
 target_link_libraries(thirdparty glfw)
+target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
+
+set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
+if (NOT MSVC)
+    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
+endif ()
 
 set(SOURCE_FILES
         #shaders

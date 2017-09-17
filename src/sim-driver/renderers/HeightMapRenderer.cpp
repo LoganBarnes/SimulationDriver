@@ -5,10 +5,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/string_cast.hpp>
-
 //#define NORMAL_RENDER
 
 namespace sim

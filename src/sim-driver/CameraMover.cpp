@@ -1,10 +1,12 @@
 #include <sim-driver/CameraMover.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
+//#pragma warning(push, 0)
+//#include <glm/gtx/string_cast.hpp>
+//#pragma warning(pop)
 
 #include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
-#include <glm/gtx/string_cast.hpp>
 
 namespace sim
 {
