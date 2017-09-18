@@ -3,8 +3,9 @@ project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
 
-option(SIM_BUILD_EXECS ON "Build visual executables")
 option(SIM_BUILD_CUDA OFF "Build CUDA files if available")
+option(SIM_BUILD_TESTS OFF "Build tests using the Catch framework")
+option(SIM_BUILD_EXAMPLES ON "Build visual executables")
 
 if (${SIM_BUILD_EXECS})
     message("-- Building visual executables")
