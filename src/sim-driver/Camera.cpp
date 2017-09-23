@@ -5,7 +5,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 
 namespace sim

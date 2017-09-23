@@ -3,10 +3,6 @@
 #include <sim-driver/Camera.hpp>
 #include <ShaderConfig.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <imgui.h>
 #include <functional>

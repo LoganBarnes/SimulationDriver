@@ -7,13 +7,8 @@ option(SIM_BUILD_CUDA OFF "Build CUDA files if available")
 option(SIM_BUILD_TESTS OFF "Build tests using the Catch framework")
 option(SIM_BUILD_EXAMPLES ON "Build visual executables")
 
-if (${SIM_BUILD_EXECS})
+if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
-endif ()
-
-set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
-if (NOT MSVC)
-    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
@@ -36,7 +31,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # compile glfw with current project
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-
+target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
 
 # Download and unpack imgui at configure time
 download_project(PROJ imgui
@@ -78,6 +73,12 @@ target_include_directories(thirdparty SYSTEM PUBLIC
         src/thirdparty
         )
 target_link_libraries(thirdparty glfw)
+target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
+
+set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
+if (NOT MSVC)
+    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
+endif ()
 
 set(SOURCE_FILES
         #shaders
@@ -157,14 +158,14 @@ if (${SIM_BUILD_CUDA} AND CUDA_FOUND)
 
         target_link_libraries(SimDriver SimDriverOptiX)
 
-        if (${SIM_BUILD_EXECS})
+        if (${SIM_BUILD_EXAMPLES})
             cuda_add_executable(OptiXExec src/exec/OptiXMain.cpp)
             target_link_libraries(OptiXExec SimDriver)
         endif ()
     endif ()
 endif ()
 
-if (${SIM_BUILD_EXECS})
+if (${SIM_BUILD_EXAMPLES})
     add_executable(MeshExec src/exec/MeshMain)
     target_link_libraries(MeshExec SimDriver)
 
