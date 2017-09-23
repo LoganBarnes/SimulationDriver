@@ -7,7 +7,6 @@ namespace sim
 {
 
 struct VAOElement;
-
 struct VAOSettings;
 
 class OpenGLHelper;

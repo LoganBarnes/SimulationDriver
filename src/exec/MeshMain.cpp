@@ -6,10 +6,12 @@
 class Simulator
 {
 public:
-    explicit Simulator(int, int, sim::SimData *pSimData)
+    explicit Simulator(int w, int h, sim::SimData *pSimData)
         : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
           simData_{*pSimData}
     {
+        simData_.camera().setNearPlane(0.1f);
+
         simData_.cameraMover.setUsingOrbitMode(true);
         simData_.cameraMover.setOrbitOrigin({0, 0, 0});
         simData_.cameraMover.setOrbitOffsetDistance(5);
@@ -17,38 +19,37 @@ public:
         prevCam_ = simData_.camera();
     }
 
-    void
-    onUpdate(double, double timeStep)
+    void onUpdate(double, double timeStep)
     {
         prevCam_ = simData_.camera();
-        simData_.cameraMover.yaw(static_cast<float>(timeStep * 5.0));
+        simData_.cameraMover.yaw(static_cast<float>(timeStep * 25.0));
     }
 
-    void
-    onRender(int, int, double alpha)
+    void onRender(int, int, double alpha)
     {
         auto a = static_cast<float>(alpha);
 
-        if (!simData_.paused) {
+        if (simData_.paused) {
+            renderer_.render(a, simData_.camera());
+        }
+        else {
+            sim::Camera &currCam = simData_.camera();
             sim::Camera camera;
-            glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), simData_.camera().getEyeVector(), a)};
-            glm::vec3 look{glm::mix(prevCam_.getLookVector(), simData_.camera().getLookVector(), a)};
-            glm::vec3 up{glm::mix(prevCam_.getUpVector(), simData_.camera().getUpVector(), a)};
 
-            float aspect{glm::mix(prevCam_.getAspectRatio(), simData_.camera().getAspectRatio(), a)};
+            glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), currCam.getEyeVector(), a)};
+            glm::vec3 look{glm::mix(prevCam_.getLookVector(), currCam.getLookVector(), a)};
+            glm::vec3 up{glm::mix(prevCam_.getUpVector(), currCam.getUpVector(), a)};
+
+            float aspect{glm::mix(prevCam_.getAspectRatio(), currCam.getAspectRatio(), a)};
 
             camera.lookAt(eye, eye + look, up);
-            camera.setAspectRatio(aspect);
+            camera.perspective(currCam.getFovYDegrees(), aspect, currCam.getNearPlane(), currCam.getFarPlane());
 
             renderer_.render(a, camera);
         }
-        else {
-            renderer_.render(a, simData_.camera());
-        }
     }
 
-    void
-    onGuiRender(int, int)
+    void onGuiRender(int, int)
     {
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
@@ -64,8 +65,7 @@ private:
     sim::Camera prevCam_;
 };
 
-int
-main()
+int main()
 {
     try {
         sim::SimInitData initData;

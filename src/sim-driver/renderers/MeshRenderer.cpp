@@ -13,14 +13,12 @@ MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
                          });
 }
 
-void
-MeshRenderer::render(float alpha, const Camera &camera) const
+void MeshRenderer::render(float alpha, const Camera &camera) const
 {
     renderer_.onRender(alpha, &camera);
 }
 
-void
-MeshRenderer::configureGui()
+void MeshRenderer::configureGui()
 {
     if (ImGui::CollapsingHeader("Mesh Options", "mesh", false, true)) {
         bool mesh_needs_update = mesh_.configureGui();
@@ -34,14 +32,12 @@ MeshRenderer::configureGui()
     }
 }
 
-void
-MeshRenderer::resize(int width, int height)
+void MeshRenderer::resize(int width, int height)
 {
     renderer_.onResize(width, height);
 }
 
-void
-MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
+void MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
 {
     renderer_.setModelMatrix(modelMatrix);
 }

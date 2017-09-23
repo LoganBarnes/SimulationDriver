@@ -24,101 +24,64 @@ public:
 
     explicit RendererHelper();
 
-    void
-    onRender(float alpha, const Camera *pCamera) const;
+    void onRender(float alpha, const Camera *pCamera) const;
 
-    void
-    onGuiRender();
+    void onGuiRender();
 
-    void
-    onResize(int width, int height);
+    void onResize(int width, int height);
 
-    void
-    customRender(float alpha,
-                 const Camera *pCamera,
-                 GLenum drawMode = GL_TRIANGLE_STRIP,
-                 int displayMode = 5,
-                 glm::vec3 shapeColor = glm::vec3{0.7},
-                 glm::vec3 lightDir = glm::vec3{0.7f, 0.85f, 1.0f},
-                 bool showNormals = false,
-                 float NormalScale = 0.5f,
-                 std::function<void(void)> programReplacement = nullptr) const;
+    void customRender(float alpha,
+                      const Camera *pCamera,
+                      GLenum drawMode = GL_TRIANGLE_STRIP,
+                      int displayMode = 5,
+                      glm::vec3 shapeColor = glm::vec3{0.7},
+                      glm::vec3 lightDir = glm::vec3{0.7f, 0.85f, 1.0f},
+                      bool showNormals = false,
+                      float NormalScale = 0.5f,
+                      std::function<void(void)> programReplacement = nullptr) const;
 
-    void
-    renderToFramebuffer(int width,
-                        int height,
-                        const std::shared_ptr<GLuint> &spColorTex = nullptr,
-                        const std::shared_ptr<GLuint> &spDepthTex = nullptr);
+    void renderToFramebuffer(int width,
+                             int height,
+                             const std::shared_ptr<GLuint> &spColorTex = nullptr,
+                             const std::shared_ptr<GLuint> &spDepthTex = nullptr);
 
-    void
-    rebuild_mesh();
+    void rebuild_mesh();
 
-    void
-    addLight(glm::vec3 lightDir, float intensity);
+    void addLight(glm::vec3 lightDir, float intensity);
 
-    void
-    setTexture(std::shared_ptr<GLuint> texture);
+    void setTexture(std::shared_ptr<GLuint> texture);
 
-    int
-    getFboWidth() const;
-    int
-    getFboHeight() const;
-    bool
-    isShowingVertsOnly() const;
-    bool
-    isUsingWireframe() const;
-    bool
-    isShowNormals() const;
-    int
-    getDisplayMode() const;
-    const glm::vec3 &
-    getShapeColor() const;
-    float
-    getShapeRoughness() const;
-    const glm::vec3 &
-    getShapeIor() const;
-    const glm::vec3 &
-    getLightDir() const;
-    int
-    getPointSize() const;
-    float
-    getNormalScale() const;
-    GLenum
-    getDrawMode() const;
+    int getFboWidth() const;
+    int getFboHeight() const;
+    bool isShowingVertsOnly() const;
+    bool isUsingWireframe() const;
+    bool isShowNormals() const;
+    int getDisplayMode() const;
+    const glm::vec3 &getShapeColor() const;
+    float getShapeRoughness() const;
+    const glm::vec3 &getShapeIor() const;
+    const glm::vec3 &getLightDir() const;
+    int getPointSize() const;
+    float getNormalScale() const;
+    GLenum getDrawMode() const;
 
-    void
-    setFboWidth(int fboWidth);
-    void
-    setFboHeight(int fboHeight);
-    void
-    setShowingVertsOnly(bool showingVertsOnly);
-    void
-    setUsingWireframe(bool usingWireframe);
-    void
-    setShowNormals(bool showNormals);
-    void
-    setDisplayMode(int displayMode);
-    void
-    setShapeColor(const glm::vec3 &shapeColor);
-    void
-    setShapeRoughness(float shapeRoughness);
-    void
-    setShapeIor(const glm::vec3 &shapeIor);
-    void
-    setLightDir(const glm::vec3 &lightDir);
-    void
-    setPointSize(int pointSize);
-    void
-    setNormalScale(float normalScale);
-    void
-    setDataFun(const DataFun &dataFun);
-    void
-    setDrawMode(GLenum drawMode);
+    void setFboWidth(int fboWidth);
+    void setFboHeight(int fboHeight);
+    void setShowingVertsOnly(bool showingVertsOnly);
+    void setUsingWireframe(bool usingWireframe);
+    void setShowNormals(bool showNormals);
+    void setDisplayMode(int displayMode);
+    void setShapeColor(const glm::vec3 &shapeColor);
+    void setShapeRoughness(float shapeRoughness);
+    void setShapeIor(const glm::vec3 &shapeIor);
+    void setLightDir(const glm::vec3 &lightDir);
+    void setPointSize(int pointSize);
+    void setNormalScale(float normalScale);
+    void setDataFun(const DataFun &dataFun);
+    void setDrawMode(GLenum drawMode);
 
-    const glm::mat4 &
-    getModelMatrix() const;
-    void
-    setModelMatrix(const glm::mat4 &modelMatrix);
+    const glm::mat4 &getModelMatrix() const;
+    void setModelMatrix(const glm::mat4 &modelMatrix);
 
 private:
     SeparablePipeline glIds_;
@@ -148,8 +111,7 @@ private:
     DataFun dataFun_{nullptr};
     GLenum drawMode_{GL_TRIANGLE_STRIP};
 
-    void
-    updateLights();
+    void updateLights();
 };
 
 using PosNormTexRenderer = sim::RendererHelper<sim::PosNormTexVertex>;

@@ -5,12 +5,10 @@ namespace sim
 {
 
 template<typename V>
-V
-create_sphere_vertex(glm::vec3 p, glm::vec2 t);
+V create_sphere_vertex(glm::vec3 p, glm::vec2 t);
 
 template<>
-sim::PosNormTexVertex
-create_sphere_vertex(glm::vec3 p, glm::vec2 t)
+sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 {
     return {{p.x, p.y, p.z},
             {p.x, p.y, p.z},
@@ -18,15 +16,13 @@ create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 }
 
 template<>
-sim::PosVertex
-create_sphere_vertex(glm::vec3 p, glm::vec2)
+sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2)
 {
     return {{p.x, p.y, p.z}};
 }
 
 template<typename V>
-sim::DrawData<V>
-create_sphere_mesh_data(int u_divisions, int v_divisions)
+sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
 {
     sim::DrawData<V> data{};
 
@@ -67,10 +63,7 @@ create_sphere_mesh_data(int u_divisions, int v_divisions)
     return data;
 }
 
-template sim::PosNormTexData
-create_sphere_mesh_data(int u_divisions, int v_divisions);
-
-template sim::PosData
-create_sphere_mesh_data(int u_divisions, int v_divisions);
+template sim::PosNormTexData create_sphere_mesh_data(int u_divisions, int v_divisions);
+template sim::PosData create_sphere_mesh_data(int u_divisions, int v_divisions);
 
 } // namespace sim

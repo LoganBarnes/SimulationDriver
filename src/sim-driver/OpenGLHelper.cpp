@@ -16,8 +16,7 @@ namespace sim
 namespace
 {
 
-const std::unordered_map<std::string, GLenum> &
-shaderTypes()
+const std::unordered_map<std::string, GLenum> &shaderTypes()
 {
     static std::unordered_map<std::string, GLenum> extMap{
         {".vert", GL_VERTEX_SHADER},
@@ -30,8 +29,7 @@ shaderTypes()
     return extMap;
 }
 
-const std::unordered_map<GLenum, std::string> &
-shaderTypeStrings()
+const std::unordered_map<GLenum, std::string> &shaderTypeStrings()
 {
     static std::unordered_map<GLenum, std::string> typeMap{
         {GL_VERTEX_SHADER, "GL_VERTEX_SHADER"},
@@ -44,8 +42,7 @@ shaderTypeStrings()
     return typeMap;
 }
 
-std::string
-read_file(const std::string filePath)
+std::string read_file(const std::string filePath)
 {
     std::ifstream file(filePath, std::ios::in);
 
@@ -74,8 +71,7 @@ read_file(const std::string filePath)
 ////////////////////////////////////////////////////////////////////////////////
 
 
-std::shared_ptr<GLuint>
-create_shader(GLenum shaderType, const std::string filePath)
+std::shared_ptr<GLuint> create_shader(GLenum shaderType, const std::string filePath)
 {
     std::shared_ptr<GLuint> spShader(new GLuint, [](auto pID)
     {
@@ -111,8 +107,7 @@ create_shader(GLenum shaderType, const std::string filePath)
 } // create_shader
 
 
-std::shared_ptr<GLuint>
-create_shader(const std::string filePath)
+std::shared_ptr<GLuint> create_shader(const std::string filePath)
 {
     size_t dot = filePath.find_last_of(".");
 
@@ -127,16 +122,14 @@ create_shader(const std::string filePath)
 
 
 template<typename ... Shaders>
-void
-create_shader(IdVec *pIds, const std::string filePath)
+void create_shader(IdVec *pIds, const std::string filePath)
 {
     // create/compile shader and add it to list of shaders
     pIds->emplace_back(create_shader(filePath));
 }
 
 template<typename ... Shaders>
-void
-create_shader(IdVec *pIds, const std::string filePath, const Shaders ... shaders)
+void create_shader(IdVec *pIds, const std::string filePath, const Shaders ... shaders)
 {
     // create/compile shader and add it to list of shaders
     pIds->emplace_back(create_shader(filePath));
@@ -149,8 +142,7 @@ create_shader(IdVec *pIds, const std::string filePath, const Shaders ... shaders
 ////////////////////////////////////////////////////////////////////////////////
 
 
-std::shared_ptr<GLuint>
-create_program(const IdVec shaderIds)
+std::shared_ptr<GLuint> create_program(const IdVec shaderIds)
 {
     std::shared_ptr<GLuint> spProgram(new GLuint(glCreateProgram()), [shaderIds](auto pID)
     {
@@ -194,8 +186,7 @@ create_program(const IdVec shaderIds)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-std::shared_ptr<GLuint>
-create_separable_program(GLenum shaderType, const std::string filePath)
+std::shared_ptr<GLuint> create_separable_program(GLenum shaderType, const std::string filePath)
 {
     // Load shader
     std::string shaderStr = read_file(filePath);
@@ -227,11 +218,9 @@ create_separable_program(GLenum shaderType, const std::string filePath)
 } // create_separable_program
 
 
-void
-create_separable_program(const std::string filePath, SeparablePrograms *pSp)
+void create_separable_program(const std::string filePath, SeparablePrograms *pSp)
 {
     size_t dot = filePath.find_last_of(".");
-
     std::string ext = filePath.substr(dot);
 
     if (shaderTypes().find(ext) == shaderTypes().end()) {
@@ -259,15 +248,13 @@ create_separable_program(const std::string filePath, SeparablePrograms *pSp)
 } // create_separable_program
 
 template<typename ... Shaders>
-void
-create_separable_program(SeparablePrograms *pSp, const std::string filePath)
+void create_separable_program(SeparablePrograms *pSp, const std::string filePath)
 {
     create_separable_program(filePath, pSp);
 }
 
 template<typename ... Shaders>
-void
-create_separable_program(SeparablePrograms *pSp, const std::string filePath, const Shaders ... shaders)
+void create_separable_program(SeparablePrograms *pSp, const std::string filePath, const Shaders ... shaders)
 {
     create_separable_program(filePath, pSp);
     create_separable_program(pSp, shaders...);
@@ -276,8 +263,7 @@ create_separable_program(SeparablePrograms *pSp, const std::string filePath, con
 } // namespace
 
 
-const std::vector<VAOElement> &
-posNormTexVaoElements()
+const std::vector<VAOElement> &posNormTexVaoElements()
 {
     static std::vector<VAOElement> elements{
         {"local_position", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosNormTexVertex, position))},
@@ -287,8 +273,7 @@ posNormTexVaoElements()
     return elements;
 }
 
-const std::vector<VAOElement> &
-posVaoElements()
+const std::vector<VAOElement> &posVaoElements()
 {
     static std::vector<VAOElement> elements{
         {"local_position", 3, GL_FLOAT, reinterpret_cast<void *>(offsetof(PosVertex, position))}
@@ -296,8 +281,7 @@ posVaoElements()
     return elements;
 }
 
-const unsigned &
-primitiveRestart()
+const unsigned &primitiveRestart()
 {
     static unsigned index = (std::numeric_limits<unsigned>::max)();
     return index;
@@ -308,8 +292,7 @@ primitiveRestart()
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::setDefaults()
+void OpenGLHelper::setDefaults()
 {
     glEnable(GL_DEPTH_TEST);
 
@@ -331,8 +314,7 @@ OpenGLHelper::setDefaults()
 
 
 template<typename ... Shaders>
-std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::string firstShader, Shaders ... shaders)
+std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string firstShader, Shaders ... shaders)
 {
     IdVec shaderIds;
 
@@ -343,8 +325,7 @@ OpenGLHelper::createProgram(std::string firstShader, Shaders ... shaders)
     return create_program(shaderIds);
 }
 
-std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::vector<std::string> shaderFiles)
+std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::vector<std::string> shaderFiles)
 {
     IdVec shaders;
     for (auto &shaderFile : shaderFiles) {
@@ -355,8 +336,7 @@ OpenGLHelper::createProgram(std::vector<std::string> shaderFiles)
 }
 
 template<typename ... Shaders>
-sim::SeparablePrograms
-OpenGLHelper::createSeparablePrograms(std::string firstShader, Shaders ... shaders)
+sim::SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string firstShader, Shaders ... shaders)
 {
     SeparablePrograms sp;
 
@@ -375,14 +355,13 @@ OpenGLHelper::createSeparablePrograms(std::string firstShader, Shaders ... shade
     return sp;
 }
 
-std::shared_ptr<GLuint>
-OpenGLHelper::createTextureArray(GLsizei width,
-                                 GLsizei height,
-                                 float *pArray,
-                                 GLint filterType,
-                                 GLint wrapType,
-                                 GLint internalFormat,
-                                 GLenum format)
+std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
+                                                         GLsizei height,
+                                                         float *pArray,
+                                                         GLint filterType,
+                                                         GLint wrapType,
+                                                         GLint internalFormat,
+                                                         GLenum format)
 {
     GLuint tex;
     glGenTextures(1, &tex);
@@ -406,24 +385,22 @@ OpenGLHelper::createTextureArray(GLsizei width,
 } // addTextureArray
 
 
-void
-OpenGLHelper::resetTextureArray(std::shared_ptr<GLuint> &spTexture,
-                                GLsizei width,
-                                GLsizei height,
-                                float *pArray,
-                                GLint internalFormat,
-                                GLenum format)
+void OpenGLHelper::resetTextureArray(std::shared_ptr<GLuint> &spTexture,
+                                     GLsizei width,
+                                     GLsizei height,
+                                     float *pArray,
+                                     GLint internalFormat,
+                                     GLenum format)
 {
     glBindTexture(GL_TEXTURE_2D, *spTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, GL_FLOAT, pArray);
 } // resetTextureArray
 
 
-std::shared_ptr<GLuint>
-OpenGLHelper::createVao(const std::shared_ptr<GLuint> &spProgram,
-                        const std::shared_ptr<GLuint> &spVbo,
-                        const GLsizei totalStride,
-                        const std::vector<VAOElement> &elements)
+std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &spProgram,
+                                                const std::shared_ptr<GLuint> &spVbo,
+                                                const GLsizei totalStride,
+                                                const std::vector<VAOElement> &elements)
 {
     GLuint vao;
     glGenVertexArrays(1, &vao);
@@ -503,11 +480,10 @@ OpenGLHelper::createVao(const std::shared_ptr<GLuint> &spProgram,
 } // createVao
 
 
-std::shared_ptr<GLuint>
-OpenGLHelper::createFramebuffer(GLsizei width,
-                                GLsizei height,
-                                const std::shared_ptr<GLuint> &spColorTex,
-                                const std::shared_ptr<GLuint> &spDepthTex)
+std::shared_ptr<GLuint> OpenGLHelper::createFramebuffer(GLsizei width,
+                                                        GLsizei height,
+                                                        const std::shared_ptr<GLuint> &spColorTex,
+                                                        const std::shared_ptr<GLuint> &spDepthTex)
 {
     std::shared_ptr<GLuint> spRbo{nullptr};
     std::shared_ptr<GLuint> spFbo{nullptr};
@@ -583,10 +559,9 @@ OpenGLHelper::createFramebuffer(GLsizei width,
 } // createFramebuffer
 
 
-StandardPipeline
-OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *pData,
-                                       const size_t numElements,
-                                       std::vector<std::string> shaderFiles)
+StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *pData,
+                                                        const size_t numElements,
+                                                        std::vector<std::string> shaderFiles)
 {
     if (shaderFiles.empty()) {
         shaderFiles = {sim::SHADER_PATH + "shader.vert",
@@ -605,10 +580,9 @@ OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *pData,
     return sp;
 }
 
-StandardPipeline
-OpenGLHelper::createPosPipeline(const PosVertex *pData,
-                                const size_t numElements,
-                                std::vector<std::string> shaderFiles)
+StandardPipeline OpenGLHelper::createPosPipeline(const PosVertex *pData,
+                                                 const size_t numElements,
+                                                 std::vector<std::string> shaderFiles)
 {
     if (shaderFiles.empty()) {
         shaderFiles = {sim::SHADER_PATH + "shader.vert",
@@ -629,8 +603,7 @@ OpenGLHelper::createPosPipeline(const PosVertex *pData,
     return sp;
 }
 
-StandardPipeline
-OpenGLHelper::createScreenspacePipeline()
+StandardPipeline OpenGLHelper::createScreenspacePipeline()
 {
     std::vector<sim::PosNormTexVertex> data{
         {{-1, -1, 0}, {0, 0, 1}, {0, 1}},
@@ -642,12 +615,11 @@ OpenGLHelper::createScreenspacePipeline()
     return createPosNormTexPipeline(data.data(), data.size());
 }
 
-void
-OpenGLHelper::bindBufferToTexture(const std::shared_ptr<GLuint> &spTexture,
-                                  const std::shared_ptr<GLuint> &spBuffer,
-                                  int alignment,
-                                  int width,
-                                  int height)
+void OpenGLHelper::bindBufferToTexture(const std::shared_ptr<GLuint> &spTexture,
+                                       const std::shared_ptr<GLuint> &spBuffer,
+                                       int alignment,
+                                       int width,
+                                       int height)
 {
     glBindTexture(GL_TEXTURE_2D, *spTexture);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, *spBuffer);
@@ -674,8 +646,7 @@ OpenGLHelper::bindBufferToTexture(const std::shared_ptr<GLuint> &spTexture,
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::bindFramebuffer()
+void OpenGLHelper::bindFramebuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -686,8 +657,7 @@ OpenGLHelper::bindFramebuffer()
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::bindFramebuffer(const std::shared_ptr<GLuint> &spFbo)
+void OpenGLHelper::bindFramebuffer(const std::shared_ptr<GLuint> &spFbo)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, *spFbo);
 }
@@ -697,8 +667,7 @@ OpenGLHelper::bindFramebuffer(const std::shared_ptr<GLuint> &spFbo)
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::clearFramebuffer()
+void OpenGLHelper::clearFramebuffer()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 } // clearWindow
@@ -710,11 +679,10 @@ OpenGLHelper::clearFramebuffer()
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
-                                const std::string &uniform,
-                                const std::shared_ptr<GLuint> &spTexture,
-                                int activeTex)
+void OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
+                                     const std::string &uniform,
+                                     const std::shared_ptr<GLuint> &spTexture,
+                                     int activeTex)
 {
     glActiveTexture(static_cast< GLenum >( GL_TEXTURE0 + activeTex ));
     glProgramUniform1i(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), activeTex);
@@ -726,12 +694,11 @@ OpenGLHelper::setTextureUniform(const std::shared_ptr<GLuint> &spProgram,
 ///
 /// \author Logan Barnes
 ////////////////////////////////////////////////////////////////////////////////
-void
-OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
-                            const std::string &uniform,
-                            const int *pValue,
-                            const int size,
-                            const int count)
+void OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
+                                 const std::string &uniform,
+                                 const int *pValue,
+                                 const int size,
+                                 const int count)
 {
     switch (size) {
 
@@ -757,8 +724,7 @@ OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
 } // setIntUniform
 
 
-void
-OpenGLHelper::setFloatUniform(
+void OpenGLHelper::setFloatUniform(
     const std::shared_ptr<GLuint> &spProgram,
     const std::string &uniform,
     const float *pValue,
@@ -790,12 +756,11 @@ OpenGLHelper::setFloatUniform(
 } // setFloatUniform
 
 
-void
-OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
-                               const std::string &uniform,
-                               const float *pValue,
-                               const int size,
-                               const int count)
+void OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
+                                    const std::string &uniform,
+                                    const float *pValue,
+                                    const int size,
+                                    const int count)
 {
     switch (size) {
         case 2:
@@ -831,12 +796,11 @@ OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
 } // OpenGLHelper::setMatrixUniform
 
 
-void
-OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
-                             const std::shared_ptr<GLuint> &spSsbo,
-                             const std::string &uniform,
-                             const int sizeBytes,
-                             const GLuint binding)
+void OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
+                                  const std::shared_ptr<GLuint> &spSsbo,
+                                  const std::string &uniform,
+                                  const int sizeBytes,
+                                  const GLuint binding)
 {
     GLuint blockIdx = glGetProgramResourceIndex(*spProgram, GL_SHADER_STORAGE_BLOCK, uniform.c_str());
     glShaderStorageBlockBinding(*spProgram, blockIdx, binding);
@@ -846,8 +810,7 @@ OpenGLHelper::setSsboUniform(const std::shared_ptr<GLuint> &spProgram,
     glBindBufferRange(GL_SHADER_STORAGE_BUFFER, binding, *spSsbo, 0, sizeBytes);
 }
 
-void
-OpenGLHelper::renderBuffer(
+void OpenGLHelper::renderBuffer(
     const std::shared_ptr<GLuint> &spVao,
     const int start,
     const int verts,
@@ -871,39 +834,21 @@ OpenGLHelper::renderBuffer(
     glBindVertexArray(0);
 } // OpenGLHelper::renderBuffer
 
-template std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::string);
-
-template std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::string, std::string);
-
-template std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::string, std::string, std::string);
-
-template std::shared_ptr<GLuint>
-OpenGLHelper::createProgram(std::string, std::string, std::string, std::string);
-
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string);
+template std::shared_ptr<GLuint> OpenGLHelper::createProgram(std::string, std::string, std::string, std::string);
 template std::shared_ptr<GLuint>
 OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string);
-
 template std::shared_ptr<GLuint>
 OpenGLHelper::createProgram(std::string, std::string, std::string, std::string, std::string, std::string);
 
-template SeparablePrograms
-OpenGLHelper::createSeparablePrograms(std::string);
-
-template SeparablePrograms
-OpenGLHelper::createSeparablePrograms(std::string, std::string);
-
-template SeparablePrograms
-OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string);
-
-template SeparablePrograms
-OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string);
-
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string);
+template SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string);
 template SeparablePrograms
 OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string);
-
 template SeparablePrograms
 OpenGLHelper::createSeparablePrograms(std::string, std::string, std::string, std::string, std::string, std::string);
 

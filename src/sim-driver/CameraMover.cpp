@@ -17,8 +17,7 @@ TCameraMover<T>::TCameraMover(TCamera<T> cam)
 {}
 
 template<typename T>
-void
-TCameraMover<T>::yaw(T angleDegrees)
+void TCameraMover<T>::yaw(T angleDegrees)
 {
     if (usingOrbitMode_) {
         orbitYawAngle_ += glm::radians(angleDegrees);
@@ -27,8 +26,7 @@ TCameraMover<T>::yaw(T angleDegrees)
 }
 
 template<typename T>
-void
-TCameraMover<T>::pitch(T angleDegrees)
+void TCameraMover<T>::pitch(T angleDegrees)
 {
     if (usingOrbitMode_) {
         orbitPitchAngle_ += glm::radians(angleDegrees);
@@ -39,75 +37,78 @@ TCameraMover<T>::pitch(T angleDegrees)
 }
 
 template<typename T>
-bool
-TCameraMover<T>::isUsingOrbitMode() const
+void TCameraMover<T>::zoom(T scale)
+{
+    if (usingOrbitMode_) {
+        constexpr auto eps = T(1.0e-3);
+        scale *= std::max(orbitOffsetDistance_, T(0.1)) * T(0.01);
+        orbitOffsetDistance_ = T(std::fmax(orbitOffsetDistance_ + scale, T(0)));
+        if (orbitOffsetDistance_ < eps) {
+            orbitOffsetDistance_ = 0.0f;
+        }
+        updateOrbitSettings();
+    }
+}
+
+template<typename T>
+bool TCameraMover<T>::isUsingOrbitMode() const
 {
     return usingOrbitMode_;
 }
 template<typename T>
-T
-TCameraMover<T>::getOrbitOffsetDistance() const
+T TCameraMover<T>::getOrbitOffsetDistance() const
 {
     return orbitOffsetDistance_;
 }
 template<typename T>
-const glm::tvec3<T> &
-TCameraMover<T>::getOrbitOrigin() const
+const glm::tvec3<T> &TCameraMover<T>::getOrbitOrigin() const
 {
     return orbitOrigin_;
 }
 template<typename T>
-T
-TCameraMover<T>::getOrbitYawAngle() const
+T TCameraMover<T>::getOrbitYawAngle() const
 {
     return orbitYawAngle_;
 }
 template<typename T>
-T
-TCameraMover<T>::getOrbitPitchAngle() const
+T TCameraMover<T>::getOrbitPitchAngle() const
 {
     return orbitPitchAngle_;
 }
 
 template<typename T>
-void
-TCameraMover<T>::setUsingOrbitMode(bool usingOrbitMode)
+void TCameraMover<T>::setUsingOrbitMode(bool usingOrbitMode)
 {
     usingOrbitMode_ = usingOrbitMode;
     updateOrbitSettings();
 }
 template<typename T>
-void
-TCameraMover<T>::setOrbitOffsetDistance(T orbitOffsetDistance)
+void TCameraMover<T>::setOrbitOffsetDistance(T orbitOffsetDistance)
 {
     orbitOffsetDistance_ = orbitOffsetDistance;
     updateOrbitSettings();
 }
 template<typename T>
-void
-TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T> &orbitOrigin)
+void TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T> &orbitOrigin)
 {
     orbitOrigin_ = orbitOrigin;
     updateOrbitSettings();
 }
 template<typename T>
-void
-TCameraMover<T>::setOrbitYawAngle(T orbitYawAngle)
+void TCameraMover<T>::setOrbitYawAngle(T orbitYawAngle)
 {
     orbitYawAngle_ = orbitYawAngle;
     updateOrbitSettings();
 }
 template<typename T>
-void
-TCameraMover<T>::setOrbitPitchAngle(T orbitPitchAngle)
+void TCameraMover<T>::setOrbitPitchAngle(T orbitPitchAngle)
 {
     orbitPitchAngle_ = orbitPitchAngle;
     updateOrbitSettings();
 }
 
 template<typename T>
-void
-TCameraMover<T>::updateOrbitSettings()
+void TCameraMover<T>::updateOrbitSettings()
 {
     if (usingOrbitMode_) {
         glm::tvec3<T> eye{0, 0, orbitOffsetDistance_};

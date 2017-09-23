@@ -19,10 +19,9 @@ TCamera<T>::TCamera()
 }
 
 template<typename T>
-void
-TCamera<T>::lookAt(const glm::tvec3<T> &eye,
-                   const glm::tvec3<T> &point,
-                   const glm::tvec3<T> &up)
+void TCamera<T>::lookAt(const glm::tvec3<T> &eye,
+                        const glm::tvec3<T> &point,
+                        const glm::tvec3<T> &up)
 {
     eyeVector_ = eye;
     lookVector_ = glm::normalize(point - eyeVector_);
@@ -34,11 +33,10 @@ TCamera<T>::lookAt(const glm::tvec3<T> &eye,
 }
 
 template<typename T>
-void
-TCamera<T>::perspective(T fovyDegrees,
-                        T aspect,
-                        T zNear,
-                        T zFar)
+void TCamera<T>::perspective(T fovyDegrees,
+                             T aspect,
+                             T zNear,
+                             T zFar)
 {
     fovYDegrees_ = fovyDegrees;
     fovYRadians_ = glm::radians(fovYDegrees_);
@@ -51,11 +49,10 @@ TCamera<T>::perspective(T fovyDegrees,
 }
 
 template<typename T>
-void
-TCamera<T>::ortho(T left,
-                  T right,
-                  T bottom,
-                  T top)
+void TCamera<T>::ortho(T left,
+                       T right,
+                       T bottom,
+                       T top)
 {
     orthoLeft_ = left;
     orthoRight_ = right;
@@ -67,72 +64,55 @@ TCamera<T>::ortho(T left,
 }
 
 template<typename T>
-const glm::tvec3<T> &
-TCamera<T>::getEyeVector() const
+const glm::tvec3<T> &TCamera<T>::getEyeVector() const
 { return eyeVector_; }
 template<typename T>
-const glm::tvec3<T> &
-TCamera<T>::getLookVector() const
+const glm::tvec3<T> &TCamera<T>::getLookVector() const
 { return lookVector_; }
 template<typename T>
-const glm::tvec3<T> &
-TCamera<T>::getUpVector() const
+const glm::tvec3<T> &TCamera<T>::getUpVector() const
 { return upVector_; }
 template<typename T>
-const glm::tvec3<T> &
-TCamera<T>::getRightVector() const
+const glm::tvec3<T> &TCamera<T>::getRightVector() const
 { return rightVector_; }
 template<typename T>
-const glm::tmat4x4<T> &
-TCamera<T>::getViewFromWorldMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getViewFromWorldMatrix() const
 { return viewFromWorldMatrix_; }
 template<typename T>
-T
-TCamera<T>::getFovYDegrees() const
+T TCamera<T>::getFovYDegrees() const
 { return fovYDegrees_; }
 template<typename T>
-T
-TCamera<T>::getFovYRadians() const
+T TCamera<T>::getFovYRadians() const
 { return fovYRadians_; }
 template<typename T>
-T
-TCamera<T>::getAspectRatio() const
+T TCamera<T>::getAspectRatio() const
 { return aspectRatio_; }
 template<typename T>
-T
-TCamera<T>::getNearPlane() const
+T TCamera<T>::getNearPlane() const
 { return nearPlane_; }
 template<typename T>
-T
-TCamera<T>::getFarPlane() const
+T TCamera<T>::getFarPlane() const
 { return farPlane_; }
 template<typename T>
-const glm::tmat4x4<T> &
-TCamera<T>::getPerspectiveScreenFromViewMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getPerspectiveScreenFromViewMatrix() const
 { return perspectiveScreenFromViewMatrix_; }
 template<typename T>
-T
-TCamera<T>::getOrthoLeft() const
+T TCamera<T>::getOrthoLeft() const
 { return orthoLeft_; }
 template<typename T>
-T
-TCamera<T>::getOrthoRight() const
+T TCamera<T>::getOrthoRight() const
 { return orthoRight_; }
 template<typename T>
-T
-TCamera<T>::getOrthoBottom() const
+T TCamera<T>::getOrthoBottom() const
 { return orthoBottom_; }
 template<typename T>
-T
-TCamera<T>::getOrthoTop() const
+T TCamera<T>::getOrthoTop() const
 { return orthoTop_; }
 template<typename T>
-const glm::tmat4x4<T> &
-TCamera<T>::getOrthographicScreenFromViewMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getOrthographicScreenFromViewMatrix() const
 { return orthographicScreenFromViewMatrix_; }
 template<typename T>
-const glm::tmat4x4<T> &
-TCamera<T>::getPerspectiveScreenFromWorldMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getPerspectiveScreenFromWorldMatrix() const
 { return perspectiveScreenFromWorldMatrix_; }
 template<typename T>
 const glm::tmat4x4<T> &
@@ -140,68 +120,57 @@ TCamera<T>::getOrthoScreenFromWorldMatrix() const
 { return orthoScreenFromWorldMatrix_; }
 
 template<typename T>
-void
-TCamera<T>::setEyeVector(const glm::tvec3<T> &eyeVector)
+void TCamera<T>::setEyeVector(const glm::tvec3<T> &eyeVector)
 {
     lookAt(eyeVector, eyeVector + lookVector_, upVector_);
 }
 template<typename T>
-void
-TCamera<T>::setLookVector(const glm::tvec3<T> &lookVector)
+void TCamera<T>::setLookVector(const glm::tvec3<T> &lookVector)
 {
     lookAt(eyeVector_, eyeVector_ + lookVector, upVector_);
 }
 template<typename T>
-void
-TCamera<T>::setUpVector(const glm::tvec3<T> &upVector)
+void TCamera<T>::setUpVector(const glm::tvec3<T> &upVector)
 {
     lookAt(eyeVector_, eyeVector_ + lookVector_, upVector);
 }
 template<typename T>
-void
-TCamera<T>::setFovYDegrees(T fovYDegrees)
+void TCamera<T>::setFovYDegrees(T fovYDegrees)
 {
     perspective(fovYDegrees, aspectRatio_, nearPlane_, farPlane_);
 }
 template<typename T>
-void
-TCamera<T>::setAspectRatio(T aspectRatio)
+void TCamera<T>::setAspectRatio(T aspectRatio)
 {
     perspective(fovYDegrees_, aspectRatio, nearPlane_, farPlane_);
 }
 template<typename T>
-void
-TCamera<T>::setNearPlane(T nearPlane)
+void TCamera<T>::setNearPlane(T nearPlane)
 {
     perspective(fovYDegrees_, aspectRatio_, nearPlane, farPlane_);
 }
 template<typename T>
-void
-TCamera<T>::setFarPlane(T farPlane)
+void TCamera<T>::setFarPlane(T farPlane)
 {
     perspective(fovYDegrees_, aspectRatio_, nearPlane_, farPlane);
 }
 template<typename T>
-void
-TCamera<T>::setOrthoLeft(T orthoLeft)
+void TCamera<T>::setOrthoLeft(T orthoLeft)
 {
     ortho(orthoLeft, orthoRight_, orthoBottom_, orthoTop_);
 }
 template<typename T>
-void
-TCamera<T>::setOrthoRight(T orthoRight)
+void TCamera<T>::setOrthoRight(T orthoRight)
 {
     ortho(orthoLeft_, orthoRight, orthoBottom_, orthoTop_);
 }
 template<typename T>
-void
-TCamera<T>::setOrthoBottom(T orthoBottom)
+void TCamera<T>::setOrthoBottom(T orthoBottom)
 {
     ortho(orthoLeft_, orthoRight_, orthoBottom, orthoTop_);
 }
 template<typename T>
-void
-TCamera<T>::setOrthoTop(T orthoTop)
+void TCamera<T>::setOrthoTop(T orthoTop)
 {
     ortho(orthoLeft_, orthoRight_, orthoBottom_, orthoTop);
 }

@@ -23,15 +23,13 @@ public:
         renderer_.setModelMatrix(model_);
     }
 
-    void
-    onUpdate(double, double timeStep)
+    void onUpdate(double, double timeStep)
     {
         prevCam_ = simData_.camera();
         simData_.cameraMover.yaw(static_cast<float>(timeStep * 25));
     }
 
-    void
-    onRender(int, int, double alpha)
+    void onRender(int, int, double alpha)
     {
         auto a = static_cast<float>(alpha);
 
@@ -39,22 +37,23 @@ public:
             renderer_.render(a, simData_.camera());
         }
         else {
+            sim::Camera &currCam = simData_.camera();
             sim::Camera camera;
-            glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), simData_.camera().getEyeVector(), a)};
-            glm::vec3 look{glm::mix(prevCam_.getLookVector(), simData_.camera().getLookVector(), a)};
-            glm::vec3 up{glm::mix(prevCam_.getUpVector(), simData_.camera().getUpVector(), a)};
 
-            float aspect{glm::mix(prevCam_.getAspectRatio(), simData_.camera().getAspectRatio(), a)};
+            glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), currCam.getEyeVector(), a)};
+            glm::vec3 look{glm::mix(prevCam_.getLookVector(), currCam.getLookVector(), a)};
+            glm::vec3 up{glm::mix(prevCam_.getUpVector(), currCam.getUpVector(), a)};
+
+            float aspect{glm::mix(prevCam_.getAspectRatio(), currCam.getAspectRatio(), a)};
 
             camera.lookAt(eye, eye + look, up);
-            camera.setAspectRatio(aspect);
+            camera.perspective(currCam.getFovYDegrees(), aspect, currCam.getNearPlane(), currCam.getFarPlane());
 
             renderer_.render(a, camera);
         }
     }
 
-    void
-    onGuiRender(int, int)
+    void onGuiRender(int, int)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
@@ -66,8 +65,7 @@ public:
         ImGui::PopStyleVar();
     }
 
-    void
-    keyCallback(GLFWwindow *, int key, int, int action, int, const sim::SimCallbacks<Simulator> &)
+    void keyCallback(GLFWwindow *, int key, int, int action, int, const sim::SimCallbacks<Simulator> &)
     {
         if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
             gravity_ = -gravity_;
@@ -80,12 +78,10 @@ private:
     sim::Camera prevCam_;
 
     glm::mat4 model_{1};
-
     glm::vec3 gravity_{0, -9.8f, 0};
 };
 
-int
-main()
+int main()
 {
     try {
         sim::SimInitData initData;

@@ -13,16 +13,14 @@ MeshHelper<V>::MeshHelper(MeshDataFun dataFun)
 }
 
 template<typename V>
-void
-MeshHelper<V>::setMeshDataFunction(MeshDataFun dataFun)
+void MeshHelper<V>::setMeshDataFunction(MeshDataFun dataFun)
 {
     dataFun_ = std::move(dataFun);
     updateData();
 }
 
 template<typename V>
-bool
-MeshHelper<V>::configureGui()
+bool MeshHelper<V>::configureGui()
 {
     bool mesh_needs_update = false;
     ImGui::Checkbox("Link U and V", &linkDivisions_);
@@ -45,15 +43,13 @@ MeshHelper<V>::configureGui()
 }
 
 template<typename V>
-const sim::DrawData<V> &
-MeshHelper<V>::getMeshData() const
+const sim::DrawData<V> &MeshHelper<V>::getMeshData() const
 {
     return data_;
 }
 
 template<typename V>
-void
-MeshHelper<V>::updateData()
+void MeshHelper<V>::updateData()
 {
     if (dataFun_) {
         data_ = dataFun_(uDivisions_, vDivisions_);
@@ -62,7 +58,6 @@ MeshHelper<V>::updateData()
 
 template
 class MeshHelper<sim::PosNormTexVertex>;
-
 template
 class MeshHelper<sim::PosVertex>;
 

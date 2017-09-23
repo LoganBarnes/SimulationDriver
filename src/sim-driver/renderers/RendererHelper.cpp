@@ -28,8 +28,7 @@ RendererHelper<Vertex>::RendererHelper()
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
+void RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
 {
     if (showNormals_) {
         customRender(alpha, pCamera, drawMode_, 1, shapeColor_, lightDir_, showNormals_, normalScale_);
@@ -39,8 +38,7 @@ RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::onGuiRender()
+void RendererHelper<Vertex>::onGuiRender()
 {
     ImGui::Checkbox("Show Normals", &showNormals_);
 
@@ -116,8 +114,7 @@ RendererHelper<Vertex>::onGuiRender()
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::onResize(int, int)
+void RendererHelper<Vertex>::onResize(int, int)
 {
     if (glIds_.framebuffer) {
         ///\todo: resize framebuffer
@@ -125,16 +122,15 @@ RendererHelper<Vertex>::onResize(int, int)
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::customRender(float,
-                                     const Camera *pCamera,
-                                     GLenum drawMode,
-                                     int displayMode,
-                                     glm::vec3 shapeColor,
-                                     glm::vec3 lightDir,
-                                     bool showNormals,
-                                     float NormalScale,
-                                     std::function<void(void)> programReplacement) const
+void RendererHelper<Vertex>::customRender(float,
+                                          const Camera *pCamera,
+                                          GLenum drawMode,
+                                          int displayMode,
+                                          glm::vec3 shapeColor,
+                                          glm::vec3 lightDir,
+                                          bool showNormals,
+                                          float NormalScale,
+                                          std::function<void(void)> programReplacement) const
 {
     if (glIds_.framebuffer) {
         glBindFramebuffer(GL_FRAMEBUFFER, *glIds_.framebuffer);
@@ -216,11 +212,10 @@ RendererHelper<Vertex>::customRender(float,
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::renderToFramebuffer(int width,
-                                            int height,
-                                            const std::shared_ptr<GLuint> &spColorTex,
-                                            const std::shared_ptr<GLuint> &spDepthTex)
+void RendererHelper<Vertex>::renderToFramebuffer(int width,
+                                                 int height,
+                                                 const std::shared_ptr<GLuint> &spColorTex,
+                                                 const std::shared_ptr<GLuint> &spDepthTex)
 {
     fboWidth_ = width;
     fboHeight_ = height;
@@ -229,8 +224,7 @@ RendererHelper<Vertex>::renderToFramebuffer(int width,
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::rebuild_mesh()
+void RendererHelper<Vertex>::rebuild_mesh()
 {
     if (!dataFun_) {
         return;
@@ -256,8 +250,7 @@ RendererHelper<Vertex>::rebuild_mesh()
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
+void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
 {
     lights_.emplace_back(lightDir, intensity);
 
@@ -269,88 +262,68 @@ RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setTexture(std::shared_ptr<GLuint> texture)
+void RendererHelper<Vertex>::setTexture(std::shared_ptr<GLuint> texture)
 {
     glIds_.texture = texture;
 }
 
 template<typename Vertex>
-int
-RendererHelper<Vertex>::getFboWidth() const
+int RendererHelper<Vertex>::getFboWidth() const
 { return fboWidth_; }
 template<typename Vertex>
-int
-RendererHelper<Vertex>::getFboHeight() const
+int RendererHelper<Vertex>::getFboHeight() const
 { return fboHeight_; }
 template<typename Vertex>
-bool
-RendererHelper<Vertex>::isShowingVertsOnly() const
+bool RendererHelper<Vertex>::isShowingVertsOnly() const
 { return showingVertsOnly_; }
 template<typename Vertex>
-bool
-RendererHelper<Vertex>::isUsingWireframe() const
+bool RendererHelper<Vertex>::isUsingWireframe() const
 { return usingWireframe_; }
 template<typename Vertex>
-bool
-RendererHelper<Vertex>::isShowNormals() const
+bool RendererHelper<Vertex>::isShowNormals() const
 { return showNormals_; }
 template<typename Vertex>
-int
-RendererHelper<Vertex>::getDisplayMode() const
+int RendererHelper<Vertex>::getDisplayMode() const
 { return displayMode_; }
 template<typename Vertex>
-const glm::vec3 &
-RendererHelper<Vertex>::getShapeColor() const
+const glm::vec3 &RendererHelper<Vertex>::getShapeColor() const
 { return shapeColor_; }
 template<typename Vertex>
-float
-RendererHelper<Vertex>::getShapeRoughness() const
+float RendererHelper<Vertex>::getShapeRoughness() const
 { return shapeRoughness_; }
 template<typename Vertex>
-const glm::vec3 &
-RendererHelper<Vertex>::getShapeIor() const
+const glm::vec3 &RendererHelper<Vertex>::getShapeIor() const
 { return shapeIor_; }
 template<typename Vertex>
-const glm::vec3 &
-RendererHelper<Vertex>::getLightDir() const
+const glm::vec3 &RendererHelper<Vertex>::getLightDir() const
 { return lightDir_; }
 template<typename Vertex>
-int
-RendererHelper<Vertex>::getPointSize() const
+int RendererHelper<Vertex>::getPointSize() const
 { return pointSize_; }
 template<typename Vertex>
-float
-RendererHelper<Vertex>::getNormalScale() const
+float RendererHelper<Vertex>::getNormalScale() const
 { return normalScale_; }
 template<typename Vertex>
-GLenum
-RendererHelper<Vertex>::getDrawMode() const
+GLenum RendererHelper<Vertex>::getDrawMode() const
 { return drawMode_; }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setFboWidth(int fboWidth)
+void RendererHelper<Vertex>::setFboWidth(int fboWidth)
 { fboWidth_ = fboWidth; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setFboHeight(int fboHeight)
+void RendererHelper<Vertex>::setFboHeight(int fboHeight)
 { fboHeight_ = fboHeight; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setShowingVertsOnly(bool showingVertsOnly)
+void RendererHelper<Vertex>::setShowingVertsOnly(bool showingVertsOnly)
 { showingVertsOnly_ = showingVertsOnly; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setUsingWireframe(bool usingWireframe)
+void RendererHelper<Vertex>::setUsingWireframe(bool usingWireframe)
 { usingWireframe_ = usingWireframe; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setShowNormals(bool showNormals)
+void RendererHelper<Vertex>::setShowNormals(bool showNormals)
 { showNormals_ = showNormals; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setDisplayMode(int displayMode)
+void RendererHelper<Vertex>::setDisplayMode(int displayMode)
 {
     if (0 > displayMode || displayMode > 8) {
         std::cerr << "Display mode should be between 0 and 8 inclusive" << std::endl;
@@ -359,24 +332,19 @@ RendererHelper<Vertex>::setDisplayMode(int displayMode)
     displayMode_ = displayMode;
 }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setShapeColor(const glm::vec3 &shapeColor)
+void RendererHelper<Vertex>::setShapeColor(const glm::vec3 &shapeColor)
 { shapeColor_ = shapeColor; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setShapeRoughness(float shapeRoughness)
+void RendererHelper<Vertex>::setShapeRoughness(float shapeRoughness)
 { shapeRoughness_ = shapeRoughness; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setShapeIor(const glm::vec3 &shapeIor)
+void RendererHelper<Vertex>::setShapeIor(const glm::vec3 &shapeIor)
 { shapeIor_ = shapeIor; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setLightDir(const glm::vec3 &lightDir)
+void RendererHelper<Vertex>::setLightDir(const glm::vec3 &lightDir)
 { lightDir_ = lightDir; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setPointSize(int pointSize)
+void RendererHelper<Vertex>::setPointSize(int pointSize)
 {
     if (0 > pointSize || pointSize > max_point_size) {
         std::cerr << "Display mode should be between 0 and " << max_point_size << " inclusive" << std::endl;
@@ -385,38 +353,32 @@ RendererHelper<Vertex>::setPointSize(int pointSize)
     pointSize_ = pointSize;
 }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setNormalScale(float normalScale)
+void RendererHelper<Vertex>::setNormalScale(float normalScale)
 { normalScale_ = normalScale; }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setDataFun(const DataFun &dataFun)
+void RendererHelper<Vertex>::setDataFun(const DataFun &dataFun)
 {
     dataFun_ = dataFun;
     rebuild_mesh();
 }
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setDrawMode(GLenum drawMode)
+void RendererHelper<Vertex>::setDrawMode(GLenum drawMode)
 { drawMode_ = drawMode; }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::updateLights()
+void RendererHelper<Vertex>::updateLights()
 {
     sim::OpenGLHelper::updateBuffer(spLightSsbo_, 0, lights_.size(), lights_.data(), GL_SHADER_STORAGE_BUFFER);
 }
 
 template<typename Vertex>
-const glm::mat4 &
-RendererHelper<Vertex>::getModelMatrix() const
+const glm::mat4 &RendererHelper<Vertex>::getModelMatrix() const
 {
     return modelMatrix_;
 }
 
 template<typename Vertex>
-void
-RendererHelper<Vertex>::setModelMatrix(const glm::mat4 &modelMatrix)
+void RendererHelper<Vertex>::setModelMatrix(const glm::mat4 &modelMatrix)
 {
     modelMatrix_ = modelMatrix;
     normalMatrix_ = glm::transpose(glm::inverse(glm::mat3(modelMatrix_)));
@@ -424,13 +386,11 @@ RendererHelper<Vertex>::setModelMatrix(const glm::mat4 &modelMatrix)
 
 template
 class sim::RendererHelper<sim::PosNormTexVertex>;
-
 template
 class sim::RendererHelper<sim::PosVertex>;
 
 template
 struct sim::DrawData<sim::PosNormTexVertex>;
-
 template
 struct sim::DrawData<sim::PosVertex>;
 
