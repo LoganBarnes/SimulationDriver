@@ -4,7 +4,7 @@
 #include <sim-driver/SimCallbacks.hpp>
 #include <sim-driver/SimData.hpp>
 
-#include <sim-driver/OpenGLForwardDeclarations.hpp>
+#include <sim-driver/OpenGLTypes.hpp>
 
 #define GLFW_INCLUDE_NONE
 
@@ -33,20 +33,29 @@ class SimDriver
 public:
 
     SimDriver(const SimDriver &) = delete;
-    SimDriver &operator=(const SimDriver &) = delete;
+    SimDriver &
+    operator=(const SimDriver &) = delete;
 
-    void runEventLoop();
-    void runAsFastAsPossibleLoop();
-    void runNoFasterThanRealTimeLoop();
+    void
+    runEventLoop();
+    void
+    runAsFastAsPossibleLoop();
+    void
+    runNoFasterThanRealTimeLoop();
 
     template<typename C>
-    void setCallbackClass(C *callbacks);
+    void
+    setCallbackClass(C *callbacks);
 
-    int getWidth() const;
-    int getHeight() const;
+    int
+    getWidth() const;
+    int
+    getHeight() const;
 
-    GLFWwindow *getWindow();
-    const GLFWwindow *getWindow() const;
+    GLFWwindow *
+    getWindow();
+    const GLFWwindow *
+    getWindow() const;
 
     SimData simData;
 
@@ -56,7 +65,8 @@ protected:
 
     ~SimDriver() = default;
     SimDriver(SimDriver &&) noexcept = default;
-    SimDriver &operator=(SimDriver &&) noexcept = default;
+    SimDriver &
+    operator=(SimDriver &&) noexcept = default;
 
 private:
 
@@ -67,16 +77,19 @@ private:
     std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>> upWindow_{nullptr};
     std::unique_ptr<bool, std::function<void(bool *)>> upImgui_{nullptr};
 
-    SimCallbacks<> callbacks_;
+    sim::SimCallbacks<> callbacks_;
 
-    void update();
-    void render(double alpha, bool eventBased = false);
-    bool isPaused() const;
+    void
+    update();
+    void
+    render(double alpha, bool eventBased = false);
+    bool
+    isPaused() const;
 };
 
 template<typename Child>
 SimDriver<Child>::SimDriver(SimInitData initData)
-        : callbacks_{&simData}
+    : callbacks_{&simData}
 {
     glfwSetErrorCallback([](int error, const char *description)
                          {
@@ -92,13 +105,11 @@ SimDriver<Child>::SimDriver(SimInitData initData)
                                                                });
     DEBUG_PRINT("Initializing GLFW");
 
-    if (*upGlfw_ == 0)
-    {
+    if (*upGlfw_ == 0) {
         throw std::runtime_error("GLFW init failed");
     }
 
-    if (initData.width == 0 || initData.height == 0)
-    {
+    if (initData.width == 0 || initData.height == 0) {
         const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
@@ -119,38 +130,35 @@ SimDriver<Child>::SimDriver(SimInitData initData)
 #endif // __APPLE__
 
     upWindow_ = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
-            glfwCreateWindow(initData.width, initData.height, initData.title.c_str(), nullptr, nullptr),
-            [](auto p)
-            {
-                if (p)
-                {
-                    DEBUG_PRINT("Destroying GLFW window");
-                    glfwDestroyWindow(p);
-                }
-            });
+        glfwCreateWindow(initData.width, initData.height, initData.title.c_str(), nullptr, nullptr),
+        [](auto p)
+        {
+            if (p) {
+                DEBUG_PRINT("Destroying GLFW window");
+                glfwDestroyWindow(p);
+            }
+        });
     DEBUG_PRINT("Creating GLFW window");
 
-    if (upWindow_ == nullptr)
-    {
+    if (upWindow_ == nullptr) {
         throw std::runtime_error("GLFW window creation failed");
     }
 
     glfwMakeContextCurrent(upWindow_.get());
     glfwSwapInterval(1);
 
-    if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0)
-    {
+    if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0) {
         throw std::runtime_error("Failed to initialize OpenGL context");
     }
 
     upImgui_ = std::unique_ptr<bool, std::function<void(bool *)>>(
-            new bool(ImGui_ImplGlfwGL3_Init(upWindow_.get(), false)), // false for no callbacks
-            [](auto p)
-            {
-                DEBUG_PRINT("Shutting down ImGui");
-                ImGui_ImplGlfwGL3_Shutdown();
-                delete p;
-            });
+        new bool(ImGui_ImplGlfwGL3_Init(upWindow_.get(), false)), // false for no callbacks
+        [](auto p)
+        {
+            DEBUG_PRINT("Shutting down ImGui");
+            ImGui_ImplGlfwGL3_Shutdown();
+            delete p;
+        });
     DEBUG_PRINT("Initializing ImGui");
 
     simData.camera().setAspectRatio(initData.width / float(initData.height));
@@ -160,69 +168,62 @@ SimDriver<Child>::SimDriver(SimInitData initData)
     DEBUG_PRINT("");
 }
 
-
 template<typename Child>
-void SimDriver<Child>::runEventLoop()
+void
+SimDriver<Child>::runEventLoop()
 {
-    do
-    {
-        if (!isPaused())
-        {
+    do {
+        if (!isPaused()) {
             update();
             worldTime_ += timeStep_;
         }
         render(1.0, true);
 
         glfwWaitEvents();
-    } while (!glfwWindowShouldClose(getWindow()));
+    }
+    while (!glfwWindowShouldClose(getWindow()));
 }
 
-
 template<typename Child>
-void SimDriver<Child>::runAsFastAsPossibleLoop()
+void
+SimDriver<Child>::runAsFastAsPossibleLoop()
 {
     glfwSwapInterval(0);
-    do
-    {
-        if (!isPaused())
-        {
+    do {
+        if (!isPaused()) {
             update();
             worldTime_ += timeStep_;
         }
         render(1.0, isPaused());
 
-        if (isPaused())
-        {
+        if (isPaused()) {
             glfwWaitEvents();
         }
-        else
-        {
+        else {
             glfwPollEvents();
         }
-    } while (!glfwWindowShouldClose(getWindow()));
+    }
+    while (!glfwWindowShouldClose(getWindow()));
 }
 
-
 template<typename Child>
-void SimDriver<Child>::runNoFasterThanRealTimeLoop()
+void
+SimDriver<Child>::runNoFasterThanRealTimeLoop()
 {
     auto currentTime = std::chrono::steady_clock::now();
     double accumulator = 0.0;
 
-    do
-    {
+    do {
         auto newTime = std::chrono::steady_clock::now();
         double frameTime = std::chrono::duration<double>{newTime - currentTime}.count();
         currentTime = newTime;
 
         frameTime = std::min(0.1, frameTime);
 
-        if (!isPaused())
-        {
+        if (!isPaused()) {
             accumulator += frameTime;
 
-            while (accumulator >= timeStep_)
-            {
+            while (accumulator >= timeStep_) {
                 update();
                 worldTime_ += timeStep_;
                 accumulator -= timeStep_;
@@ -233,21 +234,20 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
 
         render(alpha, isPaused());
 
-        if (isPaused())
-        {
+        if (isPaused()) {
             glfwWaitEvents();
         }
-        else
-        {
+        else {
             glfwPollEvents();
         }
-    } while (!glfwWindowShouldClose(getWindow()));
+    }
+    while (!glfwWindowShouldClose(getWindow()));
 }
-
 
 template<typename Child>
 template<typename C>
-void SimDriver<Child>::setCallbackClass(C *pCallbacks)
+void
+SimDriver<Child>::setCallbackClass(C *pCallbacks)
 {
     glfwSetWindowUserPointer(getWindow(), pCallbacks);
 
@@ -264,14 +264,11 @@ void SimDriver<Child>::setCallbackClass(C *pCallbacks)
     glfwSetMouseButtonCallback(getWindow(), [](GLFWwindow *pWindow, int button, int action, int mods)
     {
         ImGuiIO &io = ImGui::GetIO();
-        if (!io.WantCaptureMouse)
-        {
+        if (!io.WantCaptureMouse) {
             static_cast<C *>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods);
         }
-        else
-        {
-            if (action == GLFW_PRESS && button >= 0 && button < 3)
-            {
+        else {
+            if (action == GLFW_PRESS && button >= 0 && button < 3) {
                 io.MouseDown[button] = true;
             }
         }
@@ -280,18 +277,14 @@ void SimDriver<Child>::setCallbackClass(C *pCallbacks)
     glfwSetKeyCallback(getWindow(), [](GLFWwindow *pWindow, int key, int scancode, int action, int mods)
     {
         ImGuiIO &io = ImGui::GetIO();
-        if (!io.WantCaptureKeyboard)
-        {
+        if (!io.WantCaptureKeyboard) {
             static_cast<C *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
         }
-        else
-        {
-            if (action == GLFW_PRESS)
-            {
+        else {
+            if (action == GLFW_PRESS) {
                 io.KeysDown[key] = true;
             }
-            else if (action == GLFW_RELEASE)
-            {
+            else if (action == GLFW_RELEASE) {
                 io.KeysDown[key] = false;
             }
             io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
@@ -304,8 +297,7 @@ void SimDriver<Child>::setCallbackClass(C *pCallbacks)
     glfwSetCursorPosCallback(getWindow(), [](GLFWwindow *pWindow, double xpos, double ypos)
     {
         ImGuiIO &io = ImGui::GetIO();
-        if (!io.WantCaptureMouse)
-        {
+        if (!io.WantCaptureMouse) {
             static_cast<C *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);
         }
     });
@@ -313,12 +305,10 @@ void SimDriver<Child>::setCallbackClass(C *pCallbacks)
     glfwSetScrollCallback(getWindow(), [](GLFWwindow *pWindow, double xoffset, double yoffset)
     {
         ImGuiIO &io = ImGui::GetIO();
-        if (!io.WantCaptureMouse)
-        {
+        if (!io.WantCaptureMouse) {
             static_cast<C *>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset);
         }
-        else
-        {
+        else {
             io.MouseWheel += static_cast<float>(yoffset); // the fractional mouse wheel. 1.0 unit 5 lines
         }
     });
@@ -326,26 +316,25 @@ void SimDriver<Child>::setCallbackClass(C *pCallbacks)
     glfwSetCharCallback(getWindow(), [](GLFWwindow *pWindow, unsigned codepoint)
     {
         ImGuiIO &io = ImGui::GetIO();
-        if (!io.WantCaptureKeyboard)
-        {
+        if (!io.WantCaptureKeyboard) {
             static_cast<C *>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint);
         }
-        else if (io.WantCaptureKeyboard && codepoint > 0 && codepoint < 0x10000)
-        {
+        else if (io.WantCaptureKeyboard && codepoint > 0 && codepoint < 0x10000) {
             io.AddInputCharacter(static_cast<unsigned short>(codepoint));
         }
     });
 }
 
-
 template<typename Child>
-void SimDriver<Child>::update()
+void
+SimDriver<Child>::update()
 {
     static_cast<Child *>(this)->update(worldTime_, timeStep_);
 }
 
 template<typename Child>
-void SimDriver<Child>::render(double alpha, bool eventBased)
+void
+SimDriver<Child>::render(double alpha, bool eventBased)
 {
     int w, h;
     glfwGetWindowSize(getWindow(), &w, &h);
@@ -353,27 +342,30 @@ void SimDriver<Child>::render(double alpha, bool eventBased)
     glfwSwapBuffers(getWindow());
 }
 
-
 template<typename Child>
-bool SimDriver<Child>::isPaused() const
+bool
+SimDriver<Child>::isPaused() const
 {
     return static_cast<const Child *>(this)->paused();
 }
 
 template<typename Child>
-GLFWwindow *SimDriver<Child>::getWindow()
+GLFWwindow *
+SimDriver<Child>::getWindow()
 {
     return upWindow_.get();
 }
 
 template<typename Child>
-const GLFWwindow *SimDriver<Child>::getWindow() const
+const GLFWwindow *
+SimDriver<Child>::getWindow() const
 {
     return upWindow_.get();
 }
 
 template<typename Child>
-int SimDriver<Child>::getWidth() const
+int
+SimDriver<Child>::getWidth() const
 {
     int w;
     glfwGetWindowSize(upWindow_.get(), &w, nullptr);
@@ -381,7 +373,8 @@ int SimDriver<Child>::getWidth() const
 }
 
 template<typename Child>
-int SimDriver<Child>::getHeight() const
+int
+SimDriver<Child>::getHeight() const
 {
     int h;
     glfwGetWindowSize(upWindow_.get(), nullptr, &h);

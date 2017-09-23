@@ -5,8 +5,8 @@ class Simulator
 {
 public:
     explicit Simulator(int, int, optix::Context &context, sim::SimData *pSimData)
-            : simData_{*pSimData},
-              scene_{context}
+        : simData_{*pSimData},
+          scene_{context}
     {
         simData_.cameraMover.setUsingOrbitMode(true);
         simData_.cameraMover.setOrbitOrigin({0, 0, 0});
@@ -15,13 +15,15 @@ public:
         prevCam_ = simData_.camera();
     }
 
-    void onUpdate(double, double timeStep)
+    void
+    onUpdate(double, double timeStep)
     {
         prevCam_ = simData_.camera();
         simData_.cameraMover.yaw(static_cast<float>(timeStep));
     }
 
-    void onRender(int width, int height, double alpha, optix::Context &context)
+    void
+    onRender(int width, int height, double alpha, optix::Context &context)
     {
         auto a = static_cast<float>(alpha);
 
@@ -38,12 +40,12 @@ public:
         context->launch(0, static_cast<unsigned>(width), static_cast<unsigned>(height));
     }
 
-    void onGuiRender(int, int)
+    void
+    onGuiRender(int, int)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
+        if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGuiIO &io = ImGui::GetIO();
             ImGui::Text("Framerate: %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
@@ -51,7 +53,8 @@ public:
         ImGui::PopStyleVar();
     }
 
-    void keyCallback(GLFWwindow *, int, int, int, int mods)
+    void
+    keyCallback(GLFWwindow *, int, int, int, int mods)
     {
         simData_.paused = (mods == GLFW_MOD_SHIFT);
     }
@@ -63,14 +66,13 @@ private:
     sim::OptiXScene scene_;
 };
 
-int main()
+int
+main()
 {
-    try
-    {
-        sim::OptiXSimulation<Simulator>{{"OptiX Test"}}.runNoFasterThanRealTimeLoop();
+    try {
+        sim::OptiXSimulation < Simulator > {{"OptiX Test"}}.runNoFasterThanRealTimeLoop();
     }
-    catch (const std::exception &e)
-    {
+    catch (const std::exception &e) {
         std::cerr << "Program failed: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }

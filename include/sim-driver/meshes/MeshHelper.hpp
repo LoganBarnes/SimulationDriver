@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
 
@@ -16,13 +15,17 @@ public:
 
     explicit MeshHelper(MeshDataFun dataFun = nullptr);
 
-    bool configureGui();
+    bool
+    configureGui();
 
-    void setMeshDataFunction(MeshDataFun dataFun);
+    void
+    setMeshDataFunction(MeshDataFun dataFun);
 
-    const sim::DrawData<V> &getMeshData() const;
+    const sim::DrawData<V> &
+    getMeshData() const;
 
-    void updateData();
+    void
+    updateData();
 
 private:
     sim::DrawData<V> data_;

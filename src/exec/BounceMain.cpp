@@ -4,13 +4,12 @@
 #include <sim-driver/meshes/MeshFunctions.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-
 class Simulator
 {
 public:
     explicit Simulator(int, int, sim::SimData *pSimData)
-            : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
-              simData_{*pSimData}
+        : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
+          simData_{*pSimData}
     {
         simData_.cameraMover.setUsingOrbitMode(true);
         simData_.cameraMover.setOrbitOrigin({0, 0, 0});
@@ -24,22 +23,22 @@ public:
         renderer_.setModelMatrix(model_);
     }
 
-    void onUpdate(double, double timeStep)
+    void
+    onUpdate(double, double timeStep)
     {
         prevCam_ = simData_.camera();
         simData_.cameraMover.yaw(static_cast<float>(timeStep * 25));
     }
 
-    void onRender(int, int, double alpha)
+    void
+    onRender(int, int, double alpha)
     {
         auto a = static_cast<float>(alpha);
 
-        if (simData_.paused)
-        {
+        if (simData_.paused) {
             renderer_.render(a, simData_.camera());
         }
-        else
-        {
+        else {
             sim::Camera camera;
             glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), simData_.camera().getEyeVector(), a)};
             glm::vec3 look{glm::mix(prevCam_.getLookVector(), simData_.camera().getLookVector(), a)};
@@ -54,12 +53,12 @@ public:
         }
     }
 
-    void onGuiRender(int, int)
+    void
+    onGuiRender(int, int)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
-        if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
+        if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             ImGui::Text("Framerate: %.3f ms/frame", 1000.0f / ImGui::GetIO().Framerate);
             renderer_.configureGui();
         }
@@ -67,10 +66,10 @@ public:
         ImGui::PopStyleVar();
     }
 
-    void keyCallback(GLFWwindow *, int key, int, int action, int, const sim::SimCallbacks<Simulator> &)
+    void
+    keyCallback(GLFWwindow *, int key, int, int action, int, const sim::SimCallbacks<Simulator> &)
     {
-        if (key == GLFW_KEY_G && action == GLFW_RELEASE)
-        {
+        if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
             gravity_ = -gravity_;
         }
     }
@@ -85,16 +84,15 @@ private:
     glm::vec3 gravity_{0, -9.8f, 0};
 };
 
-int main()
+int
+main()
 {
-    try
-    {
+    try {
         sim::SimInitData initData;
         initData.title = "Mesh Sim";
         sim::OpenGLSimulation<Simulator>(initData).runNoFasterThanRealTimeLoop();
     }
-    catch (const std::exception &e)
-    {
+    catch (const std::exception &e) {
         std::cerr << "Program failed: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }

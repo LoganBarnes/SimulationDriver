@@ -5,7 +5,7 @@ namespace sim
 {
 
 MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
-        : mesh_{std::move(mesh)}
+    : mesh_{std::move(mesh)}
 {
     renderer_.setDataFun([&]
                          {
@@ -13,34 +13,35 @@ MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
                          });
 }
 
-void MeshRenderer::render(float alpha, const Camera &camera) const
+void
+MeshRenderer::render(float alpha, const Camera &camera) const
 {
     renderer_.onRender(alpha, &camera);
 }
 
-void MeshRenderer::configureGui()
+void
+MeshRenderer::configureGui()
 {
-    if (ImGui::CollapsingHeader("Mesh Options", "mesh", false, true))
-    {
+    if (ImGui::CollapsingHeader("Mesh Options", "mesh", false, true)) {
         bool mesh_needs_update = mesh_.configureGui();
-        if (mesh_needs_update)
-        {
+        if (mesh_needs_update) {
             renderer_.rebuild_mesh();
         }
     }
 
-    if (ImGui::CollapsingHeader("Render Options", "render", false, true))
-    {
+    if (ImGui::CollapsingHeader("Render Options", "render", false, true)) {
         renderer_.onGuiRender();
     }
 }
 
-void MeshRenderer::resize(int width, int height)
+void
+MeshRenderer::resize(int width, int height)
 {
     renderer_.onResize(width, height);
 }
 
-void MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
+void
+MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
 {
     renderer_.setModelMatrix(modelMatrix);
 }

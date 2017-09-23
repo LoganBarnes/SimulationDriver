@@ -5,10 +5,12 @@ namespace sim
 {
 
 template<typename V>
-V create_sphere_vertex(glm::vec3 p, glm::vec2 t);
+V
+create_sphere_vertex(glm::vec3 p, glm::vec2 t);
 
 template<>
-sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
+sim::PosNormTexVertex
+create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 {
     return {{p.x, p.y, p.z},
             {p.x, p.y, p.z},
@@ -16,25 +18,25 @@ sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 }
 
 template<>
-sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2)
+sim::PosVertex
+create_sphere_vertex(glm::vec3 p, glm::vec2)
 {
     return {{p.x, p.y, p.z}};
 }
 
 template<typename V>
-sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
+sim::DrawData<V>
+create_sphere_mesh_data(int u_divisions, int v_divisions)
 {
     sim::DrawData<V> data{};
 
     data.vbo.reserve(static_cast<unsigned>((u_divisions + 2) * (v_divisions + 2)));
 
-    for (int thetai = 0; thetai < (u_divisions + 2); ++thetai)
-    {
+    for (int thetai = 0; thetai < (u_divisions + 2); ++thetai) {
         float u = float(thetai) / (u_divisions + 1);
         float theta = glm::two_pi<float>() * u;
 
-        for (int phii = 0; phii < (v_divisions + 2); ++phii)
-        {
+        for (int phii = 0; phii < (v_divisions + 2); ++phii) {
             float v = float(phii) / (v_divisions + 1);
             float phi = glm::pi<float>() * v;
             glm::vec3 p{glm::cos(theta) * glm::sin(phi),
@@ -49,10 +51,8 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
     data.ibo.reserve(static_cast<unsigned>((u_divisions + 1) * ((v_divisions + 2) * 2 + 1)));
 
     unsigned index = 0;
-    for (int thetai = 0; thetai < (u_divisions + 1); ++thetai)
-    {
-        for (int phii = 0; phii < (v_divisions + 2); ++phii)
-        {
+    for (int thetai = 0; thetai < (u_divisions + 1); ++thetai) {
+        for (int phii = 0; phii < (v_divisions + 2); ++phii) {
             data.ibo.push_back(index);
             data.ibo.push_back(index + v_divisions + 2);
             ++index;
@@ -67,8 +67,10 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
     return data;
 }
 
-template sim::PosNormTexData create_sphere_mesh_data(int u_divisions, int v_divisions);
+template sim::PosNormTexData
+create_sphere_mesh_data(int u_divisions, int v_divisions);
 
-template sim::PosData create_sphere_mesh_data(int u_divisions, int v_divisions);
+template sim::PosData
+create_sphere_mesh_data(int u_divisions, int v_divisions);
 
 } // namespace sim

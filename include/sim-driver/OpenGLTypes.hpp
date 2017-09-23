@@ -45,7 +45,6 @@ struct StandardPipeline
     int iboSize;
 };
 
-
 struct SeparablePrograms
 {
     std::shared_ptr<GLuint> pipeline;

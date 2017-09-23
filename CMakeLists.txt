@@ -3,9 +3,9 @@ project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
 
-option(SIM_BUILD_CUDA OFF "Build CUDA files if available")
-option(SIM_BUILD_TESTS OFF "Build tests using the Catch framework")
-option(SIM_BUILD_EXAMPLES ON "Build visual executables")
+option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
+option(SIM_BUILD_TESTS "Build tests using the Catch framework" OFF)
+option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
@@ -89,28 +89,39 @@ set(SOURCE_FILES
         src/shaders/shader.frag
         src/shaders/shader_mac.frag
         # meshes
-        src/sim-driver/meshes/HeightMap
-        src/sim-driver/meshes/MeshFunctions
-        src/sim-driver/meshes/MeshHelper
+        src/sim-driver/meshes/MeshFunctions.cpp
+        src/sim-driver/meshes/MeshHelper.cpp
         # renderers
-        src/sim-driver/renderers/HeightMapRenderer
-        src/sim-driver/renderers/MeshRenderer
-        src/sim-driver/renderers/RendererHelper
+        src/sim-driver/renderers/MeshRenderer.cpp
+        src/sim-driver/renderers/RendererHelper.cpp
         # sim-driver
-        src/sim-driver/CallbackWrapper
-        src/sim-driver/Camera
-        src/sim-driver/CameraMover
-        src/sim-driver/OpenGLForwardDeclarations
-        src/sim-driver/OpenGLHelper
-        src/sim-driver/OpenGLSimulation
-        src/sim-driver/SimCallbacks
-        src/sim-driver/SimData
-        src/sim-driver/SimDriver
+        src/sim-driver/Camera.cpp
+        src/sim-driver/CameraMover.cpp
+        src/sim-driver/OpenGLHelper.cpp
         )
 
-add_library(SimDriver ${SOURCE_FILES})
+set(INCLUDE_FILES
+        # meshes
+        include/sim-driver/meshes/MeshFunctions.hpp
+        include/sim-driver/meshes/MeshHelper.hpp
+        # renderers
+        include/sim-driver/renderers/MeshRenderer.hpp
+        include/sim-driver/renderers/RendererHelper.hpp
+        # sim-driver
+        include/sim-driver/CallbackWrapper.hpp
+        include/sim-driver/Camera.hpp
+        include/sim-driver/CameraMover.hpp
+        include/sim-driver/OpenGLHelper.hpp
+        include/sim-driver/OpenGLSimulation.hpp
+        include/sim-driver/OpenGLTypes.hpp
+        include/sim-driver/SimCallbacks.hpp
+        include/sim-driver/SimData.hpp
+        include/sim-driver/SimDriver.hpp
+        )
 
-target_include_directories(SimDriver PUBLIC src ${CMAKE_BINARY_DIR})
+add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
+
+target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_link_libraries(SimDriver thirdparty)
 set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
 
@@ -168,9 +179,6 @@ endif ()
 if (${SIM_BUILD_EXAMPLES})
     add_executable(MeshExec src/exec/MeshMain)
     target_link_libraries(MeshExec SimDriver)
-
-    add_executable(HeightsExec src/exec/HeightsMain)
-    target_link_libraries(HeightsExec SimDriver)
 
     add_executable(BounceExec src/exec/BounceMain)
     target_link_libraries(BounceExec SimDriver)
