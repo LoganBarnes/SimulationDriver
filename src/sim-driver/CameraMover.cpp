@@ -41,7 +41,7 @@ void TCameraMover<T>::zoom(T scale)
 {
     if (usingOrbitMode_) {
         constexpr auto eps = T(1.0e-3);
-        scale *= std::max(orbitOffsetDistance_, T(0.1)) * T(0.01);
+        scale *= std::fmax(orbitOffsetDistance_, T(0.1)) * T(0.01);
         orbitOffsetDistance_ = T(std::fmax(orbitOffsetDistance_ + scale, T(0)));
         if (orbitOffsetDistance_ < eps) {
             orbitOffsetDistance_ = 0.0f;
