@@ -564,8 +564,8 @@ StandardPipeline OpenGLHelper::createPosNormTexPipeline(const PosNormTexVertex *
                                                         std::vector<std::string> shaderFiles)
 {
     if (shaderFiles.empty()) {
-        shaderFiles = {sim::SHADER_PATH() + "shader.vert",
-                       sim::FRAG_SHADER()};
+        shaderFiles = {sim::shader_path() + "shader.vert",
+                       sim::frag_shader_file()};
     }
     sim::StandardPipeline sp = sim::OpenGLHelper::createStandardPipeline(shaderFiles,
                                                                          pData,
@@ -580,8 +580,8 @@ StandardPipeline OpenGLHelper::createPosPipeline(const PosVertex *pData,
                                                  std::vector<std::string> shaderFiles)
 {
     if (shaderFiles.empty()) {
-        shaderFiles = {sim::SHADER_PATH() + "shader.vert",
-                       sim::FRAG_SHADER()};
+        shaderFiles = {sim::shader_path() + "shader.vert",
+                       sim::frag_shader_file()};
     }
 
     StandardPipeline sp = OpenGLHelper::createStandardPipeline(shaderFiles,
