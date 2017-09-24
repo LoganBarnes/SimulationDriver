@@ -22,7 +22,7 @@ class RendererHelper
 public:
     using DataFun = std::function<DrawData<Vertex>(void)>;
 
-    explicit RendererHelper();
+    explicit RendererHelper(std::string vertShader = "");
 
     void onRender(float alpha, const Camera *pCamera) const;
 

@@ -15,9 +15,12 @@ constexpr int max_point_size = 25;
 }
 
 template<typename Vertex>
-RendererHelper<Vertex>::RendererHelper()
+RendererHelper<Vertex>::RendererHelper(std::string vertShader)
 {
-    glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::shader_path() + "shader.vert",
+    if (vertShader.empty()) {
+      vertShader = sim::shader_path() + "shader.vert";
+    }
+    glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(vertShader,
                                                                  sim::shader_path() + "shader.geom",
                                                                  sim::frag_shader_file());
 }
