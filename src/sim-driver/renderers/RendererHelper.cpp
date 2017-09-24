@@ -6,12 +6,6 @@
 #include <iostream>
 #include <imgui.h>
 
-#ifdef __APPLE__
-#define FRAG_SHADER sim::SHADER_PATH + "shader_mac.frag"
-#else
-#define FRAG_SHADER sim::SHADER_PATH + "shader.frag"
-#endif
-
 namespace sim
 {
 
@@ -23,9 +17,9 @@ constexpr int max_point_size = 25;
 template<typename Vertex>
 RendererHelper<Vertex>::RendererHelper()
 {
-    glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::SHADER_PATH + "shader.vert",
-                                                                 sim::SHADER_PATH + "shader.geom",
-                                                                 FRAG_SHADER);
+    glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::SHADER_PATH() + "shader.vert",
+                                                                 sim::SHADER_PATH() + "shader.geom",
+                                                                 sim::FRAG_SHADER());
 }
 
 template<typename Vertex>

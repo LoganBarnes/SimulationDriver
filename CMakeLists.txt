@@ -189,7 +189,4 @@ if (${SIM_BUILD_EXAMPLES})
 
     add_executable(BounceExec src/exec/BounceMain.cpp)
     target_link_libraries(BounceExec SimDriver)
-
-    add_executable(VboExec src/exec/VboTest.cpp)
-    target_link_libraries(VboExec SimDriver)
 endif ()
