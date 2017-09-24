@@ -357,7 +357,7 @@ sim::SeparablePrograms OpenGLHelper::createSeparablePrograms(std::string firstSh
 
 std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
                                                          GLsizei height,
-                                                         float *pArray,
+                                                         const float *pArray,
                                                          GLint filterType,
                                                          GLint wrapType,
                                                          GLint internalFormat,
@@ -388,7 +388,7 @@ std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
 void OpenGLHelper::resetTextureArray(std::shared_ptr<GLuint> &spTexture,
                                      GLsizei width,
                                      GLsizei height,
-                                     float *pArray,
+                                     const float *pArray,
                                      GLint internalFormat,
                                      GLenum format)
 {
