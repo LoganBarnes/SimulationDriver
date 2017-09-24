@@ -1,11 +1,16 @@
 #include <sim-driver/renderers/RendererHelper.hpp>
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/Camera.hpp>
-#include <ShaderConfig.hpp>
+#include <sim-driver/ShaderConfig.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <imgui.h>
-#include <functional>
+
+#ifdef __APPLE__
+#define FRAG_SHADER sim::SHADER_PATH + "shader_mac.frag"
+#else
+#define FRAG_SHADER sim::SHADER_PATH + "shader.frag"
+#endif
 
 namespace sim
 {
@@ -20,11 +25,7 @@ RendererHelper<Vertex>::RendererHelper()
 {
     glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(sim::SHADER_PATH + "shader.vert",
                                                                  sim::SHADER_PATH + "shader.geom",
-#ifdef __APPLE__
-                                                                 sim::SHADER_PATH + "shader_mac.frag");
-#else
-    sim::SHADER_PATH + "shader.frag");
-#endif
+                                                                 FRAG_SHADER);
 }
 
 template<typename Vertex>
@@ -81,33 +82,29 @@ void RendererHelper<Vertex>::onGuiRender()
 #ifdef __APPLE__
             ImGui::SliderFloat3("Light Direction", glm::value_ptr(lightDir_), -1, 1);
 #else
-            if (ImGui::Button("Add Light"))
-        {
-            addLight(glm::vec3{1}, 1);
-        }
-
-        if (ImGui::CollapsingHeader("Lights", "lights", false, true))
-        {
-            bool lights_need_update = false;
-
-            for (decltype(lights_.size()) i = 0; i < lights_.size(); ++i)
-            {
-                std::string light_str = "Light " + std::to_string(i);
-                glm::vec4 &light = lights_[i];
-                lights_need_update |= ImGui::SliderFloat3(std::string(light_str + " Direction").c_str(),
-                                                          glm::value_ptr(light),
-                                                          -1,
-                                                          1);
-                lights_need_update |= ImGui::SliderFloat(std::string(light_str + " Intensity").c_str(), &light.w, 0,
-                                                         1);
-                ImGui::Separator();
+            if (ImGui::Button("Add Light")) {
+                addLight(glm::vec3{1}, 1);
             }
 
-            if (lights_need_update)
-            {
-                updateLights();
+            if (ImGui::CollapsingHeader("Lights", "lights", false, true)) {
+                bool lights_need_update = false;
+
+                for (decltype(lights_.size()) i = 0; i < lights_.size(); ++i) {
+                    std::string light_str = "Light " + std::to_string(i);
+                    glm::vec4 &light = lights_[i];
+                    lights_need_update |= ImGui::SliderFloat3(std::string(light_str + " Direction").c_str(),
+                                                              glm::value_ptr(light),
+                                                              -1,
+                                                              1);
+                    lights_need_update |= ImGui::SliderFloat(std::string(light_str + " Intensity").c_str(), &light.w, 0,
+                                                             1);
+                    ImGui::Separator();
+                }
+
+                if (lights_need_update) {
+                    updateLights();
+                }
             }
-        }
 #endif
         }
     }

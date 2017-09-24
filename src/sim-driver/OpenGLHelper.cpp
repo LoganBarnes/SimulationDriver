@@ -1,6 +1,6 @@
 #include <sim-driver/OpenGLHelper.hpp>
 
-#include "ShaderConfig.hpp"
+#include <sim-driver/ShaderConfig.hpp>
 #include <string>
 #include <iostream>
 #include <fstream>

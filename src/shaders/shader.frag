@@ -138,7 +138,7 @@ void main(void)
         {
             vec3 w_l = normalize(lights[i].xyz);
 
-            intensity += calcBRDF(w_v, normal, w_l)
+            intensity += max(vec3(0.0), calcBRDF(w_v, normal, w_l))
                          * lights[i].w
                          * max(0.0, dot(normal, w_l));
         }

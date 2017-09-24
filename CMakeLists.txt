@@ -19,7 +19,7 @@ endif ()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 include(DownloadProject)
 
-configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/ShaderConfig.hpp)
+configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/sim-driver/ShaderConfig.hpp)
 
 # Download and unpack glfw at configure time
 download_project(PROJ glfw
