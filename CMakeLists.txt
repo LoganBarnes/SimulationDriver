@@ -6,9 +6,14 @@ set(CMAKE_CXX_STANDARD 14)
 option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
 option(SIM_BUILD_TESTS "Build tests using the Catch framework" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
+option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
+endif ()
+
+if (NOT ${SIM_VERBOSE_OUTPUT})
+    set(QUIET_FLAG QUIET)
 endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
@@ -22,7 +27,7 @@ download_project(PROJ glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG latest
         UPDATE_DISCONNECTED 1
-        QUIET
+        ${QUIET_FLAG}
         )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -31,7 +36,6 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # compile glfw with current project
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
 
 # Download and unpack imgui at configure time
 download_project(PROJ imgui
@@ -39,7 +43,7 @@ download_project(PROJ imgui
         GIT_REPOSITORY https://github.com/ocornut/imgui.git
         GIT_TAG v1.50
         UPDATE_DISCONNECTED 1
-        QUIET
+        ${QUIET_FLAG}
         )
 
 # Download and unpack glm at configure time
@@ -48,7 +52,7 @@ download_project(PROJ glm
         GIT_REPOSITORY https://github.com/g-truc/glm.git
         GIT_TAG master
         UPDATE_DISCONNECTED 1
-        QUIET
+        ${QUIET_FLAG}
         )
 
 add_library(thirdparty
@@ -73,7 +77,12 @@ target_include_directories(thirdparty SYSTEM PUBLIC
         src/thirdparty
         )
 target_link_libraries(thirdparty glfw)
-target_compile_options(glfw BEFORE PRIVATE -w) # ignore third party warnings
+
+if (MSVC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    # ignore third party warnings
+    target_compile_options(glfw BEFORE PRIVATE -w)
+    target_compile_options(thirdparty BEFORE PRIVATE -w)
+endif ()
 
 set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
@@ -82,8 +91,6 @@ endif ()
 
 set(SOURCE_FILES
         #shaders
-        src/shaders/heights.vert
-        src/shaders/heights.geom
         src/shaders/shader.vert
         src/shaders/shader.geom
         src/shaders/shader.frag
@@ -177,9 +184,12 @@ if (${SIM_BUILD_CUDA} AND CUDA_FOUND)
 endif ()
 
 if (${SIM_BUILD_EXAMPLES})
-    add_executable(MeshExec src/exec/MeshMain)
+    add_executable(MeshExec src/exec/MeshMain.cpp)
     target_link_libraries(MeshExec SimDriver)
 
-    add_executable(BounceExec src/exec/BounceMain)
+    add_executable(BounceExec src/exec/BounceMain.cpp)
     target_link_libraries(BounceExec SimDriver)
+
+    add_executable(VboExec src/exec/VboTest.cpp)
+    target_link_libraries(VboExec SimDriver)
 endif ()
