@@ -78,7 +78,7 @@ target_include_directories(thirdparty SYSTEM PUBLIC
         )
 target_link_libraries(thirdparty glfw)
 
-if (MSVC AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # ignore third party warnings
     target_compile_options(glfw BEFORE PRIVATE -w)
     target_compile_options(thirdparty BEFORE PRIVATE -w)

@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <functional>
+#include <string>
 
 namespace sim
 {
