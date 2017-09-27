@@ -84,9 +84,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(thirdparty BEFORE PRIVATE -w)
 endif ()
 
-set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
+set(COMPILER_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
-    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
+    set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wall -Wextra -Werror -pedantic")
 endif ()
 
 set(SOURCE_FILES
@@ -130,7 +130,7 @@ add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 
 target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_link_libraries(SimDriver thirdparty)
-set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
+set_target_properties(SimDriver PROPERTIES COMPILE_FLAGS ${COMPILER_FLAGS})
 
 find_package(CUDA)
 if (${SIM_BUILD_CUDA} AND CUDA_FOUND)
