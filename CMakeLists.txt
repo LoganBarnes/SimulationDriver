@@ -84,9 +84,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(thirdparty BEFORE PRIVATE -w)
 endif ()
 
-set(COMPILE_FLAGS ${CMAKE_CXX_FLAGS})
+set(COMPILER_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
-    list(APPEND COMPILE_FLAGS "-Wall -Wextra -Werror -pedantic")
+    set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wall -Wextra -Werror -pedantic")
 endif ()
 
 set(SOURCE_FILES
@@ -130,7 +130,7 @@ add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 
 target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_link_libraries(SimDriver thirdparty)
-set_target_properties(SimDriver PROPERTIES CMAKE_CXX_FLAGS ${COMPILE_FLAGS})
+set_target_properties(SimDriver PROPERTIES COMPILE_FLAGS ${COMPILER_FLAGS})
 
 find_package(CUDA)
 if (${SIM_BUILD_CUDA} AND CUDA_FOUND)
@@ -190,3 +190,28 @@ if (${SIM_BUILD_EXAMPLES})
     add_executable(BounceExec src/exec/BounceMain.cpp)
     target_link_libraries(BounceExec SimDriver)
 endif ()
+
+
+if (${SIM_BUILD_TESTS})
+    # Download and unpack googletest at configure time
+    download_project(PROJ gtest
+            PREFIX thirdparty
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG release-1.8.0
+            UPDATE_DISCONNECTED 1
+            ${QUIET_FLAG}
+            )
+
+#    # compile googletest with current project
+#    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+#
+#    set(TEST_SOURCE_FILES
+#            # unit tests
+#            src/testing/ResourceHandlingTests.cpp
+#            )
+#
+#    add_executable(SimDriverTest ${TEST_SOURCE_FILES})
+#    target_link_libraries(SimDriverTest SimDriver gtest_main thirdparty)
+#    add_test(NAME sim_driver_test COMMAND SimDriverTest)
+endif()
+
