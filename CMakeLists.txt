@@ -105,7 +105,7 @@ set(SOURCE_FILES
         src/sim-driver/Camera.cpp
         src/sim-driver/CameraMover.cpp
         src/sim-driver/OpenGLHelper.cpp
-        )
+        src/sim-driver/WindowManager.cpp src/sim-driver/WindowManager.hpp)
 
 set(INCLUDE_FILES
         # meshes
