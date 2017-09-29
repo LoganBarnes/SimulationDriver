@@ -17,7 +17,7 @@
 #include <chrono>
 #include <algorithm>
 #include <functional>
-#include "../../src/sim-driver/WindowManager.hpp"
+#include <sim-driver/WindowManager.hpp>
 
 namespace sim
 {

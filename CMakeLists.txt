@@ -106,7 +106,7 @@ set(SOURCE_FILES
         src/sim-driver/CameraMover.cpp
         src/sim-driver/OpenGLHelper.cpp
         src/sim-driver/WindowManager.cpp
-        src/sim-driver/WindowManager.hpp)
+        )
 
 set(INCLUDE_FILES
         # meshes
@@ -125,10 +125,12 @@ set(INCLUDE_FILES
         include/sim-driver/SimCallbacks.hpp
         include/sim-driver/SimData.hpp
         include/sim-driver/SimDriver.hpp
+        include/sim-driver/WindowManager.hpp
         )
 
 add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 
+target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_link_libraries(SimDriver thirdparty)
 set_target_properties(SimDriver PROPERTIES COMPILE_FLAGS ${COMPILER_FLAGS})
