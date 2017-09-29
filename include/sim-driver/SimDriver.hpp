@@ -19,12 +19,6 @@
 #include <functional>
 #include "../../src/sim-driver/WindowManager.hpp"
 
-#ifdef NDEBUG
-#define DEBUG_PRINT(msg)
-#else
-#define DEBUG_PRINT(msg) std::cout << (msg) << std::endl
-#endif
-
 namespace sim
 {
 
@@ -57,17 +51,14 @@ protected:
 
     ~SimDriver() = default;
     SimDriver(SimDriver &&) noexcept = default;
-    SimDriver &
-    operator=(SimDriver &&) noexcept = default;
+    SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
 
     double timeStep_{1.0 / 60.0};
     double worldTime_{0.0};
 
-    std::unique_ptr<int, std::function<void(int *)>> upGlfw_{nullptr};
-    std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>> upWindow_{nullptr};
-    std::unique_ptr<bool, std::function<void(bool *)>> upImgui_{nullptr};
+    int window_idx_{-1};
 
     sim::SimCallbacks<> callbacks_;
 
@@ -82,63 +73,11 @@ SimDriver<Child>::SimDriver(SimInitData initData)
 {
     auto &wm = sim::WindowManager::instance();
 
-    if (initData.width == 0 || initData.height == 0) {
-        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+    window_idx_ = wm.create_window(initData.title, initData.width, initData.height, initData.samples);
 
-        initData.width = mode->width;
-        initData.height = mode->height;
-    }
-
-    glfwWindowHint(GLFW_SAMPLES, initData.samples);
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // highest on mac :(
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-#endif // __APPLE__
-
-    upWindow_ = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
-        glfwCreateWindow(initData.width, initData.height, initData.title.c_str(), nullptr, nullptr),
-        [](auto p)
-        {
-            if (p) {
-                DEBUG_PRINT("Destroying GLFW window");
-                glfwDestroyWindow(p);
-            }
-        });
-    DEBUG_PRINT("Creating GLFW window");
-
-    if (upWindow_ == nullptr) {
-        throw std::runtime_error("GLFW window creation failed");
-    }
-
-    glfwMakeContextCurrent(upWindow_.get());
-    glfwSwapInterval(1);
-
-    if (gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)) == 0) {
-        throw std::runtime_error("Failed to initialize OpenGL context");
-    }
-
-    upImgui_ = std::unique_ptr<bool, std::function<void(bool *)>>(
-        new bool(ImGui_ImplGlfwGL3_Init(upWindow_.get(), false)), // false for no callbacks
-        [](auto p)
-        {
-            DEBUG_PRINT("Shutting down ImGui");
-            ImGui_ImplGlfwGL3_Shutdown();
-            delete p;
-        });
-    DEBUG_PRINT("Initializing ImGui");
-
-    simData.camera().setAspectRatio(initData.width / float(initData.height));
+    simData.camera().setAspectRatio(getWidth() / float(getHeight()));
 
     setCallbackClass(&callbacks_);
-
-    DEBUG_PRINT("");
 }
 
 template<typename Child>
@@ -318,20 +257,20 @@ bool SimDriver<Child>::isPaused() const
 template<typename Child>
 GLFWwindow *SimDriver<Child>::getWindow()
 {
-    return upWindow_.get();
+    return sim::WindowManager::instance().get_window(window_idx_);
 }
 
 template<typename Child>
 const GLFWwindow *SimDriver<Child>::getWindow() const
 {
-    return upWindow_.get();
+    return sim::WindowManager::instance().get_window(window_idx_);
 }
 
 template<typename Child>
 int SimDriver<Child>::getWidth() const
 {
     int w;
-    glfwGetWindowSize(upWindow_.get(), &w, nullptr);
+    glfwGetWindowSize(sim::WindowManager::instance().get_window(window_idx_), &w, nullptr);
     return w;
 }
 
@@ -339,7 +278,7 @@ template<typename Child>
 int SimDriver<Child>::getHeight() const
 {
     int h;
-    glfwGetWindowSize(upWindow_.get(), nullptr, &h);
+    glfwGetWindowSize(sim::WindowManager::instance().get_window(window_idx_), nullptr, &h);
     return h;
 }
 

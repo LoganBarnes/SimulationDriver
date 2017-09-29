@@ -231,19 +231,26 @@ void create_separable_program(const std::string filePath, SeparablePrograms *pSp
     std::shared_ptr<GLuint> program = create_separable_program(type, filePath);
 
     switch (type) {
-        case GL_VERTEX_SHADER:pSp->vert = std::move(program);
+        case GL_VERTEX_SHADER:
+            pSp->vert = std::move(program);
             break;
-        case GL_TESS_CONTROL_SHADER:pSp->tesc = std::move(program);
+        case GL_TESS_CONTROL_SHADER:
+            pSp->tesc = std::move(program);
             break;
-        case GL_TESS_EVALUATION_SHADER:pSp->tese = std::move(program);
+        case GL_TESS_EVALUATION_SHADER:
+            pSp->tese = std::move(program);
             break;
-        case GL_GEOMETRY_SHADER:pSp->geom = std::move(program);
+        case GL_GEOMETRY_SHADER:
+            pSp->geom = std::move(program);
             break;
-        case GL_FRAGMENT_SHADER:pSp->frag = std::move(program);
+        case GL_FRAGMENT_SHADER:
+            pSp->frag = std::move(program);
             break;
-        case GL_COMPUTE_SHADER:pSp->comp = std::move(program);
+        case GL_COMPUTE_SHADER:
+            pSp->comp = std::move(program);
             break;
-        default:break;
+        default:
+            break;
     }
 } // create_separable_program
 
@@ -692,19 +699,24 @@ void OpenGLHelper::setIntUniform(const std::shared_ptr<GLuint> &spProgram,
 {
     switch (size) {
 
-        case 1:glProgramUniform1iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 1:
+            glProgramUniform1iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        case 2:glProgramUniform2iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 2:
+            glProgramUniform2iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        case 3:glProgramUniform3iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 3:
+            glProgramUniform3iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        case 4:glProgramUniform4iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 4:
+            glProgramUniform4iv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        default:std::stringstream msg;
+        default:
+            std::stringstream msg;
             msg << "Int or vector of size " << size << " does not exist";
             throw std::runtime_error(msg.str());
             break;
@@ -724,19 +736,24 @@ void OpenGLHelper::setFloatUniform(
 {
     switch (size) {
 
-        case 1:glProgramUniform1f(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), *pValue);
+        case 1:
+            glProgramUniform1f(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), *pValue);
             break;
 
-        case 2:glProgramUniform2fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 2:
+            glProgramUniform2fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        case 3:glProgramUniform3fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 3:
+            glProgramUniform3fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        case 4:glProgramUniform4fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
+        case 4:
+            glProgramUniform4fv(*spProgram, glGetUniformLocation(*spProgram, uniform.c_str()), count, pValue);
             break;
 
-        default:std::stringstream msg;
+        default:
+            std::stringstream msg;
             msg << "Float or vector of size " << size << " does not exist";
             throw std::runtime_error(msg.str());
             break;
@@ -777,7 +794,8 @@ void OpenGLHelper::setMatrixUniform(const std::shared_ptr<GLuint> &spProgram,
                                       pValue);
             break;
 
-        default:std::stringstream msg;
+        default:
+            std::stringstream msg;
             msg << "Matrix of size " << size << " does not exist";
             throw std::runtime_error(msg.str());
             break;

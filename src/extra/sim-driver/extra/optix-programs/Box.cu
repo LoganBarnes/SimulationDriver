@@ -24,14 +24,29 @@
 #include <optixu/optixu_aabb_namespace.h>
 
 
-rtDeclareVariable( float3, boxmin, , );
-rtDeclareVariable( float3, boxmax, , );
+rtDeclareVariable( float3, boxmin,
 
-rtDeclareVariable( optix::Ray, ray, rtCurrentRay, );
+, );
 
-rtDeclareVariable( float3, texcoord,         attribute texcoord, );
-rtDeclareVariable( float3, geometric_normal, attribute geometric_normal, );
-rtDeclareVariable( float3, shading_normal,   attribute shading_normal, );
+rtDeclareVariable( float3, boxmax,
+
+, );
+
+rtDeclareVariable( optix::Ray, ray, rtCurrentRay,
+
+);
+
+rtDeclareVariable( float3, texcoord, attribute
+
+texcoord, );
+
+rtDeclareVariable( float3, geometric_normal, attribute
+
+geometric_normal, );
+
+rtDeclareVariable( float3, shading_normal, attribute
+
+shading_normal, );
 
 
 ///
@@ -41,7 +56,8 @@ rtDeclareVariable( float3, shading_normal,   attribute shading_normal, );
 ///
 static
 __device__
-float3
+    float3
+
 boxnormal(float t)
 {
     float3 t0 = (boxmin - ray.origin) / ray.direction;
@@ -51,7 +67,6 @@ boxnormal(float t)
 
     return pos - neg;
 }
-
 
 ///
 /// \brief box_intersect
@@ -67,25 +82,20 @@ box_intersect(int)
     float tmin = fmaxf(near);
     float tmax = fminf(far);
 
-    if (tmin <= tmax)
-    {
+    if (tmin <= tmax) {
         bool check_second = true;
 
-        if (rtPotentialIntersection(tmin))
-        {
+        if (rtPotentialIntersection(tmin)) {
             texcoord = make_float3(0.0f);
             shading_normal = geometric_normal = boxnormal(tmin);
 
-            if (rtReportIntersection(0))
-            {
+            if (rtReportIntersection(0)) {
                 check_second = false;
             }
         }
 
-        if (check_second)
-        {
-            if (rtPotentialIntersection(tmax))
-            {
+        if (check_second) {
+            if (rtPotentialIntersection(tmax)) {
                 texcoord = make_float3(0.0f);
                 shading_normal = geometric_normal = boxnormal(tmax);
                 rtReportIntersection(0);
@@ -98,8 +108,8 @@ box_intersect(int)
 RT_PROGRAM
 void
 box_bounds(
-        int,
-        float result[6]
+    int,
+    float result[6]
 )
 {
     optix::Aabb *pAabb = reinterpret_cast< optix::Aabb * >( result );

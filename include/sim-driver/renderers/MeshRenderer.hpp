@@ -12,11 +12,9 @@ public:
     explicit MeshRenderer(sim::PosNormTexMesh mesh);
 
     void render(float alpha, const Camera &camera) const;
-
     void configureGui();
 
     void resize(int width, int height);
-
     void setModelMatrix(const glm::mat4 &modelMatrix);
 
 private:

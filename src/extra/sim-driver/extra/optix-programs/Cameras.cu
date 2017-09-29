@@ -1,17 +1,31 @@
 #include <sim-driver/extra/OptiXCommon.hpp>
 
-rtDeclareVariable( PerRayData, prd_current, rtPayload, );
+rtDeclareVariable( PerRayData, prd_current, rtPayload,
 
-rtDeclareVariable( optix::Ray, ray, rtCurrentRay, );
-rtDeclareVariable( uint2, launch_index, rtLaunchIndex, );
+);
 
-rtDeclareVariable(unsigned int, surface_ray_type, , );
-rtDeclareVariable(float, scene_epsilon, , );
-rtDeclareVariable( rtObject, top_object, , );
+rtDeclareVariable( optix::Ray, ray, rtCurrentRay,
+
+);
+
+rtDeclareVariable( uint2, launch_index, rtLaunchIndex,
+
+);
+
+rtDeclareVariable(unsigned int, surface_ray_type,,
+
+);
+
+rtDeclareVariable(float, scene_epsilon,,
+
+);
+
+rtDeclareVariable( rtObject, top_object,
+
+, );
 
 
 rtBuffer<float4, 2> output_buffer;
-
 
 RT_PROGRAM
 void
@@ -25,10 +39,10 @@ pinhole_camera()
     prd.result = make_float3(0.f);
 
     optix::Ray ray(
-            ray_origin,
-            ray_direction,
-            surface_ray_type,
-            scene_epsilon
+        ray_origin,
+        ray_direction,
+        surface_ray_type,
+        scene_epsilon
     );
 
     rtTrace(top_object, ray, prd);
@@ -38,7 +52,9 @@ pinhole_camera()
 
 
 
-rtDeclareVariable( float3, bg_color, , );
+rtDeclareVariable( float3, bg_color,
+
+, );
 
 RT_PROGRAM
 void
@@ -47,8 +63,9 @@ miss()
     prd_current.result = bg_color;
 }
 
+rtDeclareVariable( float3, error_color,
 
-rtDeclareVariable( float3, error_color, , );
+, );
 
 RT_PROGRAM
 void

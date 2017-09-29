@@ -2,6 +2,7 @@
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
 #include <imgui.h>
+#include <iostream>
 
 namespace sim
 {

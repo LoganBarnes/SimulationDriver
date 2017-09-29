@@ -18,7 +18,7 @@ template<typename Vertex>
 RendererHelper<Vertex>::RendererHelper(std::string vertShader)
 {
     if (vertShader.empty()) {
-      vertShader = sim::shader_path() + "shader.vert";
+        vertShader = sim::shader_path() + "shader.vert";
     }
     glIds_.programs = sim::OpenGLHelper::createSeparablePrograms(vertShader,
                                                                  sim::shader_path() + "shader.geom",
@@ -226,7 +226,7 @@ void RendererHelper<Vertex>::rebuild_mesh()
 
     glIds_.vbo = glIds_.vao = glIds_.ibo = nullptr;
 
-    auto data = dataFun_();
+    const sim::DrawData<Vertex> &data = dataFun_();
     glIds_.vbo = OpenGLHelper::createBuffer(data.vbo.data(), data.vbo.size());
 
     glIds_.vao = OpenGLHelper::createVao(glIds_.programs.vert,

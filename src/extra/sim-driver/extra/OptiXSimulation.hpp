@@ -33,7 +33,7 @@ auto make_child(priority_tag<0>, optix::Context &context, int, int, SimData *, A
 }
 
 template<typename Child>
-class OptiXSimulation : public SimDriver<OptiXSimulation<Child>>
+class OptiXSimulation: public SimDriver<OptiXSimulation<Child>>
 {
 public:
 
@@ -87,29 +87,30 @@ private:
     auto renderChildGui(T &child, int width, int height, long l) -> decltype(void());
 };
 
-
 template<typename Child>
-OptiXSimulation<Child>::OptiXSimulation() : OptiXSimulation(SimInitData{}) {}
+OptiXSimulation<Child>::OptiXSimulation()
+    : OptiXSimulation(SimInitData{})
+{}
 
 template<typename Child>
 template<typename ... Args>
 OptiXSimulation<Child>::OptiXSimulation(const SimInitData &initData, Args ...args)
-        : SimDriver<OptiXSimulation<Child>>(initData),
-          spContext_(new optix::Context(optix::Context::create()), [](auto p)
-          {
-              DEBUG_PRINT("Destroying OptiX context");
-              static_assert(std::is_same<decltype(p), optix::Context *>::value, "");
-              (*p)->destroy();
-              delete p;
-          }),
-          child_{make_child<Child>(sim::priority_tag<2>{},
-                                   *spContext_,
-                                   this->getWidth(),
-                                   this->getHeight(),
-                                   &this->simData,
-                                   args...)},
-          callbackWrapper_{this, &child_},
-          callbacks_{&this->simData, &callbackWrapper_}
+    : SimDriver<OptiXSimulation<Child>>(initData),
+      spContext_(new optix::Context(optix::Context::create()), [](auto p)
+      {
+          DEBUG_PRINT("Destroying OptiX context");
+          static_assert(std::is_same<decltype(p), optix::Context *>::value, "");
+          (*p)->destroy();
+          delete p;
+      }),
+      child_{make_child<Child>(sim::priority_tag<2>{},
+                               *spContext_,
+                               this->getWidth(),
+                               this->getHeight(),
+                               &this->simData,
+                               args...)},
+      callbackWrapper_{this, &child_},
+      callbacks_{&this->simData, &callbackWrapper_}
 {
     DEBUG_PRINT("Creating OptiX context");
     sim::OpenGLHelper::setDefaults();
@@ -119,12 +120,12 @@ OptiXSimulation<Child>::OptiXSimulation(const SimInitData &initData, Args ...arg
                          {
                              sim::PosNormTexData data;
                              data.vbo =
-                                     {
-                                             {{-1, -1, 0}, {0, 0, 1}, {0, 1}},
-                                             {{1,  -1, 0}, {0, 0, 1}, {1, 1}},
-                                             {{-1, 1,  0}, {0, 0, 1}, {0, 0}},
-                                             {{1,  1,  0}, {0, 0, 1}, {1, 0}}
-                                     };
+                                 {
+                                     {{-1, -1, 0}, {0, 0, 1}, {0, 1}},
+                                     {{1, -1, 0}, {0, 0, 1}, {1, 1}},
+                                     {{-1, 1, 0}, {0, 0, 1}, {0, 0}},
+                                     {{1, 1, 0}, {0, 0, 1}, {1, 0}}
+                                 };
                              data.vaoElements = sim::posNormTexVaoElements();
                              return data;
                          });
@@ -162,8 +163,7 @@ void OptiXSimulation<Child>::render(const int width,
 {
     glViewport(0, 0, width, height);
 
-    if (eventDriven)
-    {
+    if (eventDriven) {
         ImGui_ImplGlfwGL3_NewFrame();
         renderChildGui(child_, width, height, 0);
         ImGui::Render();
@@ -193,7 +193,8 @@ auto OptiXSimulation<Child>::updateChild(T &child, double worldTime, double time
 }
 template<typename Child>
 template<typename T>
-auto OptiXSimulation<Child>::updateChild(T &, double, double, long) -> decltype(void()) {}
+auto OptiXSimulation<Child>::updateChild(T &, double, double, long) -> decltype(void())
+{}
 
 template<typename Child>
 template<typename T>
@@ -210,16 +211,13 @@ auto OptiXSimulation<Child>::renderChild(T &child, int width, int height, double
 
     int alignmentSize = 1;
 
-    if ((elementSize % 8) == 0)
-    {
+    if ((elementSize % 8) == 0) {
         alignmentSize = 8;
     }
-    else if ((elementSize % 4) == 0)
-    {
+    else if ((elementSize % 4) == 0) {
         alignmentSize = 4;
     }
-    else if ((elementSize % 2) == 0)
-    {
+    else if ((elementSize % 2) == 0) {
         alignmentSize = 2;
     }
 
@@ -249,16 +247,13 @@ auto OptiXSimulation<Child>::renderChild(T &, int, int, double alpha, optix::Con
 
     int alignmentSize = 1;
 
-    if ((elementSize % 8) == 0)
-    {
+    if ((elementSize % 8) == 0) {
         alignmentSize = 8;
     }
-    else if ((elementSize % 4) == 0)
-    {
+    else if ((elementSize % 4) == 0) {
         alignmentSize = 4;
     }
-    else if ((elementSize % 2) == 0)
-    {
+    else if ((elementSize % 2) == 0) {
         alignmentSize = 2;
     }
 
@@ -283,8 +278,8 @@ auto OptiXSimulation<Child>::renderChildGui(T &child, int width, int height, int
 }
 template<typename Child>
 template<typename T>
-auto OptiXSimulation<Child>::renderChildGui(T &, int, int, long) -> decltype(void()) {}
-
+auto OptiXSimulation<Child>::renderChildGui(T &, int, int, long) -> decltype(void())
+{}
 
 template<typename Child>
 void OptiXSimulation<Child>::framebufferSizeCallback(GLFWwindow *, int width, int height)

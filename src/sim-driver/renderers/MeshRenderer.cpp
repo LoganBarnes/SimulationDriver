@@ -1,5 +1,6 @@
 #include <sim-driver/renderers/MeshRenderer.hpp>
 #include <imgui.h>
+#include <iostream>
 
 namespace sim
 {
@@ -7,7 +8,7 @@ namespace sim
 MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
     : mesh_{std::move(mesh)}
 {
-    renderer_.setDataFun([&]
+    renderer_.setDataFun([&]() -> const sim::DrawData<PosNormTexVertex> &
                          {
                              return mesh_.getMeshData();
                          });

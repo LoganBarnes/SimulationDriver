@@ -221,7 +221,8 @@ template<typename C>
 void SimCallbacks<C>::keyCallback(GLFWwindow *pWindow, int key, int scancode, int action, int mods)
 {
     switch (key) {
-        case GLFW_KEY_ESCAPE:glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
+        case GLFW_KEY_ESCAPE:
+            glfwSetWindowShouldClose(pWindow, GLFW_TRUE);
             break;
 
         case GLFW_KEY_S:
@@ -234,7 +235,8 @@ void SimCallbacks<C>::keyCallback(GLFWwindow *pWindow, int key, int scancode, in
             if (pSimData_ && action == GLFW_RELEASE) {
                 pSimData_->paused = !(pSimData_->paused);
             }
-        default:break;
+        default:
+            break;
     }
 
     shiftDown_ = (mods == GLFW_MOD_SHIFT);

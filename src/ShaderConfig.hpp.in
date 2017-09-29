@@ -5,18 +5,20 @@
 
 namespace sim
 {
-static const std::string& shader_path() {
-	static std::string path{"@CMAKE_CURRENT_SOURCE_DIR@/src/shaders/"};
-	return path;
+static const std::string &shader_path()
+{
+    static std::string path{"@CMAKE_CURRENT_SOURCE_DIR@/src/shaders/"};
+    return path;
 }
 
-static const std::string& frag_shader_file() {
+static const std::string &frag_shader_file()
+{
 #ifdef __APPLE__
-	static std::string shader{sim::shader_path() + "shader_mac.frag"};
+    static std::string shader{sim::shader_path() + "shader_mac.frag"};
 #else
-	static std::string shader{sim::shader_path() + "shader.frag"};
+    static std::string shader{sim::shader_path() + "shader.frag"};
 #endif
-	return shader;
+    return shader;
 }
 
 } // namespace sim

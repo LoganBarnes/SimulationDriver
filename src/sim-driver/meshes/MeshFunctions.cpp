@@ -55,9 +55,8 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
         }
         data.ibo.push_back(sim::primitiveRestart());
     }
-    data.ibo.pop_back();
 
-    assert(data.ibo.size() == data.ibo.capacity() - 1);
+    assert(data.ibo.size() == data.ibo.capacity());
 
     data.vaoElements = sim::posNormTexVaoElements();
     return data;
