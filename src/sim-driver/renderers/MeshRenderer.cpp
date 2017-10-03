@@ -21,16 +21,20 @@ void MeshRenderer::render(float alpha, const Camera &camera) const
 
 void MeshRenderer::configureGui()
 {
-    if (ImGui::CollapsingHeader("Mesh Options", "mesh", false, true)) {
+    std::stringstream uid;
+    uid << this;
+    ImGui::PushID(uid.str().c_str());
+    if (ImGui::CollapsingHeader("Mesh Options", "mesh_options", false, true)) {
         bool mesh_needs_update = mesh_.configureGui();
         if (mesh_needs_update) {
             renderer_.rebuild_mesh();
         }
     }
 
-    if (ImGui::CollapsingHeader("Render Options", "render", false, true)) {
+    if (ImGui::CollapsingHeader("Render Options", "render_options", false, true)) {
         renderer_.onGuiRender();
     }
+    ImGui::PopID();
 }
 
 void MeshRenderer::resize(int width, int height)

@@ -14,12 +14,13 @@ public:
         simData_.cameraMover.setUsingOrbitMode(true);
         simData_.cameraMover.setOrbitOrigin({0, 0, 0});
         simData_.cameraMover.setOrbitOffsetDistance(5);
+        simData_.camera().setNearPlane(0.01f);
 
         simData_.paused = true;
 
         prevCam_ = simData_.camera();
 
-        model_ = glm::translate(glm::mat4{1}, {0, 0, 0}) * glm::scale(glm::mat4{1}, glm::vec3(0.05f));
+        model_ = glm::translate(glm::mat4{1}, {0, 0, 0}) * glm::scale(glm::mat4{1}, glm::vec3(0.9f, 0.5f, 0.5f));
         renderer_.setModelMatrix(model_);
     }
 

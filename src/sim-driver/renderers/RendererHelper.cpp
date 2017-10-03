@@ -38,6 +38,9 @@ void RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
 template<typename Vertex>
 void RendererHelper<Vertex>::onGuiRender()
 {
+    std::stringstream uid;
+    uid << this;
+    ImGui::PushID(uid.str().c_str());
     ImGui::Checkbox("Show Normals", &showNormals_);
 
     if (showNormals_) {
@@ -105,6 +108,7 @@ void RendererHelper<Vertex>::onGuiRender()
 #endif
         }
     }
+    ImGui::PopID();
 }
 
 template<typename Vertex>
@@ -148,10 +152,10 @@ void RendererHelper<Vertex>::customRender(float,
                                                 glm::value_ptr(pCamera->getPerspectiveScreenFromWorldMatrix()));
             sim::OpenGLHelper::setFloatUniform(glIds_.programs.frag, "eye", glm::value_ptr(pCamera->getEyeVector()), 3);
         }
-//        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local",
-//                                            glm::value_ptr(modelMatrix_));
-//        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local_normals",
-//                                            glm::value_ptr(normalMatrix_), 3);
+        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local",
+                                            glm::value_ptr(modelMatrix_));
+        sim::OpenGLHelper::setMatrixUniform(glIds_.programs.vert, "world_from_local_normals",
+                                            glm::value_ptr(normalMatrix_), 3);
 
         if (showNormals) {
             if (pCamera != nullptr) {
