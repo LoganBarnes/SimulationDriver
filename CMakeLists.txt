@@ -205,9 +205,9 @@ if (${SIM_BUILD_TESTS})
             ${QUIET_FLAG}
             )
 
-#    # compile googletest with current project
-#    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
-#
+    # compile googletest with current project
+    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+
 #    set(TEST_SOURCE_FILES
 #            # unit tests
 #            src/testing/ResourceHandlingTests.cpp
