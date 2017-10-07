@@ -12,19 +12,21 @@ namespace sim
 
 template<typename T, typename ... Args>
 auto make_child(priority_tag<2>, int w, int h, SimData *pSimData, Args ...args)
--> decltype(std::make_unique<T>(w, h, pSimData, args...))
+-> decltype(T(w, h, pSimData, args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(w, h, pSimData, args...);
 }
 
 template<typename T, typename ... Args>
-auto make_child(priority_tag<1>, int w, int h, SimData *, Args ...args) -> decltype(std::make_unique<T>(w, h, args...))
+auto make_child(priority_tag<1>, int w, int h, SimData *, Args ...args)
+-> decltype(T(w, h, args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(w, h, args...);
 }
 
 template<typename T, typename ... Args>
-auto make_child(priority_tag<0>, int, int, SimData *, Args ...args) -> decltype(std::make_unique<T>(args...))
+auto make_child(priority_tag<0>, int, int, SimData *, Args ...args)
+-> decltype(T(args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(args...);
 }
