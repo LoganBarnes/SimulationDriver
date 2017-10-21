@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sim-driver/CameraMover.hpp>
+#include <string>
 
 namespace sim
 {
