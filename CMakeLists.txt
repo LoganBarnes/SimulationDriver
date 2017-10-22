@@ -206,7 +206,7 @@ if (${SIM_BUILD_TESTS})
             )
 
     # compile googletest with current project
-    add_subdirectory(${gtest_SOURCE_DIR} ${gtest_BINARY_DIR})
+    add_subdirectory(${gtest_SOURCE_DIR}/googletest ${gtest_BINARY_DIR}/googletest)
 
 #    set(TEST_SOURCE_FILES
 #            # unit tests
