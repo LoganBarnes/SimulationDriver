@@ -205,16 +205,18 @@ if (${SIM_BUILD_TESTS})
             ${QUIET_FLAG}
             )
 
+    # Prevent overriding the parent project's compiler/linker settings on Windows
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
     # compile googletest with current project
     add_subdirectory(${gtest_SOURCE_DIR}/googletest ${gtest_BINARY_DIR}/googletest)
 
-#    set(TEST_SOURCE_FILES
-#            # unit tests
-#            src/testing/ResourceHandlingTests.cpp
-#            )
-#
-#    add_executable(SimDriverTest ${TEST_SOURCE_FILES})
-#    target_link_libraries(SimDriverTest SimDriver gtest_main thirdparty)
-#    add_test(NAME sim_driver_test COMMAND SimDriverTest)
+    set(TEST_SOURCE_FILES
+            src/testing/TemplateCompilationTests.cpp
+            )
+
+    add_executable(SimDriverTest ${TEST_SOURCE_FILES})
+    target_link_libraries(SimDriverTest SimDriver gtest_main thirdparty)
+    add_test(NAME sim_driver_test COMMAND SimDriverTest)
 endif()
 
