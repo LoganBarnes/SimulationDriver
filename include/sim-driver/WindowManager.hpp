@@ -1,13 +1,22 @@
 #pragma once
+#define GLFW_INCLUDE_NONE
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#ifdef OFFSCREEN_MESA
+#define GLFW_EXPOSE_NATIVE_OSMESA
+#include <GLFW/glfw3native.h>
+#endif
+
+#include <imgui.h>
+#include <imgui_impl_glfw_gl3.h>
+#include <iostream>
 
 #include <functional>
 #include <memory>
 #include <vector>
 #include <string>
-
-struct GLFWwindow;
-
-typedef GLFWwindow GLFWwindow;
 
 namespace sim
 {

@@ -5,19 +5,14 @@
 #include <sim-driver/SimData.hpp>
 
 #include <sim-driver/OpenGLTypes.hpp>
+#include <sim-driver/WindowManager.hpp>
 
-#define GLFW_INCLUDE_NONE
-
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <imgui_impl_glfw_gl3.h>
 #include <string>
 #include <iostream>
 #include <memory>
 #include <chrono>
 #include <algorithm>
 #include <functional>
-#include <sim-driver/WindowManager.hpp>
 
 namespace sim
 {

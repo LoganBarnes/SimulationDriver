@@ -1,11 +1,4 @@
 #include <sim-driver/WindowManager.hpp>
-
-#define GLFW_INCLUDE_NONE
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <imgui_impl_glfw_gl3.h>
 #include <iostream>
 
 namespace sim
@@ -51,6 +44,10 @@ int WindowManager::create_window(const std::string &title, int width, int height
 
     glfwWindowHint(GLFW_SAMPLES, samples);
     glfwWindowHint(GLFW_RESIZABLE, resizable);
+
+    if (title.empty()) {
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // highest on mac :(
