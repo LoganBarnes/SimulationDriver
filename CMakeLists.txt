@@ -241,6 +241,6 @@ if (${SIM_BUILD_TESTS})
     add_executable(SimDriverTests ${TEST_SOURCE_FILES})
     target_link_libraries(SimDriverTests SimDriver gtest_main thirdparty ${PROFILE_LIBS})
     target_compile_options(SimDriverTests PRIVATE ${INTENSE_FLAGS} ${PROFILE_FLAGS})
-    add_test(NAME sim-driver-test COMMAND SimDriverTest)
+    add_test(NAME sim-driver-test COMMAND SimDriverTests)
 endif()
 
