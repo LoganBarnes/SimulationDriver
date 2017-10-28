@@ -4,7 +4,7 @@ project(SimDriver)
 set(CMAKE_CXX_STANDARD 14)
 
 option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
-option(SIM_BUILD_TESTS "Build tests using the Catch framework" OFF)
+option(SIM_BUILD_TESTS "Build SimulationDriver unit tests" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
 
@@ -16,7 +16,11 @@ if (NOT ${SIM_VERBOSE_OUTPUT})
     set(QUIET_FLAG QUIET)
 endif ()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+######################
+### EXTERNAL REPOS ###
+######################
 include(DownloadProject)
 
 configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/sim-driver/ShaderConfig.hpp)
@@ -78,6 +82,9 @@ target_include_directories(thirdparty SYSTEM PUBLIC
         )
 target_link_libraries(thirdparty glfw)
 
+#############################
+### Project Configuration ###
+#############################
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # ignore third party warnings
     target_compile_options(glfw BEFORE PRIVATE -w)
@@ -89,6 +96,9 @@ if (NOT MSVC)
     set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wall -Wextra -Werror -pedantic")
 endif ()
 
+#########################
+### Simulation Driver ###
+#########################
 set(SOURCE_FILES
         #shaders
         src/shaders/shader.vert
@@ -211,12 +221,26 @@ if (${SIM_BUILD_TESTS})
     # compile googletest with current project
     add_subdirectory(${gtest_SOURCE_DIR}/googletest ${gtest_BINARY_DIR}/googletest)
 
+    # add test coverage capabilities
+    if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES "Debug")
+        include(CodeCoverage)
+        setup_target_for_coverage(${PROJECT_NAME}_coverage SimDriverTests coverage)
+        set(PROFILE_FLAGS -fprofile-arcs -ftest-coverage)
+        set(PROFILE_LIBS gcov)
+        target_compile_options(SimDriver PRIVATE ${PROFILE_FLAGS})
+        target_link_libraries(SimDriver ${PROFILE_LIBS})
+    endif ()
+
+    include(CTest)
+    enable_testing()
+
     set(TEST_SOURCE_FILES
             src/testing/TemplateCompilationTests.cpp
             )
 
-    add_executable(SimDriverTest ${TEST_SOURCE_FILES})
-    target_link_libraries(SimDriverTest SimDriver gtest_main thirdparty)
-    add_test(NAME sim_driver_test COMMAND SimDriverTest)
+    add_executable(SimDriverTests ${TEST_SOURCE_FILES})
+    target_link_libraries(SimDriverTests SimDriver gtest_main thirdparty ${PROFILE_LIBS})
+    target_compile_options(SimDriverTests PRIVATE ${INTENSE_FLAGS} ${PROFILE_FLAGS})
+    add_test(NAME sim-driver-test COMMAND SimDriverTest)
 endif()
 

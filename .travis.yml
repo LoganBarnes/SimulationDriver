@@ -1,0 +1,98 @@
+language: c++
+
+branches:
+  only:
+    - master
+
+dist: trusty
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - mesa-utils
+            - xorg-dev
+            - libglu1-mesa-dev
+            - lcov
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="CC=clang && CXX=clang++"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+
+    ############################################################################
+    # Update OS X homebrew
+    ############################################################################
+    - |
+      if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+        brew update
+      fi
+      
+install:
+  ############################################################################
+  # All compiled dependencies are installed in ${TRAVIS_BUILD_DIR}/deps/
+  ############################################################################
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
+
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="https://cmake.org/files/v3.9/cmake-3.9.0-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    else
+      brew outdated cmake || brew upgrade cmake
+    fi
+  - cmake --version
+
+script:
+  ############################################################################
+  # Build project and run CPU based tests
+  ############################################################################
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir cmake-build-debug
+  - cd cmake-build-debug
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DSIM_BUILD_TESTS=ON ..
+  - make -j
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then make SimDriver_coverage -j; fi;
+  - ctest
+
+  - cd ${TRAVIS_BUILD_DIR}
+  - mkdir cmake-build-release
+  - cd cmake-build-release
+  - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON ..
+  - make -j
+  - ctest
+
+after_success:
+  ############################################################################
+  # Create code coverage report
+  ############################################################################
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      cd ${TRAVIS_BUILD_DIR}
+      lcov --directory . --capture --output-file coverage.info # capture coverage info
+      lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter out system
+      lcov --remove coverage.info '*/thirdparty/*' --output-file coverage.info # filter out non-project libs
+      lcov --list coverage.info #debug info
+      # Upload report to CodeCov
+      bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
+    fi
+
+notifications:
+  on_success: never
+  on_failure: always
