@@ -20,6 +20,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
+add_definitions(-DOFFSCREEN_MESA)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -35,13 +36,14 @@ download_project(PROJ glfw
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG master
-        UPDATE_DISCONNECTED 1
-        ${QUIET_FLAG}
+        UPDATE_DISCONNECTED 0
+#        ${QUIET_FLAG}
         )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
+set(GLFW_USE_OSMESA ON CACHE BOOL "" FORCE)
 
 # compile glfw with current project
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})

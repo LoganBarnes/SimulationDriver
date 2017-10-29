@@ -28,8 +28,18 @@ WindowManager::WindowManager()
         throw std::runtime_error("GLFW init failed");
     }
 }
-int WindowManager::create_window(const std::string &title, int width, int height, int samples, bool resizable)
+int WindowManager::create_window(const std::string &/*title*/, int width, int height, int /*samples*/, bool /*resizable*/)
 {
+
+#ifdef OFFSCREEN_MESA
+    std::cout << "MESA!" << std::endl;
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
+    width = 640;
+    height = 480;
+#else
     if (width == 0 || height == 0) {
         const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
@@ -47,6 +57,7 @@ int WindowManager::create_window(const std::string &title, int width, int height
     if (title.empty()) {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     }
+#endif
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // highest on mac :(
@@ -55,12 +66,9 @@ int WindowManager::create_window(const std::string &title, int width, int height
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif // __APPLE__
 
-#ifdef OFFSCREEN_MESA
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
-#endif
-
     auto up_window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
-        glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),
+//        glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),
+        glfwCreateWindow(width, height, " ", nullptr, nullptr),
         [](auto p)
         {
             if (p) {
@@ -90,7 +98,7 @@ int WindowManager::create_window(const std::string &title, int width, int height
             });
     }
 
-    int index = windows_.size();
+    int index = static_cast<int>(windows_.size());
     windows_.emplace_back(std::move(up_window));
 
     return index;
