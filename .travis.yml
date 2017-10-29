@@ -76,7 +76,8 @@ script:
   - cd cmake-build-release
   - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON ..
   - make -j
-  - ctest
+#  - ctest
+  - ./SimDriverTests
 
 after_success:
   ############################################################################
