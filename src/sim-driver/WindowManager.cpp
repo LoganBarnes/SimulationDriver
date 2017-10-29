@@ -1,5 +1,4 @@
 #include <sim-driver/WindowManager.hpp>
-#include <iostream>
 
 namespace sim
 {
@@ -55,6 +54,10 @@ int WindowManager::create_window(const std::string &title, int width, int height
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif // __APPLE__
+
+#ifdef OFFSCREEN_MESA
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
+#endif
 
     auto up_window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
         glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),

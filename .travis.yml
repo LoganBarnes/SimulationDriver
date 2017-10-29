@@ -18,6 +18,7 @@ matrix:
             - mesa-utils
             - xorg-dev
             - libglu1-mesa-dev
+            - libosmesa6-dev
             - lcov
       env:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
