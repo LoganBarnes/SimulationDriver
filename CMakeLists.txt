@@ -7,6 +7,7 @@ option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
 option(SIM_BUILD_TESTS "Build SimulationDriver unit tests" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
+option(SIM_OFFSCREEN "Render offscreen using OSMesa" OFF)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
@@ -20,7 +21,9 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif ()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
-#add_definitions(-DOFFSCREEN_MESA)
+if (${SIM_OFFSCREEN})
+    add_definitions(-DOFFSCREEN_MESA)
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -37,13 +40,13 @@ download_project(PROJ glfw
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG master
         UPDATE_DISCONNECTED 0
-#        ${QUIET_FLAG}
+        ${QUIET_FLAG}
         )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
-set(GLFW_USE_OSMESA ON CACHE BOOL "" FORCE)
+set(GLFW_USE_OSMESA ${SIM_OFFSCREEN} CACHE BOOL "" FORCE)
 
 # compile glfw with current project
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
