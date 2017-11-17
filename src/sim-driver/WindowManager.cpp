@@ -28,7 +28,7 @@ WindowManager::WindowManager()
         throw std::runtime_error("GLFW init failed");
     }
 }
-int WindowManager::create_window(const std::string &/*title*/, int width, int height, int /*samples*/, bool /*resizable*/)
+int WindowManager::create_window(const std::string &title, int width, int height, int samples, bool resizable)
 {
 
 #ifdef OFFSCREEN_MESA
