@@ -206,7 +206,9 @@ void RendererHelper<Vertex>::customRender(float,
         glEnable(GL_CULL_FACE);
     }
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    if (glIds_.framebuffer) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 template<typename Vertex>
