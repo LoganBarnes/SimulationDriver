@@ -67,8 +67,7 @@ int WindowManager::create_window(const std::string &title, int width, int height
 #endif // __APPLE__
 
     auto up_window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
-//        glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),
-        glfwCreateWindow(width, height, " ", nullptr, nullptr),
+        glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),
         [](auto p)
         {
             if (p) {
