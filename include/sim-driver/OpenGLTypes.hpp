@@ -3,24 +3,23 @@
 #include <glad/glad.h>
 #include <memory>
 
-namespace sim
-{
+namespace sim {
 
 struct VAOElement;
 struct VAOSettings;
 
 class OpenGLHelper;
 
-template<typename T>
+template <typename T>
 class TCamera;
 
 using Camera = TCamera<float>;
 using CameraD = TCamera<double>;
 
-template<typename T>
+template <typename T>
 class RendererHelper;
 
-template<typename T>
+template <typename T>
 struct DrawData;
 
 struct PosNormTexVertex;
@@ -32,8 +31,7 @@ using PosRenderer = sim::RendererHelper<sim::PosVertex>;
 using PosNormTexData = sim::DrawData<sim::PosNormTexVertex>;
 using PosData = sim::DrawData<sim::PosVertex>;
 
-struct StandardPipeline
-{
+struct StandardPipeline {
     std::shared_ptr<GLuint> program;
     std::shared_ptr<GLuint> vbo;
     std::shared_ptr<GLuint> ibo;
@@ -44,8 +42,7 @@ struct StandardPipeline
     int iboSize;
 };
 
-struct SeparablePrograms
-{
+struct SeparablePrograms {
     std::shared_ptr<GLuint> pipeline;
     std::shared_ptr<GLuint> vert;
     std::shared_ptr<GLuint> tesc;
@@ -55,8 +52,7 @@ struct SeparablePrograms
     std::shared_ptr<GLuint> comp;
 };
 
-struct SeparablePipeline
-{
+struct SeparablePipeline {
     SeparablePrograms programs;
     std::shared_ptr<GLuint> vbo;
     std::shared_ptr<GLuint> ibo;

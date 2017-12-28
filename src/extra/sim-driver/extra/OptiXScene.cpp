@@ -1,19 +1,10 @@
 #include "OptiXScene.hpp"
 #include <optixu/optixu_math_stream_namespace.h>
 
-namespace sim
-{
+namespace sim {
 
-OptiXScene::OptiXScene(optix::Context &context)
-    : material_(context->createMaterial())
-{
-    std::vector<float> data =
-        {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            -1.0f, 1.0f, 0.0f,
-            1.0f, 1.0f, 0.0f
-        };
+OptiXScene::OptiXScene(optix::Context& context) : material_(context->createMaterial()) {
+    std::vector<float> data = {-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f};
 
     // context
     context->setRayTypeCount(2);
@@ -25,19 +16,22 @@ OptiXScene::OptiXScene(optix::Context &context)
     context["scene_epsilon"]->setFloat(1.0e-3f);
 
     // Starting program to generate rays
-    context->setRayGenerationProgram(0, context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx",
-                                                                          "pinhole_camera"));
+    context->setRayGenerationProgram(0,
+                                     context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx",
+                                                                       "pinhole_camera"));
     // What to do when something messes up
     context["error_color"]->setFloat(1.0f, 0.0f, 0.0f);
-    context->setExceptionProgram(0, context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx",
-                                                                      "exception"));
+    context->setExceptionProgram(0,
+                                 context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx",
+                                                                   "exception"));
     // What to do when rays don't intersect with anything
     context["bg_color"]->setFloat(0.0f, 0.0f, 1.0f);
-    context->setMissProgram(0, context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx",
-                                                                 "miss"));
+    context->setMissProgram(0,
+                            context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Cameras.cu.ptx", "miss"));
 
-    material_->setClosestHitProgram(0, context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Brdf.cu.ptx",
-                                                                         "closest_hit_normals"));
+    material_->setClosestHitProgram(0,
+                                    context->createProgramFromPTXFile("ptx/SimDriverOptiX_generated_Brdf.cu.ptx",
+                                                                      "closest_hit_normals"));
 
     // box
     std::string box_ptx("ptx/SimDriverOptiX_generated_Box.cu.ptx");
@@ -79,7 +73,7 @@ OptiXScene::OptiXScene(optix::Context &context)
     optix::Group topGroup = context->createGroup();
     topGroup->setChildCount(1);
 
-//  topGroup->setChild( 0, boxGroup );
+    //  topGroup->setChild( 0, boxGroup );
     topGroup->setChild(0, trans);
 
     topGroup->setAcceleration(context->createAcceleration("Bvh", "Bvh"));

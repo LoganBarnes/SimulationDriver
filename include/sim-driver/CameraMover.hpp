@@ -2,14 +2,11 @@
 
 #include <sim-driver/Camera.hpp>
 
-namespace sim
-{
+namespace sim {
 
-template<typename T>
-class TCameraMover
-{
+template <typename T>
+class TCameraMover {
 public:
-
     explicit TCameraMover(TCamera<T> camera);
 
     void yaw(T angleDegrees);
@@ -18,20 +15,19 @@ public:
 
     bool isUsingOrbitMode() const;
     T getOrbitOffsetDistance() const;
-    const glm::tvec3<T> &getOrbitOrigin() const;
+    const glm::tvec3<T>& getOrbitOrigin() const;
     T getOrbitYawAngle() const;
     T getOrbitPitchAngle() const;
 
     void setUsingOrbitMode(bool usingOrbitMode);
     void setOrbitOffsetDistance(T orbitOffsetDistance);
-    void setOrbitOrigin(const glm::tvec3<T> &orbitOrigin);
+    void setOrbitOrigin(const glm::tvec3<T>& orbitOrigin);
     void setOrbitYawAngle(T orbitYawAngle);
     void setOrbitPitchAngle(T orbitPitchAngle);
 
     TCamera<T> camera;
 
 private:
-
     // orbit variables
     bool usingOrbitMode_{false};
     T orbitOffsetDistance_{0};
@@ -41,7 +37,6 @@ private:
     T orbitPitchAngle_{0};
 
     void updateOrbitSettings();
-
 };
 
 using CameraMover = TCameraMover<float>;

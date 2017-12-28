@@ -5,7 +5,6 @@
 #include <optix.h>
 #include <optixu/optixu_math_stream_namespace.h>
 
-struct PerRayData
-{
+struct PerRayData {
     float3 result;
 };

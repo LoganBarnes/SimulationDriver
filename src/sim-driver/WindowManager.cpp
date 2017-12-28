@@ -31,12 +31,13 @@ WindowManager::WindowManager()
 int WindowManager::create_window(const std::string &title, int width, int height, int samples, bool resizable)
 {
 
-#ifdef OFFSCREEN_MESA
+#ifdef OFFSCREEN
     std::cout << "MESA!" << std::endl;
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     width = 640;
     height = 480;
 #else
@@ -51,13 +52,9 @@ int WindowManager::create_window(const std::string &title, int width, int height
         height = mode->height;
     }
 
-    glfwWindowHint(GLFW_SAMPLES, samples);
-    glfwWindowHint(GLFW_RESIZABLE, resizable);
-
     if (title.empty()) {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     }
-#endif
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // highest on mac :(
@@ -65,6 +62,11 @@ int WindowManager::create_window(const std::string &title, int width, int height
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 #endif // __APPLE__
+
+#endif
+
+    glfwWindowHint(GLFW_SAMPLES, samples);
+    glfwWindowHint(GLFW_RESIZABLE, resizable);
 
     auto up_window = std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow *)>>(
         glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr),
@@ -97,15 +99,25 @@ int WindowManager::create_window(const std::string &title, int width, int height
             });
     }
 
-    int index = static_cast<int>(windows_.size());
+    auto index = static_cast<int>(windows_.size());
     windows_.emplace_back(std::move(up_window));
 
     return index;
 }
 
+void WindowManager::poll_events_blocking()
+{
+    glfwWaitEvents();
+}
+
+void WindowManager::poll_events_non_blocking()
+{
+    glfwPollEvents();
+}
+
 GLFWwindow *WindowManager::get_window(int index) const
 {
-    return windows_.at(index).get();
+    return windows_.at(static_cast<std::size_t>(index)).get();
 }
 
 } // namespace sim

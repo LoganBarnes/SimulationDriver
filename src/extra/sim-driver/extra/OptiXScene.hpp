@@ -2,15 +2,12 @@
 
 #include <sim-driver/extra/OptiXSimulation.hpp>
 
-namespace sim
-{
+namespace sim {
 
-class OptiXScene
-{
+class OptiXScene {
 
 public:
-
-    explicit OptiXScene(optix::Context &context);
+    explicit OptiXScene(optix::Context& context);
 
 private:
     optix::Material material_;

@@ -2,29 +2,21 @@
 
 #include <sim-driver/OpenGLSimulation.hpp>
 
-namespace
-{
-struct FirstSim
-{
+namespace {
+struct FirstSim {};
+
+struct SecondSim {
+    SecondSim(int, int) {}
 };
 
-struct SecondSim
-{
-    SecondSim(int, int)
-    {}
-};
-
-struct ThirdSim
-{
-    ThirdSim(int, int, sim::SimData *)
-    {}
+struct ThirdSim {
+    ThirdSim(int, int, sim::SimData*) {}
 };
 
 } // namespace
 
-TEST(OpenGLSimulationCompiles, compiles_with_default_constructor)
-{
-    sim::OpenGLSimulation<FirstSim> sim{{""}};
+TEST(OpenGLSimulationCompiles, compiles_with_default_constructor) {
+    sim::OpenGLSimulation<FirstSim> sim;
     EXPECT_TRUE(true);
 }
 //

@@ -1,29 +1,23 @@
 #include <sim-driver/meshes/MeshHelper.hpp>
 #include <glm/gtc/constants.hpp>
 
-namespace sim
-{
+namespace sim {
 
-template<typename V>
+template <typename V>
 V create_sphere_vertex(glm::vec3 p, glm::vec2 t);
 
-template<>
-sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
-{
-    return {{p.x, p.y, p.z},
-            {p.x, p.y, p.z},
-            {t.x, t.y}};
+template <>
+sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t) {
+    return {{p.x, p.y, p.z}, {p.x, p.y, p.z}, {t.x, t.y}};
 }
 
-template<>
-sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2)
-{
+template <>
+sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2) {
     return {{p.x, p.y, p.z}};
 }
 
-template<typename V>
-sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
-{
+template <typename V>
+sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions) {
     sim::DrawData<V> data{};
 
     data.vbo.reserve(static_cast<unsigned>((u_divisions + 2) * (v_divisions + 2)));
@@ -35,9 +29,7 @@ sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
         for (int phii = 0; phii < (v_divisions + 2); ++phii) {
             float v = float(phii) / (v_divisions + 1);
             float phi = glm::pi<float>() * v;
-            glm::vec3 p{glm::cos(theta) * glm::sin(phi),
-                        glm::cos(phi),
-                        glm::sin(theta) * glm::sin(phi)};
+            glm::vec3 p{glm::cos(theta) * glm::sin(phi), glm::cos(phi), glm::sin(theta) * glm::sin(phi)};
             data.vbo.emplace_back(create_sphere_vertex<V>(p, glm::vec2{1.0f - u, v}));
         }
     }

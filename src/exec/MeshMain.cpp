@@ -7,8 +7,7 @@ class Simulator
 {
 public:
     explicit Simulator(int w, int h, sim::SimData *pSimData)
-        : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)},
-          simData_{*pSimData}
+        : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}, simData_{*pSimData}
     {
         simData_.camera().setNearPlane(0.1f);
 
@@ -67,15 +66,8 @@ private:
 
 int main()
 {
-    try {
-        sim::SimInitData initData;
-        initData.title = "Mesh Sim";
-        sim::OpenGLSimulation<Simulator>(initData).runNoFasterThanRealTimeLoop();
-    }
-    catch (const std::exception &e) {
-        std::cerr << "Program failed: " << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
-
+    sim::SimInitData initData;
+    initData.title = "Mesh Sim";
+    sim::OpenGLSimulation<Simulator>(initData).runNoFasterThanRealTimeLoop();
     return EXIT_SUCCESS;
 }

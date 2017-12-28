@@ -39,12 +39,6 @@ before_install:
         brew update
       fi
 
-    - |
-      sudo apt-add-repository ppa:xorg-edgers/ppa -y
-      sudo apt-get update -q && sudo apt-get upgrade -q
-      sudo apt-get upgrade libegl1-mesa libgbm1 libgl1-mesa-dri libva1 -q
-      glxinfo | grep "OpenGL version"
-
 install:
   ############################################################################
   # All compiled dependencies are installed in ${TRAVIS_BUILD_DIR}/deps/

@@ -2,12 +2,13 @@ cmake_minimum_required(VERSION 3.7)
 project(SimDriver)
 
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
 option(SIM_BUILD_TESTS "Build SimulationDriver unit tests" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
-option(SIM_OFFSCREEN "Render offscreen using OSMesa" OFF)
+option(SIM_OFFSCREEN "Render offscreen using EGL" OFF)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
@@ -22,7 +23,7 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 if (${SIM_OFFSCREEN})
-    add_definitions(-DOFFSCREEN_MESA)
+    add_definitions(-DOFFSCREEN)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -38,14 +39,14 @@ configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/sim-driver/ShaderConf
 download_project(PROJ glfw
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG master
+        GIT_TAG latest
         UPDATE_DISCONNECTED 0
         ${QUIET_FLAG}
         )
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES ON CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_USE_OSMESA ${SIM_OFFSCREEN} CACHE BOOL "" FORCE)
 
 # compile glfw with current project

@@ -1,17 +1,13 @@
 #pragma once
 
-
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
 
-namespace sim
-{
+namespace sim {
 
-template<typename V>
-class MeshHelper
-{
+template <typename V>
+class MeshHelper {
 public:
-
     using MeshDataFun = std::function<sim::DrawData<V>(int, int)>;
 
     explicit MeshHelper(MeshDataFun dataFun = nullptr);
@@ -20,7 +16,7 @@ public:
 
     void setMeshDataFunction(MeshDataFun dataFun);
 
-    const sim::DrawData<V> &getMeshData() const;
+    const sim::DrawData<V>& getMeshData() const;
 
     void updateData();
 
