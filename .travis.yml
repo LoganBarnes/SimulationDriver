@@ -22,25 +22,28 @@ matrix:
         - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
 before_install:
-    - eval "${MATRIX_EVAL}"
+  - eval "${MATRIX_EVAL}"
 
-    ############################################################################
-    # Update OS X homebrew
-    ############################################################################
-    - |
-      if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-        brew update
-      fi
-
-    ############################################################################
-    # Install OSMesa
-    ############################################################################
+  ############################################################################
+  # Update OS X homebrew
+  ############################################################################
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-        sudo add-apt-repository ppa:xorg-edgers/ppa
-        sudo apt-get update
-        sudo apt-get install mesa
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew update
     fi
+
+  ############################################################################
+  # Install OSMesa
+  ############################################################################
+  - sudo add-apt-repository ppa:xorg-edgers/ppa
+  - sudo apt-get update
+  - sudo apt-get install mesa
+#  - |
+#    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+#      sudo add-apt-repository ppa:xorg-edgers/ppa
+#      sudo apt-get update
+#      sudo apt-get install mesa
+#    fi
 
 install:
   ############################################################################
