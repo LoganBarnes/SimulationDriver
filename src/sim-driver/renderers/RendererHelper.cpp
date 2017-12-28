@@ -6,14 +6,17 @@
 #include <iostream>
 #include <imgui.h>
 
-namespace sim {
+namespace sim
+{
 
-namespace {
+namespace
+{
 constexpr int max_point_size = 25;
 }
 
-template <typename Vertex>
-RendererHelper<Vertex>::RendererHelper(std::string vertShader) {
+template<typename Vertex>
+RendererHelper<Vertex>::RendererHelper(std::string vertShader)
+{
     if (vertShader.empty()) {
         vertShader = sim::shader_path() + "shader.vert";
     }
@@ -22,8 +25,9 @@ RendererHelper<Vertex>::RendererHelper(std::string vertShader) {
                                                                  sim::frag_shader_file());
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::onRender(float alpha, const Camera* pCamera) const {
+template<typename Vertex>
+void RendererHelper<Vertex>::onRender(float alpha, const Camera *pCamera) const
+{
     if (showNormals_) {
         customRender(alpha, pCamera, drawMode_, 1, shapeColor_, lightDir_, showNormals_, normalScale_);
     }
@@ -31,8 +35,9 @@ void RendererHelper<Vertex>::onRender(float alpha, const Camera* pCamera) const 
     customRender(alpha, pCamera, drawMode_, displayMode_, shapeColor_, lightDir_, false);
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::onGuiRender() {
+template<typename Vertex>
+void RendererHelper<Vertex>::onGuiRender()
+{
     std::stringstream uid;
     uid << this;
     ImGui::PushID(uid.str().c_str());
@@ -46,7 +51,8 @@ void RendererHelper<Vertex>::onGuiRender() {
 
     if (showingVertsOnly_) {
         ImGui::SliderInt("Point Size", &pointSize_, 1, max_point_size);
-    } else {
+    }
+    else {
         ImGui::Checkbox("Wireframe", &usingWireframe_);
     }
 
@@ -55,21 +61,22 @@ void RendererHelper<Vertex>::onGuiRender() {
     ImGui::Combo("Display Mode",
                  &displayMode_,
                  " Position \0"
-                 " Normal \0"
-                 " Tex Coords \0"
-                 " Color \0"
-                 " Texture \0"
-                 " Simple Shading \0"
-                 " Advanced Shading \0"
-                 " White \0"
-                 "\0\0");
+                     " Normal \0"
+                     " Tex Coords \0"
+                     " Color \0"
+                     " Texture \0"
+                     " Simple Shading \0"
+                     " Advanced Shading \0"
+                     " White \0"
+                     "\0\0");
 
     if (displayMode_ == 3 || displayMode_ == 5 || displayMode_ == 6) {
         ImGui::ColorEdit3("Shape Color", glm::value_ptr(shapeColor_));
 
         if (displayMode_ == 5) {
             ImGui::SliderFloat3("Light Direction", glm::value_ptr(lightDir_), -1, 1);
-        } else if (displayMode_ == 6) {
+        }
+        else if (displayMode_ == 6) {
             ImGui::SliderFloat("Shape Roughness", &shapeRoughness_, 0.01f, 1.0f);
             ImGui::SliderFloat3("Shape Index of Refraction", glm::value_ptr(shapeIor_), 1.0f, 10.0f);
 
@@ -85,7 +92,7 @@ void RendererHelper<Vertex>::onGuiRender() {
 
                 for (decltype(lights_.size()) i = 0; i < lights_.size(); ++i) {
                     std::string light_str = "Light " + std::to_string(i);
-                    glm::vec4& light = lights_[i];
+                    glm::vec4 &light = lights_[i];
                     lights_need_update |= ImGui::SliderFloat3(std::string(light_str + " Direction").c_str(),
                                                               glm::value_ptr(light),
                                                               -1,
@@ -105,23 +112,25 @@ void RendererHelper<Vertex>::onGuiRender() {
     ImGui::PopID();
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::onResize(int, int) {
+template<typename Vertex>
+void RendererHelper<Vertex>::onResize(int, int)
+{
     if (glIds_.framebuffer) {
         ///\todo: resize framebuffer
     }
 }
 
-template <typename Vertex>
+template<typename Vertex>
 void RendererHelper<Vertex>::customRender(float,
-                                          const Camera* pCamera,
+                                          const Camera *pCamera,
                                           GLenum drawMode,
                                           int displayMode,
                                           glm::vec3 shapeColor,
                                           glm::vec3 lightDir,
                                           bool showNormals,
                                           float NormalScale,
-                                          std::function<void(void)> programReplacement) const {
+                                          std::function<void(void)> programReplacement) const
+{
     if (glIds_.framebuffer) {
         glBindFramebuffer(GL_FRAMEBUFFER, *glIds_.framebuffer);
         glViewport(0, 0, fboWidth_, fboHeight_);
@@ -130,7 +139,8 @@ void RendererHelper<Vertex>::customRender(float,
 
     if (programReplacement) {
         programReplacement();
-    } else {
+    }
+    else {
         glUseProgram(0);
         glUseProgramStages(*glIds_.programs.pipeline, GL_VERTEX_SHADER_BIT, *glIds_.programs.vert);
         glUseProgramStages(*glIds_.programs.pipeline, GL_GEOMETRY_SHADER_BIT, showNormals ? *glIds_.programs.geom : 0);
@@ -205,26 +215,28 @@ void RendererHelper<Vertex>::customRender(float,
     }
 }
 
-template <typename Vertex>
+template<typename Vertex>
 void RendererHelper<Vertex>::renderToFramebuffer(int width,
                                                  int height,
-                                                 const std::shared_ptr<GLuint>& spColorTex,
-                                                 const std::shared_ptr<GLuint>& spDepthTex) {
+                                                 const std::shared_ptr<GLuint> &spColorTex,
+                                                 const std::shared_ptr<GLuint> &spDepthTex)
+{
     fboWidth_ = width;
     fboHeight_ = height;
     glIds_.framebuffer = nullptr;
     glIds_.framebuffer = OpenGLHelper::createFramebuffer(fboWidth_, fboHeight_, spColorTex, spDepthTex);
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::rebuild_mesh() {
+template<typename Vertex>
+void RendererHelper<Vertex>::rebuild_mesh()
+{
     if (!dataFun_) {
         return;
     }
 
     glIds_.vbo = glIds_.vao = glIds_.ibo = nullptr;
 
-    const sim::DrawData<Vertex>& data = dataFun_();
+    const sim::DrawData<Vertex> &data = dataFun_();
     glIds_.vbo = OpenGLHelper::createBuffer(data.vbo.data(), data.vbo.size());
 
     glIds_.vao = OpenGLHelper::createVao(glIds_.programs.vert, glIds_.vbo, sizeof(Vertex), data.vaoElements);
@@ -237,8 +249,9 @@ void RendererHelper<Vertex>::rebuild_mesh() {
     }
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity) {
+template<typename Vertex>
+void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity)
+{
     lights_.emplace_back(lightDir, intensity);
 
     spLightSsbo_ = nullptr;
@@ -246,150 +259,185 @@ void RendererHelper<Vertex>::addLight(glm::vec3 lightDir, float intensity) {
         = sim::OpenGLHelper::createBuffer(lights_.data(), lights_.size(), GL_SHADER_STORAGE_BUFFER, GL_DYNAMIC_DRAW);
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::setTexture(std::shared_ptr<GLuint> texture) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setTexture(std::shared_ptr<GLuint> texture)
+{
     glIds_.texture = texture;
 }
 
-template <typename Vertex>
-int RendererHelper<Vertex>::getFboWidth() const {
+template<typename Vertex>
+int RendererHelper<Vertex>::getFboWidth() const
+{
     return fboWidth_;
 }
-template <typename Vertex>
-int RendererHelper<Vertex>::getFboHeight() const {
+template<typename Vertex>
+int RendererHelper<Vertex>::getFboHeight() const
+{
     return fboHeight_;
 }
-template <typename Vertex>
-bool RendererHelper<Vertex>::isShowingVertsOnly() const {
+template<typename Vertex>
+bool RendererHelper<Vertex>::isShowingVertsOnly() const
+{
     return showingVertsOnly_;
 }
-template <typename Vertex>
-bool RendererHelper<Vertex>::isUsingWireframe() const {
+template<typename Vertex>
+bool RendererHelper<Vertex>::isUsingWireframe() const
+{
     return usingWireframe_;
 }
-template <typename Vertex>
-bool RendererHelper<Vertex>::isShowNormals() const {
+template<typename Vertex>
+bool RendererHelper<Vertex>::isShowNormals() const
+{
     return showNormals_;
 }
-template <typename Vertex>
-int RendererHelper<Vertex>::getDisplayMode() const {
+template<typename Vertex>
+int RendererHelper<Vertex>::getDisplayMode() const
+{
     return displayMode_;
 }
-template <typename Vertex>
-const glm::vec3& RendererHelper<Vertex>::getShapeColor() const {
+template<typename Vertex>
+const glm::vec3 &RendererHelper<Vertex>::getShapeColor() const
+{
     return shapeColor_;
 }
-template <typename Vertex>
-float RendererHelper<Vertex>::getShapeRoughness() const {
+template<typename Vertex>
+float RendererHelper<Vertex>::getShapeRoughness() const
+{
     return shapeRoughness_;
 }
-template <typename Vertex>
-const glm::vec3& RendererHelper<Vertex>::getShapeIor() const {
+template<typename Vertex>
+const glm::vec3 &RendererHelper<Vertex>::getShapeIor() const
+{
     return shapeIor_;
 }
-template <typename Vertex>
-const glm::vec3& RendererHelper<Vertex>::getLightDir() const {
+template<typename Vertex>
+const glm::vec3 &RendererHelper<Vertex>::getLightDir() const
+{
     return lightDir_;
 }
-template <typename Vertex>
-int RendererHelper<Vertex>::getPointSize() const {
+template<typename Vertex>
+int RendererHelper<Vertex>::getPointSize() const
+{
     return pointSize_;
 }
-template <typename Vertex>
-float RendererHelper<Vertex>::getNormalScale() const {
+template<typename Vertex>
+float RendererHelper<Vertex>::getNormalScale() const
+{
     return normalScale_;
 }
-template <typename Vertex>
-GLenum RendererHelper<Vertex>::getDrawMode() const {
+template<typename Vertex>
+GLenum RendererHelper<Vertex>::getDrawMode() const
+{
     return drawMode_;
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::setFboWidth(int fboWidth) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setFboWidth(int fboWidth)
+{
     fboWidth_ = fboWidth;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setFboHeight(int fboHeight) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setFboHeight(int fboHeight)
+{
     fboHeight_ = fboHeight;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setShowingVertsOnly(bool showingVertsOnly) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setShowingVertsOnly(bool showingVertsOnly)
+{
     showingVertsOnly_ = showingVertsOnly;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setUsingWireframe(bool usingWireframe) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setUsingWireframe(bool usingWireframe)
+{
     usingWireframe_ = usingWireframe;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setShowNormals(bool showNormals) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setShowNormals(bool showNormals)
+{
     showNormals_ = showNormals;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setDisplayMode(int displayMode) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setDisplayMode(int displayMode)
+{
     if (0 > displayMode || displayMode > 8) {
         std::cerr << "Display mode should be between 0 and 8 inclusive" << std::endl;
         return;
     }
     displayMode_ = displayMode;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setShapeColor(const glm::vec3& shapeColor) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setShapeColor(const glm::vec3 &shapeColor)
+{
     shapeColor_ = shapeColor;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setShapeRoughness(float shapeRoughness) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setShapeRoughness(float shapeRoughness)
+{
     shapeRoughness_ = shapeRoughness;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setShapeIor(const glm::vec3& shapeIor) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setShapeIor(const glm::vec3 &shapeIor)
+{
     shapeIor_ = shapeIor;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setLightDir(const glm::vec3& lightDir) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setLightDir(const glm::vec3 &lightDir)
+{
     lightDir_ = lightDir;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setPointSize(int pointSize) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setPointSize(int pointSize)
+{
     if (0 > pointSize || pointSize > max_point_size) {
         std::cerr << "Display mode should be between 0 and " << max_point_size << " inclusive" << std::endl;
         return;
     }
     pointSize_ = pointSize;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setNormalScale(float normalScale) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setNormalScale(float normalScale)
+{
     normalScale_ = normalScale;
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setDataFun(const DataFun& dataFun) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setDataFun(const DataFun &dataFun)
+{
     dataFun_ = dataFun;
     rebuild_mesh();
 }
-template <typename Vertex>
-void RendererHelper<Vertex>::setDrawMode(GLenum drawMode) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setDrawMode(GLenum drawMode)
+{
     drawMode_ = drawMode;
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::updateLights() {
+template<typename Vertex>
+void RendererHelper<Vertex>::updateLights()
+{
     sim::OpenGLHelper::updateBuffer(spLightSsbo_, 0, lights_.size(), lights_.data(), GL_SHADER_STORAGE_BUFFER);
 }
 
-template <typename Vertex>
-const glm::mat4& RendererHelper<Vertex>::getModelMatrix() const {
+template<typename Vertex>
+const glm::mat4 &RendererHelper<Vertex>::getModelMatrix() const
+{
     return modelMatrix_;
 }
 
-template <typename Vertex>
-void RendererHelper<Vertex>::setModelMatrix(const glm::mat4& modelMatrix) {
+template<typename Vertex>
+void RendererHelper<Vertex>::setModelMatrix(const glm::mat4 &modelMatrix)
+{
     modelMatrix_ = modelMatrix;
     normalMatrix_ = glm::transpose(glm::inverse(glm::mat3(modelMatrix_)));
 }
 
-template class sim::RendererHelper<sim::PosNormTexVertex>;
-template class sim::RendererHelper<sim::PosVertex>;
+template
+class sim::RendererHelper<sim::PosNormTexVertex>;
+template
+class sim::RendererHelper<sim::PosVertex>;
 
-template struct sim::DrawData<sim::PosNormTexVertex>;
-template struct sim::DrawData<sim::PosVertex>;
+template
+struct sim::DrawData<sim::PosNormTexVertex>;
+template
+struct sim::DrawData<sim::PosVertex>;
 
 } // namespace sim

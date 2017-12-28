@@ -2,33 +2,34 @@
 
 rtDeclareVariable(PerRayData, prd_current, rtPayload,
 
-                  );
+);
 
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay,
 
-                  );
+);
 
 rtDeclareVariable(uint2, launch_index, rtLaunchIndex,
 
-                  );
+);
 
-rtDeclareVariable(unsigned int, surface_ray_type, ,
+rtDeclareVariable(unsigned int, surface_ray_type,,
 
-                  );
+);
 
-rtDeclareVariable(float, scene_epsilon, ,
+rtDeclareVariable(float, scene_epsilon,,
 
-                  );
+);
 
 rtDeclareVariable(rtObject,
-                  top_object,
+    top_object,
 
-                  , );
+, );
 
 rtBuffer<float4, 2> output_buffer;
 
 RT_PROGRAM
-void pinhole_camera() {
+void pinhole_camera()
+{
     float3 ray_origin = make_float3(0.0f, 0.0f, -5.0f);
     float3 ray_direction = make_float3(0.0f, 0.0f, 1.0f);
 
@@ -44,21 +45,23 @@ void pinhole_camera() {
 } // pinhole_camera
 
 rtDeclareVariable(float3,
-                  bg_color,
+    bg_color,
 
-                  , );
+, );
 
 RT_PROGRAM
-void miss() {
+void miss()
+{
     prd_current.result = bg_color;
 }
 
 rtDeclareVariable(float3,
-                  error_color,
+    error_color,
 
-                  , );
+, );
 
 RT_PROGRAM
-void exception() {
+void exception()
+{
     output_buffer[launch_index] = make_float4(error_color, 1.0);
 }

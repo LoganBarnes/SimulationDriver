@@ -6,30 +6,33 @@
 #include <functional>
 #include <string>
 
-namespace sim {
+namespace sim
+{
 
-template <typename Vertex>
-struct DrawData {
+template<typename Vertex>
+struct DrawData
+{
     std::vector<Vertex> vbo;
     std::vector<unsigned> ibo;
     std::vector<sim::VAOElement> vaoElements;
 };
 
-template <typename Vertex>
-class RendererHelper {
+template<typename Vertex>
+class RendererHelper
+{
 public:
     using DataFun = std::function<DrawData<Vertex>(void)>;
 
     explicit RendererHelper(std::string vertShader = "");
 
-    void onRender(float alpha, const Camera* pCamera) const;
+    void onRender(float alpha, const Camera *pCamera) const;
 
     void onGuiRender();
 
     void onResize(int width, int height);
 
     void customRender(float alpha,
-                      const Camera* pCamera,
+                      const Camera *pCamera,
                       GLenum drawMode = GL_TRIANGLE_STRIP,
                       int displayMode = 5,
                       glm::vec3 shapeColor = glm::vec3{0.7},
@@ -40,8 +43,8 @@ public:
 
     void renderToFramebuffer(int width,
                              int height,
-                             const std::shared_ptr<GLuint>& spColorTex = nullptr,
-                             const std::shared_ptr<GLuint>& spDepthTex = nullptr);
+                             const std::shared_ptr<GLuint> &spColorTex = nullptr,
+                             const std::shared_ptr<GLuint> &spDepthTex = nullptr);
 
     void rebuild_mesh();
 
@@ -55,10 +58,10 @@ public:
     bool isUsingWireframe() const;
     bool isShowNormals() const;
     int getDisplayMode() const;
-    const glm::vec3& getShapeColor() const;
+    const glm::vec3 &getShapeColor() const;
     float getShapeRoughness() const;
-    const glm::vec3& getShapeIor() const;
-    const glm::vec3& getLightDir() const;
+    const glm::vec3 &getShapeIor() const;
+    const glm::vec3 &getLightDir() const;
     int getPointSize() const;
     float getNormalScale() const;
     GLenum getDrawMode() const;
@@ -69,17 +72,17 @@ public:
     void setUsingWireframe(bool usingWireframe);
     void setShowNormals(bool showNormals);
     void setDisplayMode(int displayMode);
-    void setShapeColor(const glm::vec3& shapeColor);
+    void setShapeColor(const glm::vec3 &shapeColor);
     void setShapeRoughness(float shapeRoughness);
-    void setShapeIor(const glm::vec3& shapeIor);
-    void setLightDir(const glm::vec3& lightDir);
+    void setShapeIor(const glm::vec3 &shapeIor);
+    void setLightDir(const glm::vec3 &lightDir);
     void setPointSize(int pointSize);
     void setNormalScale(float normalScale);
-    void setDataFun(const DataFun& dataFun);
+    void setDataFun(const DataFun &dataFun);
     void setDrawMode(GLenum drawMode);
 
-    const glm::mat4& getModelMatrix() const;
-    void setModelMatrix(const glm::mat4& modelMatrix);
+    const glm::mat4 &getModelMatrix() const;
+    void setModelMatrix(const glm::mat4 &modelMatrix);
 
 private:
     SeparablePipeline glIds_;

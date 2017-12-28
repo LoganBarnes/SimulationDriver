@@ -24,36 +24,36 @@
 #include <optixu/optixu_aabb_namespace.h>
 
 rtDeclareVariable(float3,
-                  boxmin,
+    boxmin,
 
-                  , );
+, );
 
 rtDeclareVariable(float3,
-                  boxmax,
+    boxmax,
 
-                  , );
+, );
 
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay,
 
-                  );
+);
 
 rtDeclareVariable(float3,
-                  texcoord,
-                  attribute
+    texcoord,
+    attribute
 
-                      texcoord, );
-
-rtDeclareVariable(float3,
-                  geometric_normal,
-                  attribute
-
-                      geometric_normal, );
+texcoord, );
 
 rtDeclareVariable(float3,
-                  shading_normal,
-                  attribute
+    geometric_normal,
+    attribute
 
-                      shading_normal, );
+geometric_normal, );
+
+rtDeclareVariable(float3,
+    shading_normal,
+    attribute
+
+shading_normal, );
 
 ///
 /// \brief boxnormal
@@ -62,7 +62,8 @@ rtDeclareVariable(float3,
 ///
 static __device__ float3
 
-boxnormal(float t) {
+boxnormal(float t)
+{
     float3 t0 = (boxmin - ray.origin) / ray.direction;
     float3 t1 = (boxmax - ray.origin) / ray.direction;
     float3 neg = make_float3(t == t0.x ? 1 : 0, t == t0.y ? 1 : 0, t == t0.z ? 1 : 0);
@@ -75,7 +76,8 @@ boxnormal(float t) {
 /// \brief box_intersect
 ///
 RT_PROGRAM
-void box_intersect(int) {
+void box_intersect(int)
+{
     float3 t0 = (boxmin - ray.origin) / ray.direction;
     float3 t1 = (boxmax - ray.origin) / ray.direction;
     float3 near = fminf(t0, t1);
@@ -106,7 +108,8 @@ void box_intersect(int) {
 } // box_intersect
 
 RT_PROGRAM
-void box_bounds(int, float result[6]) {
-    optix::Aabb* pAabb = reinterpret_cast<optix::Aabb*>(result);
+void box_bounds(int, float result[6])
+{
+    optix::Aabb *pAabb = reinterpret_cast<optix::Aabb *>(result);
     pAabb->set(boxmin, boxmax);
 }
