@@ -65,7 +65,7 @@ std::string read_file(const std::string filePath)
 
 std::shared_ptr<GLuint> create_shader(GLenum shaderType, const std::string filePath)
 {
-    std::shared_ptr<GLuint> spShader(new GLuint, [](auto* pID) {
+    std::shared_ptr<GLuint> spShader(new GLuint, [](auto *pID) {
         glDeleteShader(*pID);
         delete pID;
     });
@@ -131,7 +131,7 @@ void create_shader(IdVec *pIds, const std::string filePath, const Shaders... sha
 
 std::shared_ptr<GLuint> create_program(const IdVec shaderIds)
 {
-    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateProgram()), [shaderIds](auto* pID) {
+    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateProgram()), [shaderIds](auto *pID) {
         for (auto &spShader : shaderIds) {
             glDeleteShader(*spShader);
         }
@@ -178,7 +178,7 @@ std::shared_ptr<GLuint> create_separable_program(GLenum shaderType, const std::s
     std::string shaderStr = read_file(filePath);
     const char *shaderSource = shaderStr.c_str();
 
-    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateShaderProgramv(shaderType, 1, &shaderSource)), [](auto* pId) {
+    std::shared_ptr<GLuint> spProgram(new GLuint(glCreateShaderProgramv(shaderType, 1, &shaderSource)), [](auto *pId) {
         glDeleteProgram(*pId);
         delete pId;
     });
@@ -354,7 +354,7 @@ std::shared_ptr<GLuint> OpenGLHelper::createTextureArray(GLsizei width,
 {
     GLuint tex;
     glGenTextures(1, &tex);
-    std::shared_ptr<GLuint> spTexture(new GLuint(tex), [](auto* pID) {
+    std::shared_ptr<GLuint> spTexture(new GLuint(tex), [](auto *pID) {
         glDeleteTextures(1, pID);
         delete pID;
     });
@@ -390,7 +390,7 @@ std::shared_ptr<GLuint> OpenGLHelper::createVao(const std::shared_ptr<GLuint> &s
 {
     GLuint vao;
     glGenVertexArrays(1, &vao);
-    std::shared_ptr<GLuint> spVao(new GLuint(vao), [](auto* pID) {
+    std::shared_ptr<GLuint> spVao(new GLuint(vao), [](auto *pID) {
         glDeleteVertexArrays(1, pID);
         delete pID;
     });
@@ -472,7 +472,7 @@ std::shared_ptr<GLuint> OpenGLHelper::createFramebuffer(GLsizei width,
     if (!spDepthTex) {
         GLuint rbo;
         glGenRenderbuffers(1, &rbo);
-        spRbo = std::shared_ptr<GLuint>(new GLuint(rbo), [](auto* pID) {
+        spRbo = std::shared_ptr<GLuint>(new GLuint(rbo), [](auto *pID) {
             glDeleteRenderbuffers(1, pID);
             delete pID;
         });
@@ -480,7 +480,7 @@ std::shared_ptr<GLuint> OpenGLHelper::createFramebuffer(GLsizei width,
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
-    spFbo = std::shared_ptr<GLuint>(new GLuint(fbo), [spRbo](auto* pID) {
+    spFbo = std::shared_ptr<GLuint>(new GLuint(fbo), [spRbo](auto *pID) {
         glDeleteFramebuffers(1, pID);
         delete pID;
     });
