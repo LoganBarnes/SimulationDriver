@@ -36,7 +36,7 @@ int WindowManager::create_window(const std::string& title, int width, int height
     width = 640;
     height = 480;
 #else
-    if (width == 0 || height == 0) {
+    if (!title.empty() && (width == 0 || height == 0)) {
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwWindowHint(GLFW_RED_BITS, mode->redBits);
         glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
