@@ -10,21 +10,21 @@
 namespace sim {
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<2>, int w, int h, SimData* pSimData, Args... args)
+auto make_child(priority_tag<2>, int w, int h, SimData *pSimData, Args... args)
     -> decltype(T(w, h, pSimData, args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(w, h, pSimData, args...);
 }
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<1>, int w, int h, SimData*, Args... args)
+auto make_child(priority_tag<1>, int w, int h, SimData *, Args... args)
     -> decltype(T(w, h, args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(w, h, args...);
 }
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<0>, int, int, SimData*, Args... args) -> decltype(T(args...), std::unique_ptr<T>())
+auto make_child(priority_tag<0>, int, int, SimData *, Args... args) -> decltype(T(args...), std::unique_ptr<T>())
 {
     return std::make_unique<T>(args...);
 }
@@ -36,37 +36,37 @@ public:
     OpenGLSimulation();
 
     template <typename... Args>
-    explicit OpenGLSimulation(const SimInitData& initData, Args... args);
+    explicit OpenGLSimulation(const SimInitData &initData, Args... args);
 
     void update(double worldTime, double timeStep);
     void render(int width, int height, double alpha, bool eventDriven);
     bool paused() const;
 
-    const Child& get_child_sim() const;
+    const Child &get_child_sim() const;
 
 private:
     std::unique_ptr<Child> child_{nullptr};
     std::unique_ptr<SimCallbacks<Child>> callbacks_{nullptr};
 
     template <class T = Child>
-    auto updateChild(T& child, double worldTime, double timeStep, int i)
+    auto updateChild(T &child, double worldTime, double timeStep, int i)
         -> decltype(child.onUpdate(worldTime, timeStep), void());
 
     template <class T = Child>
-    auto updateChild(T& child, double worldTime, double timeStep, long l) -> decltype(void());
+    auto updateChild(T &child, double worldTime, double timeStep, long l) -> decltype(void());
 
     template <class T = Child>
-    auto renderChild(T& child, int width, int height, double alpha, int i)
+    auto renderChild(T &child, int width, int height, double alpha, int i)
         -> decltype(child.onRender(width, height, alpha), void());
 
     template <class T = Child>
-    auto renderChild(T& child, int width, int height, double alpha, long l) -> decltype(void());
+    auto renderChild(T &child, int width, int height, double alpha, long l) -> decltype(void());
 
     template <class T = Child>
-    auto renderChildGui(T& child, int width, int height, int i) -> decltype(child.onGuiRender(width, height), void());
+    auto renderChildGui(T &child, int width, int height, int i) -> decltype(child.onGuiRender(width, height), void());
 
     template <class T = Child>
-    auto renderChildGui(T& child, int width, int height, long l) -> decltype(void());
+    auto renderChildGui(T &child, int width, int height, long l) -> decltype(void());
 };
 
 template <typename Child>
@@ -76,7 +76,7 @@ OpenGLSimulation<Child>::OpenGLSimulation() : OpenGLSimulation(SimInitData{})
 
 template <typename Child>
 template <typename... Args>
-OpenGLSimulation<Child>::OpenGLSimulation(const SimInitData& initData, Args... args)
+OpenGLSimulation<Child>::OpenGLSimulation(const SimInitData &initData, Args... args)
     : SimDriver<OpenGLSimulation<Child>>(initData)
 {
     sim::OpenGLHelper::setDefaults();
@@ -119,14 +119,14 @@ bool OpenGLSimulation<Child>::paused() const
 }
 
 template <typename Child>
-const Child& OpenGLSimulation<Child>::get_child_sim() const
+const Child &OpenGLSimulation<Child>::get_child_sim() const
 {
     return *child_;
 }
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::updateChild(T& child, double worldTime, double timeStep, int)
+auto OpenGLSimulation<Child>::updateChild(T &child, double worldTime, double timeStep, int)
     -> decltype(child.onUpdate(worldTime, timeStep), void())
 {
     child.onUpdate(worldTime, timeStep);
@@ -134,13 +134,13 @@ auto OpenGLSimulation<Child>::updateChild(T& child, double worldTime, double tim
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::updateChild(T&, double, double, long) -> decltype(void())
+auto OpenGLSimulation<Child>::updateChild(T &, double, double, long) -> decltype(void())
 {
 }
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::renderChild(T& child, int width, int height, double alpha, int)
+auto OpenGLSimulation<Child>::renderChild(T &child, int width, int height, double alpha, int)
     -> decltype(child.onRender(width, height, alpha), void())
 {
     child.onRender(width, height, alpha);
@@ -148,13 +148,13 @@ auto OpenGLSimulation<Child>::renderChild(T& child, int width, int height, doubl
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::renderChild(T&, int, int, double, long) -> decltype(void())
+auto OpenGLSimulation<Child>::renderChild(T &, int, int, double, long) -> decltype(void())
 {
 }
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::renderChildGui(T& child, int width, int height, int)
+auto OpenGLSimulation<Child>::renderChildGui(T &child, int width, int height, int)
     -> decltype(child.onGuiRender(width, height), void())
 {
     child.onGuiRender(width, height);
@@ -162,7 +162,7 @@ auto OpenGLSimulation<Child>::renderChildGui(T& child, int width, int height, in
 
 template <typename Child>
 template <typename T>
-auto OpenGLSimulation<Child>::renderChildGui(T&, int, int, long) -> decltype(void())
+auto OpenGLSimulation<Child>::renderChildGui(T &, int, int, long) -> decltype(void())
 {
 }
 

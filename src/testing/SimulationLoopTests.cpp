@@ -4,7 +4,7 @@
 namespace {
 struct EmptySim
 {
-    EmptySim(int, int, sim::SimData* data) : sim_data(*data) {}
+    EmptySim(int, int, sim::SimData *data) : sim_data(*data) {}
 
     void onUpdate(double t, double)
     {
@@ -12,7 +12,7 @@ struct EmptySim
         ++num_updates;
     }
 
-    sim::SimData& sim_data;
+    sim::SimData &sim_data;
     double sim_time{-1.f};
     std::size_t num_updates{0};
 };

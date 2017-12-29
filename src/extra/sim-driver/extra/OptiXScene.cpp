@@ -3,7 +3,7 @@
 
 namespace sim {
 
-OptiXScene::OptiXScene(optix::Context& context) : material_(context->createMaterial())
+OptiXScene::OptiXScene(optix::Context &context) : material_(context->createMaterial())
 {
     std::vector<float> data = {-1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f};
 

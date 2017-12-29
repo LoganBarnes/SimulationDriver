@@ -17,7 +17,7 @@ public:
 
     void setMeshDataFunction(MeshDataFun dataFun);
 
-    const sim::DrawData<V>& getMeshData() const;
+    const sim::DrawData<V> &getMeshData() const;
 
     void updateData();
 

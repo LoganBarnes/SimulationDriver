@@ -4,7 +4,7 @@
 class Simulator
 {
 public:
-    explicit Simulator(int, int, optix::Context& context, sim::SimData* pSimData) : simData_{*pSimData}, scene_{context}
+    explicit Simulator(int, int, optix::Context &context, sim::SimData *pSimData) : simData_{*pSimData}, scene_{context}
     {
         simData_.cameraMover.setUsingOrbitMode(true);
         simData_.cameraMover.setOrbitOrigin({0, 0, 0});
@@ -19,7 +19,7 @@ public:
         simData_.cameraMover.yaw(static_cast<float>(timeStep));
     }
 
-    void onRender(int width, int height, double alpha, optix::Context& context)
+    void onRender(int width, int height, double alpha, optix::Context &context)
     {
         auto a = static_cast<float>(alpha);
 
@@ -41,17 +41,17 @@ public:
         ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Window", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-            ImGuiIO& io = ImGui::GetIO();
+            ImGuiIO &io = ImGui::GetIO();
             ImGui::Text("Framerate: %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         }
         ImGui::End();
         ImGui::PopStyleVar();
     }
 
-    void keyCallback(GLFWwindow*, int, int, int, int mods) { simData_.paused = (mods == GLFW_MOD_SHIFT); }
+    void keyCallback(GLFWwindow *, int, int, int, int mods) { simData_.paused = (mods == GLFW_MOD_SHIFT); }
 
 private:
-    sim::SimData& simData_;
+    sim::SimData &simData_;
     sim::Camera prevCam_;
 
     sim::OptiXScene scene_;
@@ -61,7 +61,7 @@ int main()
 {
     try {
         sim::OptiXSimulation<Simulator>{{"OptiX Test"}}.runNoFasterThanRealTimeLoop();
-    } catch (const std::exception& e) {
+    } catch (const std::exception &e) {
         std::cerr << "Program failed: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }

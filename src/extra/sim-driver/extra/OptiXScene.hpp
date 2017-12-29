@@ -8,7 +8,7 @@ class OptiXScene
 {
 
 public:
-    explicit OptiXScene(optix::Context& context);
+    explicit OptiXScene(optix::Context &context);
 
 private:
     optix::Material material_;

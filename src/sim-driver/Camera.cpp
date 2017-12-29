@@ -18,7 +18,7 @@ TCamera<T>::TCamera()
 }
 
 template <typename T>
-void TCamera<T>::lookAt(const glm::tvec3<T>& eye, const glm::tvec3<T>& point, const glm::tvec3<T>& up)
+void TCamera<T>::lookAt(const glm::tvec3<T> &eye, const glm::tvec3<T> &point, const glm::tvec3<T> &up)
 {
     eyeVector_ = eye;
     lookVector_ = glm::normalize(point - eyeVector_);
@@ -55,27 +55,27 @@ void TCamera<T>::ortho(T left, T right, T bottom, T top)
 }
 
 template <typename T>
-const glm::tvec3<T>& TCamera<T>::getEyeVector() const
+const glm::tvec3<T> &TCamera<T>::getEyeVector() const
 {
     return eyeVector_;
 }
 template <typename T>
-const glm::tvec3<T>& TCamera<T>::getLookVector() const
+const glm::tvec3<T> &TCamera<T>::getLookVector() const
 {
     return lookVector_;
 }
 template <typename T>
-const glm::tvec3<T>& TCamera<T>::getUpVector() const
+const glm::tvec3<T> &TCamera<T>::getUpVector() const
 {
     return upVector_;
 }
 template <typename T>
-const glm::tvec3<T>& TCamera<T>::getRightVector() const
+const glm::tvec3<T> &TCamera<T>::getRightVector() const
 {
     return rightVector_;
 }
 template <typename T>
-const glm::tmat4x4<T>& TCamera<T>::getViewFromWorldMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getViewFromWorldMatrix() const
 {
     return viewFromWorldMatrix_;
 }
@@ -105,7 +105,7 @@ T TCamera<T>::getFarPlane() const
     return farPlane_;
 }
 template <typename T>
-const glm::tmat4x4<T>& TCamera<T>::getPerspectiveScreenFromViewMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getPerspectiveScreenFromViewMatrix() const
 {
     return perspectiveScreenFromViewMatrix_;
 }
@@ -130,33 +130,33 @@ T TCamera<T>::getOrthoTop() const
     return orthoTop_;
 }
 template <typename T>
-const glm::tmat4x4<T>& TCamera<T>::getOrthographicScreenFromViewMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getOrthographicScreenFromViewMatrix() const
 {
     return orthographicScreenFromViewMatrix_;
 }
 template <typename T>
-const glm::tmat4x4<T>& TCamera<T>::getPerspectiveScreenFromWorldMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getPerspectiveScreenFromWorldMatrix() const
 {
     return perspectiveScreenFromWorldMatrix_;
 }
 template <typename T>
-const glm::tmat4x4<T>& TCamera<T>::getOrthoScreenFromWorldMatrix() const
+const glm::tmat4x4<T> &TCamera<T>::getOrthoScreenFromWorldMatrix() const
 {
     return orthoScreenFromWorldMatrix_;
 }
 
 template <typename T>
-void TCamera<T>::setEyeVector(const glm::tvec3<T>& eyeVector)
+void TCamera<T>::setEyeVector(const glm::tvec3<T> &eyeVector)
 {
     lookAt(eyeVector, eyeVector + lookVector_, upVector_);
 }
 template <typename T>
-void TCamera<T>::setLookVector(const glm::tvec3<T>& lookVector)
+void TCamera<T>::setLookVector(const glm::tvec3<T> &lookVector)
 {
     lookAt(eyeVector_, eyeVector_ + lookVector, upVector_);
 }
 template <typename T>
-void TCamera<T>::setUpVector(const glm::tvec3<T>& upVector)
+void TCamera<T>::setUpVector(const glm::tvec3<T> &upVector)
 {
     lookAt(eyeVector_, eyeVector_ + lookVector_, upVector);
 }

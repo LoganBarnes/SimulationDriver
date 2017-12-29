@@ -13,7 +13,7 @@ struct SecondSim
 
 struct ThirdSim
 {
-    ThirdSim(int, int, sim::SimData*) {}
+    ThirdSim(int, int, sim::SimData *) {}
 };
 
 } // namespace

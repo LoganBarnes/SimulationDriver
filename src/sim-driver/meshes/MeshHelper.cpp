@@ -41,7 +41,7 @@ bool MeshHelper<V>::configureGui()
 }
 
 template <typename V>
-const sim::DrawData<V>& MeshHelper<V>::getMeshData() const
+const sim::DrawData<V> &MeshHelper<V>::getMeshData() const
 {
     return data_;
 }

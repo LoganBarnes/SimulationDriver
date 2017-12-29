@@ -22,21 +22,21 @@ template <typename Child>
 class SimDriver
 {
 public:
-    SimDriver(const SimDriver&) = delete;
-    SimDriver& operator=(const SimDriver&) = delete;
+    SimDriver(const SimDriver &) = delete;
+    SimDriver &operator=(const SimDriver &) = delete;
 
     void runEventLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
     void runAsFastAsPossibleLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
     void runNoFasterThanRealTimeLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
 
     template <typename C>
-    void setCallbackClass(C* callbacks);
+    void setCallbackClass(C *callbacks);
 
     int getWidth() const;
     int getHeight() const;
 
-    GLFWwindow* getWindow();
-    const GLFWwindow* getWindow() const;
+    GLFWwindow *getWindow();
+    const GLFWwindow *getWindow() const;
 
     SimData simData;
 
@@ -44,8 +44,8 @@ protected:
     explicit SimDriver(SimInitData initData);
 
     ~SimDriver() = default;
-    SimDriver(SimDriver&&) noexcept = default;
-    SimDriver& operator=(SimDriver&&) noexcept = default;
+    SimDriver(SimDriver &&) noexcept = default;
+    SimDriver &operator=(SimDriver &&) noexcept = default;
 
 private:
     double timeStep_{1.0 / 60.0};
@@ -63,7 +63,7 @@ private:
 template <typename Child>
 SimDriver<Child>::SimDriver(SimInitData initData) : callbacks_{&simData}
 {
-    auto& wm = WindowManager::instance();
+    auto &wm = WindowManager::instance();
 
     window_idx_ = wm.create_window(initData.title, initData.width, initData.height, initData.samples);
 
@@ -148,22 +148,22 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop(std::size_t max_iterations)
 
 template <typename Child>
 template <typename C>
-void SimDriver<Child>::setCallbackClass(C* pCallbacks)
+void SimDriver<Child>::setCallbackClass(C *pCallbacks)
 {
     glfwSetWindowUserPointer(getWindow(), pCallbacks);
 
-    glfwSetFramebufferSizeCallback(getWindow(), [](GLFWwindow* pWindow, int width, int height) {
-        static_cast<C*>(glfwGetWindowUserPointer(pWindow))->framebufferSizeCallback(pWindow, width, height);
+    glfwSetFramebufferSizeCallback(getWindow(), [](GLFWwindow *pWindow, int width, int height) {
+        static_cast<C *>(glfwGetWindowUserPointer(pWindow))->framebufferSizeCallback(pWindow, width, height);
     });
 
-    glfwSetWindowFocusCallback(getWindow(), [](GLFWwindow* pWindow, int focus) {
-        static_cast<C*>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus);
+    glfwSetWindowFocusCallback(getWindow(), [](GLFWwindow *pWindow, int focus) {
+        static_cast<C *>(glfwGetWindowUserPointer(pWindow))->windowFocusCallback(pWindow, focus);
     });
 
-    glfwSetMouseButtonCallback(getWindow(), [](GLFWwindow* pWindow, int button, int action, int mods) {
-        ImGuiIO& io = ImGui::GetIO();
+    glfwSetMouseButtonCallback(getWindow(), [](GLFWwindow *pWindow, int button, int action, int mods) {
+        ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse) {
-            static_cast<C*>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->mouseButtonCallback(pWindow, button, action, mods);
         } else {
             if (action == GLFW_PRESS && button >= 0 && button < 3) {
                 io.MouseDown[button] = true;
@@ -171,10 +171,10 @@ void SimDriver<Child>::setCallbackClass(C* pCallbacks)
         }
     });
 
-    glfwSetKeyCallback(getWindow(), [](GLFWwindow* pWindow, int key, int scancode, int action, int mods) {
-        ImGuiIO& io = ImGui::GetIO();
+    glfwSetKeyCallback(getWindow(), [](GLFWwindow *pWindow, int key, int scancode, int action, int mods) {
+        ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard) {
-            static_cast<C*>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->keyCallback(pWindow, key, scancode, action, mods);
         } else {
             if (action == GLFW_PRESS) {
                 io.KeysDown[key] = true;
@@ -188,26 +188,26 @@ void SimDriver<Child>::setCallbackClass(C* pCallbacks)
         }
     });
 
-    glfwSetCursorPosCallback(getWindow(), [](GLFWwindow* pWindow, double xpos, double ypos) {
-        ImGuiIO& io = ImGui::GetIO();
+    glfwSetCursorPosCallback(getWindow(), [](GLFWwindow *pWindow, double xpos, double ypos) {
+        ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse) {
-            static_cast<C*>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->cursorPosCallback(pWindow, xpos, ypos);
         }
     });
 
-    glfwSetScrollCallback(getWindow(), [](GLFWwindow* pWindow, double xoffset, double yoffset) {
-        ImGuiIO& io = ImGui::GetIO();
+    glfwSetScrollCallback(getWindow(), [](GLFWwindow *pWindow, double xoffset, double yoffset) {
+        ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureMouse) {
-            static_cast<C*>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->scrollCallback(pWindow, xoffset, yoffset);
         } else {
             io.MouseWheel += static_cast<float>(yoffset); // the fractional mouse wheel. 1.0 unit 5 lines
         }
     });
 
-    glfwSetCharCallback(getWindow(), [](GLFWwindow* pWindow, unsigned codepoint) {
-        ImGuiIO& io = ImGui::GetIO();
+    glfwSetCharCallback(getWindow(), [](GLFWwindow *pWindow, unsigned codepoint) {
+        ImGuiIO &io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard) {
-            static_cast<C*>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint);
+            static_cast<C *>(glfwGetWindowUserPointer(pWindow))->charCallback(pWindow, codepoint);
         } else if (io.WantCaptureKeyboard && codepoint > 0 && codepoint < 0x10000) {
             io.AddInputCharacter(static_cast<unsigned short>(codepoint));
         }
@@ -217,7 +217,7 @@ void SimDriver<Child>::setCallbackClass(C* pCallbacks)
 template <typename Child>
 void SimDriver<Child>::update()
 {
-    static_cast<Child*>(this)->update(worldTime_, timeStep_);
+    static_cast<Child *>(this)->update(worldTime_, timeStep_);
 }
 
 template <typename Child>
@@ -225,24 +225,24 @@ void SimDriver<Child>::render(double alpha, bool eventBased)
 {
     int w, h;
     glfwGetWindowSize(getWindow(), &w, &h);
-    static_cast<Child*>(this)->render(w, h, alpha, eventBased);
+    static_cast<Child *>(this)->render(w, h, alpha, eventBased);
     glfwSwapBuffers(getWindow());
 }
 
 template <typename Child>
 bool SimDriver<Child>::isPaused() const
 {
-    return static_cast<const Child*>(this)->paused();
+    return static_cast<const Child *>(this)->paused();
 }
 
 template <typename Child>
-GLFWwindow* SimDriver<Child>::getWindow()
+GLFWwindow *SimDriver<Child>::getWindow()
 {
     return WindowManager::instance().get_window(window_idx_);
 }
 
 template <typename Child>
-const GLFWwindow* SimDriver<Child>::getWindow() const
+const GLFWwindow *SimDriver<Child>::getWindow() const
 {
     return WindowManager::instance().get_window(window_idx_);
 }

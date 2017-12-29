@@ -110,6 +110,6 @@ void box_intersect(int)
 RT_PROGRAM
 void box_bounds(int, float result[6])
 {
-    optix::Aabb* pAabb = reinterpret_cast<optix::Aabb*>(result);
+    optix::Aabb *pAabb = reinterpret_cast<optix::Aabb *>(result);
     pAabb->set(boxmin, boxmax);
 }

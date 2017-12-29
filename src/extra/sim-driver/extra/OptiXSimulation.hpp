@@ -11,21 +11,21 @@
 namespace sim {
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<2>, optix::Context& context, int w, int h, SimData* pSimData, Args... args)
+auto make_child(priority_tag<2>, optix::Context &context, int w, int h, SimData *pSimData, Args... args)
     -> decltype(T(w, h, context, pSimData, args...))
 {
     return T(w, h, context, pSimData, args...);
 }
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<1>, optix::Context& context, int w, int h, SimData*, Args... args)
+auto make_child(priority_tag<1>, optix::Context &context, int w, int h, SimData *, Args... args)
     -> decltype(T(w, h, context, args...))
 {
     return T(w, h, context, args...);
 }
 
 template <typename T, typename... Args>
-auto make_child(priority_tag<0>, optix::Context& context, int, int, SimData*, Args... args)
+auto make_child(priority_tag<0>, optix::Context &context, int, int, SimData *, Args... args)
     -> decltype(T(context, args...))
 {
     return T(context, args...);
@@ -38,15 +38,15 @@ public:
     OptiXSimulation();
 
     template <typename... Args>
-    explicit OptiXSimulation(const SimInitData& initData, Args... args);
+    explicit OptiXSimulation(const SimInitData &initData, Args... args);
 
     void update(double worldTime, double timeStep);
     void render(int width, int height, double alpha, bool eventDriven);
     bool paused() const;
 
-    void framebufferSizeCallback(GLFWwindow* pWindow, int width, int height);
+    void framebufferSizeCallback(GLFWwindow *pWindow, int width, int height);
 
-    optix::Context& context();
+    optix::Context &context();
 
 private:
     std::shared_ptr<optix::Context> spContext_;
@@ -62,25 +62,25 @@ private:
     std::shared_ptr<GLuint> texture_;
 
     template <class T>
-    auto updateChild(T& child, double worldTime, double timeStep, int i)
+    auto updateChild(T &child, double worldTime, double timeStep, int i)
         -> decltype(child.onUpdate(worldTime, timeStep), void());
 
     template <class T>
-    auto updateChild(T& child, double worldTime, double timeStep, long l) -> decltype(void());
+    auto updateChild(T &child, double worldTime, double timeStep, long l) -> decltype(void());
 
     template <class T>
-    auto renderChild(T& child, int width, int height, double alpha, optix::Context& context, int i)
+    auto renderChild(T &child, int width, int height, double alpha, optix::Context &context, int i)
         -> decltype(child.onRender(width, height, alpha, context), void());
 
     template <class T>
-    auto renderChild(T& child, int width, int height, double alpha, optix::Context& context, long l)
+    auto renderChild(T &child, int width, int height, double alpha, optix::Context &context, long l)
         -> decltype(void());
 
     template <class T>
-    auto renderChildGui(T& child, int width, int height, int i) -> decltype(child.onGuiRender(width, height), void());
+    auto renderChildGui(T &child, int width, int height, int i) -> decltype(child.onGuiRender(width, height), void());
 
     template <class T>
-    auto renderChildGui(T& child, int width, int height, long l) -> decltype(void());
+    auto renderChildGui(T &child, int width, int height, long l) -> decltype(void());
 };
 
 template <typename Child>
@@ -90,12 +90,12 @@ OptiXSimulation<Child>::OptiXSimulation() : OptiXSimulation(SimInitData{})
 
 template <typename Child>
 template <typename... Args>
-OptiXSimulation<Child>::OptiXSimulation(const SimInitData& initData, Args... args)
+OptiXSimulation<Child>::OptiXSimulation(const SimInitData &initData, Args... args)
     : SimDriver<OptiXSimulation<Child>>(initData),
       spContext_(new optix::Context(optix::Context::create()),
                  [](auto p) {
                      DEBUG_PRINT("Destroying OptiX context");
-                     static_assert(std::is_same<decltype(p), optix::Context*>::value, "");
+                     static_assert(std::is_same<decltype(p), optix::Context *>::value, "");
                      (*p)->destroy();
                      delete p;
                  }),
@@ -175,20 +175,20 @@ bool OptiXSimulation<Child>::paused() const
 
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::updateChild(T& child, double worldTime, double timeStep, int)
+auto OptiXSimulation<Child>::updateChild(T &child, double worldTime, double timeStep, int)
     -> decltype(child.onUpdate(worldTime, timeStep), void())
 {
     child.onUpdate(worldTime, timeStep);
 }
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::updateChild(T&, double, double, long) -> decltype(void())
+auto OptiXSimulation<Child>::updateChild(T &, double, double, long) -> decltype(void())
 {
 }
 
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::renderChild(T& child, int width, int height, double alpha, optix::Context& context, int)
+auto OptiXSimulation<Child>::renderChild(T &child, int width, int height, double alpha, optix::Context &context, int)
     -> decltype(child.onRender(width, height, alpha, context), void())
 {
     optix::Buffer buffer = context["output_buffer"]->getBuffer();
@@ -222,7 +222,7 @@ auto OptiXSimulation<Child>::renderChild(T& child, int width, int height, double
 }
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::renderChild(T&, int, int, double alpha, optix::Context& context, long) -> decltype(void())
+auto OptiXSimulation<Child>::renderChild(T &, int, int, double alpha, optix::Context &context, long) -> decltype(void())
 {
     optix::Buffer buffer = context["output_buffer"]->getBuffer();
     RTsize buffer_width, buffer_height;
@@ -256,19 +256,19 @@ auto OptiXSimulation<Child>::renderChild(T&, int, int, double alpha, optix::Cont
 
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::renderChildGui(T& child, int width, int height, int)
+auto OptiXSimulation<Child>::renderChildGui(T &child, int width, int height, int)
     -> decltype(child.onGuiRender(width, height), void())
 {
     child.onGuiRender(width, height);
 }
 template <typename Child>
 template <typename T>
-auto OptiXSimulation<Child>::renderChildGui(T&, int, int, long) -> decltype(void())
+auto OptiXSimulation<Child>::renderChildGui(T &, int, int, long) -> decltype(void())
 {
 }
 
 template <typename Child>
-void OptiXSimulation<Child>::framebufferSizeCallback(GLFWwindow*, int width, int height)
+void OptiXSimulation<Child>::framebufferSizeCallback(GLFWwindow *, int width, int height)
 {
     optix::Buffer buffer = context()["output_buffer"]->getBuffer();
 
@@ -286,7 +286,7 @@ void OptiXSimulation<Child>::framebufferSizeCallback(GLFWwindow*, int width, int
 }
 
 template <typename Child>
-optix::Context& OptiXSimulation<Child>::context()
+optix::Context &OptiXSimulation<Child>::context()
 {
     return *spContext_;
 }

@@ -60,7 +60,7 @@ T TCameraMover<T>::getOrbitOffsetDistance() const
     return orbitOffsetDistance_;
 }
 template <typename T>
-const glm::tvec3<T>& TCameraMover<T>::getOrbitOrigin() const
+const glm::tvec3<T> &TCameraMover<T>::getOrbitOrigin() const
 {
     return orbitOrigin_;
 }
@@ -88,7 +88,7 @@ void TCameraMover<T>::setOrbitOffsetDistance(T orbitOffsetDistance)
     updateOrbitSettings();
 }
 template <typename T>
-void TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T>& orbitOrigin)
+void TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T> &orbitOrigin)
 {
     orbitOrigin_ = orbitOrigin;
     updateOrbitSettings();
