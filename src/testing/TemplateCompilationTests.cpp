@@ -20,18 +20,18 @@ struct ThirdSim
 
 TEST(OpenGLSimulationCompiles, compiles_with_default_constructor)
 {
-    sim::OpenGLSimulation<FirstSim> sim;
+    sim::OpenGLSimulation<FirstSim> sim{{""}};
     EXPECT_TRUE(true);
 }
 
 TEST(OpenGLSimulationCompiles, compiles_with_width_height_constructor)
 {
-    sim::OpenGLSimulation<SecondSim> sim;
+    sim::OpenGLSimulation<SecondSim> sim{{""}};
     EXPECT_TRUE(true);
 }
 
 TEST(OpenGLSimulationCompiles, compiles_with_SimData_constructor)
 {
-    sim::OpenGLSimulation<ThirdSim> sim;
+    sim::OpenGLSimulation<ThirdSim> sim{{""}};
     EXPECT_TRUE(true);
 }
