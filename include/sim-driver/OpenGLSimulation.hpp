@@ -42,6 +42,8 @@ public:
     void render(int width, int height, double alpha, bool eventDriven);
     bool paused() const;
 
+    const Child& get_child_sim() const;
+
 private:
     std::unique_ptr<Child> child_{nullptr};
     std::unique_ptr<SimCallbacks<Child>> callbacks_{nullptr};
@@ -114,6 +116,12 @@ template <typename Child>
 bool OpenGLSimulation<Child>::paused() const
 {
     return this->simData.paused;
+}
+
+template <typename Child>
+const Child& OpenGLSimulation<Child>::get_child_sim() const
+{
+    return *child_;
 }
 
 template <typename Child>
