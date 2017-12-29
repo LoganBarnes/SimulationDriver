@@ -5,9 +5,7 @@
 #include <sim-driver/SimData.hpp>
 
 #include <sim-driver/OpenGLTypes.hpp>
-#ifndef EGL_OFFSCREEN
 #include <sim-driver/WindowManager.hpp>
-#endif
 
 #include <string>
 #include <iostream>

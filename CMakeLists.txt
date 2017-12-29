@@ -246,6 +246,21 @@ if (${SIM_BUILD_TESTS})
     enable_testing()
 
     set(TEST_SOURCE_FILES
+            src/testing/include_checks/meshes/MeshFunctionsIncludeTest.cpp
+            src/testing/include_checks/meshes/MeshHelperIncludeTest.cpp
+            src/testing/include_checks/renderers/MeshRendererIncludeTest.cpp
+            src/testing/include_checks/renderers/RendererHelperIncludeTest.cpp
+            src/testing/include_checks/CallbackWrapperIncludeTest.cpp
+            src/testing/include_checks/CameraIncludeTest.cpp
+            src/testing/include_checks/CameraMoverIncludeTest.cpp
+            src/testing/include_checks/OpenGLHelperIncludeTest.cpp
+            src/testing/include_checks/OpenGLSimulationIncludeTest.cpp
+            src/testing/include_checks/OpenGLTypesIncludeTest.cpp
+            src/testing/include_checks/SimCallbacksIncludeTest.cpp
+            src/testing/include_checks/SimDataIncludeTest.cpp
+            src/testing/include_checks/SimDriverIncludeTest.cpp
+            src/testing/include_checks/WindowManagerIncludeTest.cpp
+
             src/testing/SimulationLoopTests.cpp
             src/testing/TemplateCompilationTests.cpp
             )
