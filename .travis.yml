@@ -25,7 +25,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && OFFSCREEN=OFF"
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && OFFSCREEN=ON"
 
 before_install:
   - eval "${MATRIX_EVAL}"
