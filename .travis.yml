@@ -65,7 +65,7 @@ script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir cmake-build-debug
   - cd cmake-build-debug
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DSIM_BUILD_TESTS=ON ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN ..
   - make -j
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then make SimDriver_coverage -j; fi;
@@ -95,5 +95,4 @@ after_success:
 
 notifications:
   on_success: never
-#  on_failure: always
-  on_failure: never # while playing around
+  on_failure: always
