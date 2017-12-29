@@ -8,24 +8,24 @@ dist: trusty
 
 matrix:
   include:
-#    - os: linux
-#      addons:
-#        apt:
-#          sources:
-#            - ubuntu-toolchain-r-test
-#          packages:
-#            - g++-6
-#            - mesa-utils
-#            - xorg-dev
-#            - libosmesa6-dev
-#            - lcov
-#      env:
-#        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && OFFSCREEN=ON"
-
-    - os: osx
-      osx_image: xcode8
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - mesa-utils
+            - xorg-dev
+            - libosmesa6-dev
+            - lcov
       env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && OFFSCREEN=ON"
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+#    - os: osx
+#      osx_image: xcode8
+#      env:
+#        - MATRIX_EVAL="CC=clang && CXX=clang++"
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -73,7 +73,7 @@ script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir cmake-build-debug
   - cd cmake-build-debug
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=${OFFSCREEN} ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=ON ..
   - make -j
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then make SimDriver_coverage -j; fi;
@@ -83,7 +83,7 @@ script:
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir cmake-build-release
   - cd cmake-build-release
-  - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=${OFFSCREEN} ..
+  - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=ON ..
   - make -j
   - ctest
   - ./SimDriverTests

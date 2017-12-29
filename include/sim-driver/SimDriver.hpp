@@ -143,7 +143,7 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop(std::size_t max_iterations)
         } else {
             WindowManager::instance().poll_events_non_blocking();
         }
-    } while (!glfwWindowShouldClose(getWindow()));
+    } while (!glfwWindowShouldClose(getWindow()) && iterations <= max_iterations);
 }
 
 template <typename Child>

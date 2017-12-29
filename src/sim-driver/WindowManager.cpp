@@ -37,19 +37,14 @@ int WindowManager::create_window(const std::string &title, int width, int height
     height = 480;
 #else
     if (width == 0 || height == 0) {
-        if (title.empty()) {
-            width = 640;
-            height = 480;
-        } else {
-            const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-            glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-            glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-            glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-            width = mode->width;
-            height = mode->height;
-        }
+        width = mode->width;
+        height = mode->height;
     }
 
     if (title.empty()) {
