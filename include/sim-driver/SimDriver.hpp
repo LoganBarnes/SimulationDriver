@@ -25,9 +25,9 @@ public:
     SimDriver(const SimDriver&) = delete;
     SimDriver& operator=(const SimDriver&) = delete;
 
-    void runEventLoop();
-    void runAsFastAsPossibleLoop();
-    void runNoFasterThanRealTimeLoop();
+    void runEventLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
+    void runAsFastAsPossibleLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
+    void runNoFasterThanRealTimeLoop(std::size_t max_iterations = std::numeric_limits<std::size_t>::max());
 
     template <typename C>
     void setCallbackClass(C* callbacks);
@@ -73,27 +73,31 @@ SimDriver<Child>::SimDriver(SimInitData initData) : callbacks_{&simData}
 }
 
 template <typename Child>
-void SimDriver<Child>::runEventLoop()
+void SimDriver<Child>::runEventLoop(std::size_t max_iterations)
 {
+    std::size_t iterations = 1;
     do {
         if (!isPaused()) {
             update();
             worldTime_ += timeStep_;
+            ++iterations;
         }
         render(1.0, true);
 
         WindowManager::instance().poll_events_blocking();
-    } while (!glfwWindowShouldClose(getWindow()));
+    } while (!glfwWindowShouldClose(getWindow()) && iterations <= max_iterations);
 }
 
 template <typename Child>
-void SimDriver<Child>::runAsFastAsPossibleLoop()
+void SimDriver<Child>::runAsFastAsPossibleLoop(std::size_t max_iterations)
 {
+    std::size_t iterations = 1;
     glfwSwapInterval(0);
     do {
         if (!isPaused()) {
             update();
             worldTime_ += timeStep_;
+            ++iterations;
         }
         render(1.0, isPaused());
 
@@ -102,12 +106,13 @@ void SimDriver<Child>::runAsFastAsPossibleLoop()
         } else {
             WindowManager::instance().poll_events_non_blocking();
         }
-    } while (!glfwWindowShouldClose(getWindow()));
+    } while (!glfwWindowShouldClose(getWindow()) && iterations <= max_iterations);
 }
 
 template <typename Child>
-void SimDriver<Child>::runNoFasterThanRealTimeLoop()
+void SimDriver<Child>::runNoFasterThanRealTimeLoop(std::size_t max_iterations)
 {
+    std::size_t iterations = 1;
     auto currentTime = std::chrono::steady_clock::now();
     double accumulator = 0.0;
 
@@ -125,6 +130,7 @@ void SimDriver<Child>::runNoFasterThanRealTimeLoop()
                 update();
                 worldTime_ += timeStep_;
                 accumulator -= timeStep_;
+                ++iterations;
             }
         }
 

@@ -25,7 +25,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="CC=clang && CXX=clang++ && OFFSCREEN=ON"
+        - MATRIX_EVAL="CC=clang && CXX=clang++ && OFFSCREEN=OFF"
 
 before_install:
   - eval "${MATRIX_EVAL}"
@@ -69,7 +69,7 @@ script:
   - make -j
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then make SimDriver_coverage -j; fi;
-#  - ctest
+  - ctest
   - ./SimDriverTests
 
   - cd ${TRAVIS_BUILD_DIR}
@@ -77,7 +77,7 @@ script:
   - cd cmake-build-release
   - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=${OFFSCREEN} ..
   - make -j
-#  - ctest
+  - ctest
   - ./SimDriverTests
 
 after_success:

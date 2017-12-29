@@ -246,6 +246,7 @@ if (${SIM_BUILD_TESTS})
     enable_testing()
 
     set(TEST_SOURCE_FILES
+            src/testing/SimulationLoopTests.cpp
             src/testing/TemplateCompilationTests.cpp
             )
 
