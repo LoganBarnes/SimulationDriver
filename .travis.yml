@@ -8,19 +8,19 @@ dist: trusty
 
 matrix:
   include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - mesa-utils
-            - xorg-dev
-            - libosmesa6-dev
-            - lcov
-      env:
-        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && OFFSCREEN=ON"
+#    - os: linux
+#      addons:
+#        apt:
+#          sources:
+#            - ubuntu-toolchain-r-test
+#          packages:
+#            - g++-6
+#            - mesa-utils
+#            - xorg-dev
+#            - libosmesa6-dev
+#            - lcov
+#      env:
+#        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && OFFSCREEN=ON"
 
     - os: osx
       osx_image: xcode8
@@ -69,14 +69,16 @@ script:
   - make -j
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then make SimDriver_coverage -j; fi;
-  - ctest
+#  - ctest
+  - ./SimDriverTests
 
   - cd ${TRAVIS_BUILD_DIR}
   - mkdir cmake-build-release
   - cd cmake-build-release
   - cmake -DCMAKE_BUILD_TYPE=Release -DSIM_BUILD_TESTS=ON -DSIM_OFFSCREEN=${OFFSCREEN} ..
   - make -j
-  - ctest
+#  - ctest
+  - ./SimDriverTests
 
 after_success:
   ############################################################################
