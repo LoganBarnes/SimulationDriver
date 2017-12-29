@@ -1,0 +1,61 @@
+version: 1.0.{build}
+
+branches:
+  only:
+  - master
+
+skip_tags: true
+clone_folder: c:\projects\sim-driver
+
+image:
+  - Visual Studio 2017
+
+configuration:
+  - Debug
+  - Release
+
+matrix:
+  fast_finish: true
+
+platform: x64
+
+build:
+  parallel: true # enable MSBuild parallel builds
+  verbosity: minimal
+
+install:
+  ############################################################################
+  # All external dependencies are installed in C:\projects\deps
+  ############################################################################
+  - mkdir C:\projects\deps
+  - cd C:\projects\deps
+
+  ############################################################################
+  # Install a recent CMake
+  ############################################################################
+  - set CMAKE_URL="https://cmake.org/files/v3.9/cmake-3.9.6-win64-x64.zip"
+  - appveyor DownloadFile %CMAKE_URL% -FileName cmake.zip
+  - 7z x cmake.zip -oC:\projects\deps > nul
+  - move C:\projects\deps\cmake-* C:\projects\deps\cmake # Move to a version-agnostic directory
+  - set PATH=C:\projects\deps\cmake\bin;%PATH%
+  - cmake --version
+
+before_build:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - cd C:\projects\sim-driver
+
+build_script:
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DSIM_BUILD_TESTS=ON ..
+  - cmake --build . --config %CONFIGURATION% -- /m
+
+#test_script:
+#  - ctest -C %CONFIGURATION%
+
+notifications:
+  - provider: Email
+    to:
+      - '{{commitAuthorEmail}}'
+    on_build_failure: true
+    on_build_success: false

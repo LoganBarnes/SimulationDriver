@@ -40,7 +40,7 @@ download_project(PROJ glfw
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/glfw/glfw.git
         GIT_TAG master
-        UPDATE_DISCONNECTED 0
+        UPDATE_DISCONNECTED 1
         ${QUIET_FLAG}
         )
 
