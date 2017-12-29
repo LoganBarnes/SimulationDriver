@@ -70,7 +70,7 @@ TEST_F(LoopTimingTest, event_loop_does_not_block_without_window)
 {
     constexpr std::size_t max_iters = 1000;
 
-    double duration = time_it([&] { sim.runAsFastAsPossibleLoop(max_iters); });
+    double duration = time_it([&] { sim.runEventLoop(max_iters); });
 
     auto &child = sim.get_child_sim();
     EXPECT_GT(child.sim_time, duration);
