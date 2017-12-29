@@ -96,7 +96,7 @@ TEST_F(LoopTimingTest, event_loop_holds_until_event)
     auto &child = sim.get_child_sim();
     EXPECT_LT(child.sim_time, duration);
     EXPECT_EQ(max_iters, child.num_updates);
-    EXPECT_NEAR(wait_millis * 1e-3, duration, 5e-4);
+    EXPECT_NEAR(wait_millis * 1e-3, duration, 1e-3);
     // first update is actually time=0.0 so we subtract one
     EXPECT_NEAR((child.num_updates - 1) * child.timestep, child.sim_time, 1e-9);
 }

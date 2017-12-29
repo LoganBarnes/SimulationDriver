@@ -165,7 +165,7 @@ template <typename T>
 std::shared_ptr<GLuint>
 OpenGLHelper::createBuffer(const T *pData, const size_t numElements, const GLenum type, const GLenum usage)
 {
-    std::shared_ptr<GLuint> upBuffer(new GLuint, [](auto pID) {
+    std::shared_ptr<GLuint> upBuffer(new GLuint, [](auto* pID) {
         glDeleteBuffers(1, pID);
         delete pID;
     });
