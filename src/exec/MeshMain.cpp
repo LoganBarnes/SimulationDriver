@@ -6,7 +6,7 @@
 class Simulator
 {
 public:
-    explicit Simulator(int w, int h, sim::SimData *pSimData)
+    explicit Simulator(int w, int h, sim::SimData* pSimData)
         : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}, simData_{*pSimData}
     {
         simData_.camera().setNearPlane(0.1f);
@@ -30,9 +30,8 @@ public:
 
         if (simData_.paused) {
             renderer_.render(a, simData_.camera());
-        }
-        else {
-            sim::Camera &currCam = simData_.camera();
+        } else {
+            sim::Camera& currCam = simData_.camera();
             sim::Camera camera;
 
             glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), currCam.getEyeVector(), a)};
@@ -60,7 +59,7 @@ public:
 
 private:
     sim::MeshRenderer renderer_;
-    sim::SimData &simData_;
+    sim::SimData& simData_;
     sim::Camera prevCam_;
 };
 

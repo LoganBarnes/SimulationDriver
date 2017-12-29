@@ -2,22 +2,19 @@
 
 #include <sim-driver/OpenGLSimulation.hpp>
 
-namespace
-{
+namespace {
 struct FirstSim
 {
 };
 
 struct SecondSim
 {
-    SecondSim(int, int)
-    {}
+    SecondSim(int, int) {}
 };
 
 struct ThirdSim
 {
-    ThirdSim(int, int, sim::SimData *)
-    {}
+    ThirdSim(int, int, sim::SimData*) {}
 };
 
 } // namespace

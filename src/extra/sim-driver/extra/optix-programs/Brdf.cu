@@ -1,30 +1,30 @@
 #include <sim-driver/extra/OptiXCommon.hpp>
 
 rtDeclareVariable(float3,
-    shading_normal,
-    attribute
+                  shading_normal,
+                  attribute
 
-shading_normal, );
+                      shading_normal, );
 
 rtDeclareVariable(float3,
-    geometric_normal,
-    attribute
+                  geometric_normal,
+                  attribute
 
-geometric_normal, );
+                      geometric_normal, );
 
 rtDeclareVariable(PerRayData, prd_current, rtPayload,
 
-);
+                  );
 
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay,
 
-);
+                  );
 
-rtDeclareVariable(float, t_hit, rtIntersectionDistance,);
+rtDeclareVariable(float, t_hit, rtIntersectionDistance, );
 
-rtDeclareVariable(float, scene_epsilon,,
+rtDeclareVariable(float, scene_epsilon, ,
 
-);
+                  );
 
 RT_PROGRAM
 void closest_hit_normals()

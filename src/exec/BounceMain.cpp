@@ -7,7 +7,7 @@
 class Simulator
 {
 public:
-    explicit Simulator(int, int, sim::SimData *pSimData)
+    explicit Simulator(int, int, sim::SimData* pSimData)
         : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}, simData_{*pSimData}
     {
         simData_.cameraMover.setUsingOrbitMode(true);
@@ -35,9 +35,8 @@ public:
 
         if (simData_.paused) {
             renderer_.render(a, simData_.camera());
-        }
-        else {
-            sim::Camera &currCam = simData_.camera();
+        } else {
+            sim::Camera& currCam = simData_.camera();
             sim::Camera camera;
 
             glm::vec3 eye{glm::mix(prevCam_.getEyeVector(), currCam.getEyeVector(), a)};
@@ -65,7 +64,7 @@ public:
         ImGui::PopStyleVar();
     }
 
-    void keyCallback(GLFWwindow *, int key, int, int action, int, const sim::SimCallbacks<Simulator> &)
+    void keyCallback(GLFWwindow*, int key, int, int action, int, const sim::SimCallbacks<Simulator>&)
     {
         if (key == GLFW_KEY_G && action == GLFW_RELEASE) {
             gravity_ = -gravity_;
@@ -74,7 +73,7 @@ public:
 
 private:
     sim::MeshRenderer renderer_;
-    sim::SimData &simData_;
+    sim::SimData& simData_;
     sim::Camera prevCam_;
 
     glm::mat4 model_{1};

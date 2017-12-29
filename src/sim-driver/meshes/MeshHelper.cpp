@@ -4,23 +4,21 @@
 #include <imgui.h>
 #include <iostream>
 
-namespace sim
-{
-template<typename V>
-MeshHelper<V>::MeshHelper(MeshDataFun dataFun)
-    : dataFun_{std::move(dataFun)}
+namespace sim {
+template <typename V>
+MeshHelper<V>::MeshHelper(MeshDataFun dataFun) : dataFun_{std::move(dataFun)}
 {
     updateData();
 }
 
-template<typename V>
+template <typename V>
 void MeshHelper<V>::setMeshDataFunction(MeshDataFun dataFun)
 {
     dataFun_ = std::move(dataFun);
     updateData();
 }
 
-template<typename V>
+template <typename V>
 bool MeshHelper<V>::configureGui()
 {
     bool mesh_needs_update = false;
@@ -31,8 +29,7 @@ bool MeshHelper<V>::configureGui()
     if (linkDivisions_) {
         mesh_needs_update |= (uDivisions_ != vDivisions_);
         vDivisions_ = uDivisions_;
-    }
-    else {
+    } else {
         mesh_needs_update |= ImGui::SliderInt("V Subdivisions", &vDivisions_, 0, 250);
     }
 
@@ -43,13 +40,13 @@ bool MeshHelper<V>::configureGui()
     return mesh_needs_update;
 }
 
-template<typename V>
-const sim::DrawData<V> &MeshHelper<V>::getMeshData() const
+template <typename V>
+const sim::DrawData<V>& MeshHelper<V>::getMeshData() const
 {
     return data_;
 }
 
-template<typename V>
+template <typename V>
 void MeshHelper<V>::updateData()
 {
     if (dataFun_) {
@@ -57,9 +54,7 @@ void MeshHelper<V>::updateData()
     }
 }
 
-template
-class MeshHelper<sim::PosNormTexVertex>;
-template
-class MeshHelper<sim::PosVertex>;
+template class MeshHelper<sim::PosNormTexVertex>;
+template class MeshHelper<sim::PosVertex>;
 
 } // namespace sim

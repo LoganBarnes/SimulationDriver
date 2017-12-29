@@ -1,25 +1,24 @@
 #include <sim-driver/meshes/MeshHelper.hpp>
 #include <glm/gtc/constants.hpp>
 
-namespace sim
-{
+namespace sim {
 
-template<typename V>
+template <typename V>
 V create_sphere_vertex(glm::vec3 p, glm::vec2 t);
 
-template<>
+template <>
 sim::PosNormTexVertex create_sphere_vertex(glm::vec3 p, glm::vec2 t)
 {
     return {{p.x, p.y, p.z}, {p.x, p.y, p.z}, {t.x, t.y}};
 }
 
-template<>
+template <>
 sim::PosVertex create_sphere_vertex(glm::vec3 p, glm::vec2)
 {
     return {{p.x, p.y, p.z}};
 }
 
-template<typename V>
+template <typename V>
 sim::DrawData<V> create_sphere_mesh_data(int u_divisions, int v_divisions)
 {
     sim::DrawData<V> data{};

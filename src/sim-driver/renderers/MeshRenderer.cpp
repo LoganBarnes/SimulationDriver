@@ -2,17 +2,14 @@
 #include <imgui.h>
 #include <iostream>
 
-namespace sim
-{
+namespace sim {
 
-MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh)
-    : mesh_{std::move(mesh)}
+MeshRenderer::MeshRenderer(sim::PosNormTexMesh mesh) : mesh_{std::move(mesh)}
 {
-    renderer_.setDataFun([&]() -> const sim::DrawData<PosNormTexVertex> &
-                         { return mesh_.getMeshData(); });
+    renderer_.setDataFun([&]() -> const sim::DrawData<PosNormTexVertex>& { return mesh_.getMeshData(); });
 }
 
-void MeshRenderer::render(float alpha, const Camera &camera) const
+void MeshRenderer::render(float alpha, const Camera& camera) const
 {
     renderer_.onRender(alpha, &camera);
 }
@@ -40,7 +37,7 @@ void MeshRenderer::resize(int width, int height)
     renderer_.onResize(width, height);
 }
 
-void MeshRenderer::setModelMatrix(const glm::mat4 &modelMatrix)
+void MeshRenderer::setModelMatrix(const glm::mat4& modelMatrix)
 {
     renderer_.setModelMatrix(modelMatrix);
 }

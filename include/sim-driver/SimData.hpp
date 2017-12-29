@@ -3,16 +3,14 @@
 #include <sim-driver/CameraMover.hpp>
 #include <string>
 
-namespace sim
-{
+namespace sim {
 
 struct SimData
 {
     CameraMover cameraMover{Camera{}};
     bool paused{false};
 
-    Camera &camera()
-    { return cameraMover.camera; }
+    Camera& camera() { return cameraMover.camera; }
 };
 
 struct SimInitData

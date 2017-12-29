@@ -3,10 +3,9 @@
 #include <sim-driver/OpenGLHelper.hpp>
 #include <sim-driver/renderers/RendererHelper.hpp>
 
-namespace sim
-{
+namespace sim {
 
-template<typename V>
+template <typename V>
 class MeshHelper
 {
 public:
@@ -18,7 +17,7 @@ public:
 
     void setMeshDataFunction(MeshDataFun dataFun);
 
-    const sim::DrawData<V> &getMeshData() const;
+    const sim::DrawData<V>& getMeshData() const;
 
     void updateData();
 

@@ -3,24 +3,23 @@
 #include <glad/glad.h>
 #include <memory>
 
-namespace sim
-{
+namespace sim {
 
 struct VAOElement;
 struct VAOSettings;
 
 class OpenGLHelper;
 
-template<typename T>
+template <typename T>
 class TCamera;
 
 using Camera = TCamera<float>;
 using CameraD = TCamera<double>;
 
-template<typename T>
+template <typename T>
 class RendererHelper;
 
-template<typename T>
+template <typename T>
 struct DrawData;
 
 struct PosNormTexVertex;

@@ -24,36 +24,36 @@
 #include <optixu/optixu_aabb_namespace.h>
 
 rtDeclareVariable(float3,
-    boxmin,
+                  boxmin,
 
-, );
+                  , );
 
 rtDeclareVariable(float3,
-    boxmax,
+                  boxmax,
 
-, );
+                  , );
 
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay,
 
-);
+                  );
 
 rtDeclareVariable(float3,
-    texcoord,
-    attribute
+                  texcoord,
+                  attribute
 
-texcoord, );
-
-rtDeclareVariable(float3,
-    geometric_normal,
-    attribute
-
-geometric_normal, );
+                      texcoord, );
 
 rtDeclareVariable(float3,
-    shading_normal,
-    attribute
+                  geometric_normal,
+                  attribute
 
-shading_normal, );
+                      geometric_normal, );
+
+rtDeclareVariable(float3,
+                  shading_normal,
+                  attribute
+
+                      shading_normal, );
 
 ///
 /// \brief boxnormal
@@ -110,6 +110,6 @@ void box_intersect(int)
 RT_PROGRAM
 void box_bounds(int, float result[6])
 {
-    optix::Aabb *pAabb = reinterpret_cast<optix::Aabb *>(result);
+    optix::Aabb* pAabb = reinterpret_cast<optix::Aabb*>(result);
     pAabb->set(boxmin, boxmax);
 }

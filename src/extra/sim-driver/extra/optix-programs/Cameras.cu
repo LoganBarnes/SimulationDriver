@@ -2,28 +2,28 @@
 
 rtDeclareVariable(PerRayData, prd_current, rtPayload,
 
-);
+                  );
 
 rtDeclareVariable(optix::Ray, ray, rtCurrentRay,
 
-);
+                  );
 
 rtDeclareVariable(uint2, launch_index, rtLaunchIndex,
 
-);
+                  );
 
-rtDeclareVariable(unsigned int, surface_ray_type,,
+rtDeclareVariable(unsigned int, surface_ray_type, ,
 
-);
+                  );
 
-rtDeclareVariable(float, scene_epsilon,,
+rtDeclareVariable(float, scene_epsilon, ,
 
-);
+                  );
 
 rtDeclareVariable(rtObject,
-    top_object,
+                  top_object,
 
-, );
+                  , );
 
 rtBuffer<float4, 2> output_buffer;
 
@@ -45,9 +45,9 @@ void pinhole_camera()
 } // pinhole_camera
 
 rtDeclareVariable(float3,
-    bg_color,
+                  bg_color,
 
-, );
+                  , );
 
 RT_PROGRAM
 void miss()
@@ -56,9 +56,9 @@ void miss()
 }
 
 rtDeclareVariable(float3,
-    error_color,
+                  error_color,
 
-, );
+                  , );
 
 RT_PROGRAM
 void exception()

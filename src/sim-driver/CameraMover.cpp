@@ -8,15 +8,14 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <iostream>
 
-namespace sim
+namespace sim {
+
+template <typename T>
+TCameraMover<T>::TCameraMover(TCamera<T> cam) : camera{std::move(cam)}
 {
+}
 
-template<typename T>
-TCameraMover<T>::TCameraMover(TCamera<T> cam)
-    : camera{std::move(cam)}
-{}
-
-template<typename T>
+template <typename T>
 void TCameraMover<T>::yaw(T angleDegrees)
 {
     if (usingOrbitMode_) {
@@ -25,7 +24,7 @@ void TCameraMover<T>::yaw(T angleDegrees)
     }
 }
 
-template<typename T>
+template <typename T>
 void TCameraMover<T>::pitch(T angleDegrees)
 {
     if (usingOrbitMode_) {
@@ -36,7 +35,7 @@ void TCameraMover<T>::pitch(T angleDegrees)
     }
 }
 
-template<typename T>
+template <typename T>
 void TCameraMover<T>::zoom(T scale)
 {
     if (usingOrbitMode_) {
@@ -50,64 +49,64 @@ void TCameraMover<T>::zoom(T scale)
     }
 }
 
-template<typename T>
+template <typename T>
 bool TCameraMover<T>::isUsingOrbitMode() const
 {
     return usingOrbitMode_;
 }
-template<typename T>
+template <typename T>
 T TCameraMover<T>::getOrbitOffsetDistance() const
 {
     return orbitOffsetDistance_;
 }
-template<typename T>
-const glm::tvec3<T> &TCameraMover<T>::getOrbitOrigin() const
+template <typename T>
+const glm::tvec3<T>& TCameraMover<T>::getOrbitOrigin() const
 {
     return orbitOrigin_;
 }
-template<typename T>
+template <typename T>
 T TCameraMover<T>::getOrbitYawAngle() const
 {
     return orbitYawAngle_;
 }
-template<typename T>
+template <typename T>
 T TCameraMover<T>::getOrbitPitchAngle() const
 {
     return orbitPitchAngle_;
 }
 
-template<typename T>
+template <typename T>
 void TCameraMover<T>::setUsingOrbitMode(bool usingOrbitMode)
 {
     usingOrbitMode_ = usingOrbitMode;
     updateOrbitSettings();
 }
-template<typename T>
+template <typename T>
 void TCameraMover<T>::setOrbitOffsetDistance(T orbitOffsetDistance)
 {
     orbitOffsetDistance_ = orbitOffsetDistance;
     updateOrbitSettings();
 }
-template<typename T>
-void TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T> &orbitOrigin)
+template <typename T>
+void TCameraMover<T>::setOrbitOrigin(const glm::tvec3<T>& orbitOrigin)
 {
     orbitOrigin_ = orbitOrigin;
     updateOrbitSettings();
 }
-template<typename T>
+template <typename T>
 void TCameraMover<T>::setOrbitYawAngle(T orbitYawAngle)
 {
     orbitYawAngle_ = orbitYawAngle;
     updateOrbitSettings();
 }
-template<typename T>
+template <typename T>
 void TCameraMover<T>::setOrbitPitchAngle(T orbitPitchAngle)
 {
     orbitPitchAngle_ = orbitPitchAngle;
     updateOrbitSettings();
 }
 
-template<typename T>
+template <typename T>
 void TCameraMover<T>::updateOrbitSettings()
 {
     if (usingOrbitMode_) {
@@ -125,10 +124,8 @@ void TCameraMover<T>::updateOrbitSettings()
     }
 }
 
-template
-class TCameraMover<float>;
+template class TCameraMover<float>;
 
-template
-class TCameraMover<double>;
+template class TCameraMover<double>;
 
 } // namespace sim
