@@ -8,7 +8,7 @@ option(SIM_BUILD_CUDA "Build CUDA files if available" OFF)
 option(SIM_BUILD_TESTS "Build SimulationDriver unit tests" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
-option(SIM_OFFSCREEN "Render offscreen using EGL" OFF)
+option(SIM_OFFSCREEN "Render offscreen using OS Mesa" OFF)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
@@ -218,7 +218,7 @@ endif ()
 
 if (${SIM_BUILD_TESTS})
     # Download and unpack googletest at configure time
-    download_project(PROJ gtest
+    download_project(PROJ googletest
             PREFIX thirdparty
             GIT_REPOSITORY https://github.com/google/googletest.git
             GIT_TAG release-1.8.0
@@ -230,7 +230,11 @@ if (${SIM_BUILD_TESTS})
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
     # compile googletest with current project
-    add_subdirectory(${gtest_SOURCE_DIR}/googletest ${gtest_BINARY_DIR}/googletest)
+    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+    target_include_directories(gmock_main SYSTEM BEFORE INTERFACE
+            "${googletest_SOURCE_DIR}/googletest/include"
+            "${googletest_SOURCE_DIR}/googlemock/include")
 
     # add test coverage capabilities
     if (CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -266,7 +270,7 @@ if (${SIM_BUILD_TESTS})
             )
 
     add_executable(SimDriverTests ${TEST_SOURCE_FILES})
-    target_link_libraries(SimDriverTests SimDriver gtest_main thirdparty ${PROFILE_LIBS})
+    target_link_libraries(SimDriverTests SimDriver gmock_main thirdparty ${PROFILE_LIBS})
     target_compile_options(SimDriverTests PRIVATE ${INTENSE_FLAGS} ${PROFILE_FLAGS})
     add_test(NAME sim-driver-test COMMAND SimDriverTests)
 endif ()
