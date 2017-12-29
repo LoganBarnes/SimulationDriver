@@ -39,7 +39,7 @@ configure_file(src/ShaderConfig.hpp.in ${CMAKE_BINARY_DIR}/sim-driver/ShaderConf
 download_project(PROJ glfw
         PREFIX thirdparty
         GIT_REPOSITORY https://github.com/glfw/glfw.git
-        GIT_TAG latest
+        GIT_TAG master
         UPDATE_DISCONNECTED 0
         ${QUIET_FLAG}
         )

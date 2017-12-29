@@ -32,7 +32,6 @@ int WindowManager::create_window(const std::string &title, int width, int height
 {
 
 #ifdef OFFSCREEN
-    std::cout << "MESA!" << std::endl;
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_OSMESA_CONTEXT_API);
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
