@@ -9,6 +9,7 @@ option(SIM_BUILD_TESTS "Build SimulationDriver unit tests" OFF)
 option(SIM_BUILD_EXAMPLES "Build visual executables" ON)
 option(SIM_VERBOSE_OUTPUT "Print verbose configuration updates" OFF)
 option(SIM_OFFSCREEN "Render offscreen using OS Mesa" OFF)
+option(SIM_USE_DEV_FLAGS "Compile with all the flags" OFF)
 
 if (${SIM_BUILD_EXAMPLES})
     message("-- Building visual executables")
@@ -24,7 +25,7 @@ endif ()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 if (${SIM_OFFSCREEN})
     add_definitions(-DOFFSCREEN)
-endif()
+endif ()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -102,9 +103,12 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options(thirdparty BEFORE PRIVATE -w)
 endif ()
 
-set(COMPILER_FLAGS ${CMAKE_CXX_FLAGS})
 if (NOT MSVC)
-    set(COMPILER_FLAGS "${COMPILER_FLAGS} -Wall -Wextra -Werror -pedantic")
+    set(INTENSE_FLAGS -Wall -Wextra -Winit-self -Winit-self
+            -Wold-style-cast -Woverloaded-virtual -Werror
+            -Wmissing-declarations -pedantic -Wuninitialized)
+else ()
+    set(INTENSE_FLAGS -WX)
 endif ()
 
 #########################
@@ -154,7 +158,10 @@ add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
 target_link_libraries(SimDriver thirdparty)
-set_target_properties(SimDriver PROPERTIES COMPILE_FLAGS ${COMPILER_FLAGS})
+
+if (${SIM_USE_DEV_FLAGS})
+    target_compile_options(SimDriver PUBLIC ${INTENSE_FLAGS})
+endif ()
 
 find_package(CUDA)
 if (${SIM_BUILD_CUDA} AND CUDA_FOUND)

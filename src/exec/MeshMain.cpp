@@ -6,7 +6,7 @@
 class Simulator
 {
 public:
-    explicit Simulator(int w, int h, sim::SimData *pSimData)
+    explicit Simulator(int, int, sim::SimData *pSimData)
         : renderer_{sim::PosNormTexMesh(sim::create_sphere_mesh_data<sim::PosNormTexVertex>)}, simData_{*pSimData}
     {
         simData_.camera().setNearPlane(0.1f);
