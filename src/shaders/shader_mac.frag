@@ -19,6 +19,8 @@ uniform float roughness = 0.2;
 uniform vec3  IOR = vec3(1.5145, 1.5208, 1.5232);
 uniform vec3  eye;
 
+uniform float alpha = 1.0;
+
 layout(location = 0) out vec4 outColor;
 
 
@@ -142,5 +144,5 @@ void main(void)
         break;
     }
 
-    outColor = vec4(color, 1.0);
+    outColor = vec4(color, alpha);
 }
