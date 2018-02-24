@@ -98,7 +98,7 @@ void main(void)
 {
     vec3 color = vec3(1);
 
-    vec3 normal = gl_FrontFacing ? vertex.world_normal : -vertex.world_normal;
+    vec3 normal = normalize(gl_FrontFacing ? vertex.world_normal : -vertex.world_normal);
 
     switch(displayMode)
     {
