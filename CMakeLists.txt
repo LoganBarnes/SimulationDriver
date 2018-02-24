@@ -135,28 +135,28 @@ set(SOURCE_FILES
 
 set(INCLUDE_FILES
         # meshes
-        include/sim-driver/meshes/MeshFunctions.hpp
-        include/sim-driver/meshes/MeshHelper.hpp
+        src/sim-driver/meshes/MeshFunctions.hpp
+        src/sim-driver/meshes/MeshHelper.hpp
         # renderers
-        include/sim-driver/renderers/MeshRenderer.hpp
-        include/sim-driver/renderers/RendererHelper.hpp
+        src/sim-driver/renderers/MeshRenderer.hpp
+        src/sim-driver/renderers/RendererHelper.hpp
         # sim-driver
-        include/sim-driver/CallbackWrapper.hpp
-        include/sim-driver/Camera.hpp
-        include/sim-driver/CameraMover.hpp
-        include/sim-driver/OpenGLHelper.hpp
-        include/sim-driver/OpenGLSimulation.hpp
-        include/sim-driver/OpenGLTypes.hpp
-        include/sim-driver/SimCallbacks.hpp
-        include/sim-driver/SimData.hpp
-        include/sim-driver/SimDriver.hpp
-        include/sim-driver/WindowManager.hpp
+        src/sim-driver/CallbackWrapper.hpp
+        src/sim-driver/Camera.hpp
+        src/sim-driver/CameraMover.hpp
+        src/sim-driver/OpenGLHelper.hpp
+        src/sim-driver/OpenGLSimulation.hpp
+        src/sim-driver/OpenGLTypes.hpp
+        src/sim-driver/SimCallbacks.hpp
+        src/sim-driver/SimData.hpp
+        src/sim-driver/SimDriver.hpp
+        src/sim-driver/WindowManager.hpp
         )
+# can copy these to an include location on install when that is implemented
 
 add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
-target_include_directories(SimDriver PUBLIC include ${CMAKE_BINARY_DIR} PRIVATE src)
+target_include_directories(SimDriver PUBLIC ${CMAKE_BINARY_DIR} src)
 target_link_libraries(SimDriver thirdparty)
 
 if (${SIM_USE_DEV_FLAGS})
