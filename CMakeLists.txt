@@ -152,15 +152,11 @@ set(INCLUDE_FILES
         src/sim-driver/SimDriver.hpp
         src/sim-driver/WindowManager.hpp
         )
-
-foreach (include_file ${INCLUDE_FILES})
-    string(REPLACE "src" "" local_path ${include_file})
-    configure_file(${include_file} ${CMAKE_BINARY_DIR}/${local_path} COPYONLY)
-endforeach ()
+# can copy these to an include location on install when that is implemented
 
 add_library(SimDriver ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories(SimDriver PUBLIC ${CMAKE_BINARY_DIR} PRIVATE src)
+target_include_directories(SimDriver PUBLIC ${CMAKE_BINARY_DIR} src)
 target_link_libraries(SimDriver thirdparty)
 
 if (${SIM_USE_DEV_FLAGS})
